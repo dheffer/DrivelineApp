@@ -9,16 +9,15 @@
 ---
 
 ## Key Features:
-- [] A login page using OAuth to create a profile for a user
-- [] Users will be able to buy, sell and rent their vehicle(s) on the Marketplace.
-- [] Users can view the service history, rental history, upcoming services, and general vehicle information.
-- [] Users will have a profile, and a ‘My Garage’ page containing their personal information and information regarding their vehicle(s).
-- [] Marketplace will display a large list of all vehicles available for rent or for sale.
-- [] Marketplace will also contain a variety of filtering options such is ‘Available now’, ‘Rent’, ‘Buy’, ‘Mileage’, YYMET,
-- [] Profile will contain basic information about the user/seller, 
-- [] ‘Garage’ > ‘Vehicle Overview’ > ‘Edit Vehicle Details’
-- [] ‘Garage’ > ‘Manage Garage’ > ‘Add/Remove/Invite Other Users’
-- [] ‘Garage’ > Filter by vehicle status, ie.: Listed, Unlisted, Shared, Lent,
-- [] ‘Garage’ will allow users to add their personal vehicles (not for sale/rent), to view information / upcoming maintenance
-- [] ‘Marketplace’ > ‘’
-- [] Each user will have access to a settings page, allowing them to configure aspects of their profile and settings for the app (light & dark mode, anyone?), and the ability to choose what info they wish to display publicly
+- [ ] A login page using OAuth to create a profile for a user
+- [ ] Users will be able to buy, sell and rent their vehicle(s) on the Marketplace.
+- [ ] Users can view the service history, rental history, upcoming services, and general vehicle information.
+- [ ] Users will have a profile, and a ‘My Garage’ page containing their personal information and information regarding their vehicle(s).
+- [ ] Marketplace will display a large list of all vehicles available for rent or for sale.
+- [ ] Marketplace will also contain a variety of filtering options such is ‘Available now’, ‘Rent’, ‘Buy’, ‘Mileage’, YYMET,
+- [ ] Profile will contain basic information about the user/seller, 
+- [ ] ‘Garage’ > ‘Vehicle Overview’ > ‘Edit Vehicle Details’
+- [ ] ‘Garage’ > ‘Manage Garage’ > ‘Add/Remove/Invite Other Users’
+- [ ] ‘Garage’ > Filter by vehicle status, ie.: Listed, Unlisted, Shared, Lent,
+- [ ] ‘Garage’ will allow users to add their personal vehicles (not for sale/rent), to view information / upcoming maintenance
+- [ ] Each user will have access to a settings page, allowing them to configure aspects of their profile and settings for the app (light & dark mode, anyone?), and the ability to choose what info they wish to display publicly
