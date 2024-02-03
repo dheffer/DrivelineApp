@@ -12,7 +12,6 @@
 - [ ] Users will have a profile, and a ‘My Garage’ page containing their personal information and information regarding their vehicle(s).
 - [ ] Users will be able to upload their vehicles to their garage
 - [ ] Users can view the service history, upcoming services, and general vehicle information when selecting a vehicle in their garage
-- [ ] Profile will contain basic information about the user/seller
 - [ ] ‘Garage’ > ‘Vehicle Overview’ > ‘Edit Vehicle Details’
 - [ ] ‘Garage’ > ‘Manage Garage’ > ‘Add/Remove Vehicle’
 - [ ] Each user will have access to a settings page, allowing them to configure aspects of their profile and settings for the app (light & dark mode, anyone?), and the ability to choose what info they wish to display publicly
