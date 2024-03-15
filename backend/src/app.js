@@ -2,7 +2,7 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import bodyParser from 'body-parser';
-import jwt from 'jsonwebtoken';
+import jwt from 'jsonwebtoken'; // TODO - add a jsonwebtoken package or module
 
 const app = express()
 
