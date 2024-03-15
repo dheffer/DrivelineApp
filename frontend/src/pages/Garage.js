@@ -1,13 +1,14 @@
 import { BrowserRouter, Routes, Route } from "react-router-dom";
 import GarageNavbar from "./GarageNavbar";
+import AddRemoveNavbar from "./AddRemoveNavbar";
 
 function Garage() {
   return (
     <div>
-      <GarageNavbar />
+      <AddRemoveNavbar />
       <Routes>
-        <Route path="/garage/vehicle-info" />
-        <Route path="/garage/vehicle-history" />
+        <Route path="/garage/add" />
+        <Route path="/garage/remove" />
       </Routes>
     </div>
   );

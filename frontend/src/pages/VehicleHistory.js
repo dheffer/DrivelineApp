@@ -13,8 +13,8 @@ function VehicleHistory() {
 
             <UploadNavbar />
             <Routes>
-                <Route path="/garage/vehicle-info/upload" />
-                <Route path="/garage/vehicle-info/manual" />
+                <Route path="/garage/vehicle-history/upload" />
+                <Route path="/garage/vehicle-history/manual" />
             </Routes>
 
             <table>
