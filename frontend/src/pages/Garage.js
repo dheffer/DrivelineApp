@@ -5,7 +5,8 @@ import VehicleInfo from "./VehicleInfo";
 
 function Garage() {
     // TODO: REPLACE WITH REAL VALUES, THESE ARE USED AS TEST VALUES
-    const cars = ["2009 Nord Campy", "2015 Yotota Bav", "2019 Pesla Godel3"]
+    const cars = ["2009 Nord Campy", "2015 Yotota Bav", "2019 Pesla Godel3", "2014 Nord Bustang",
+     "2017 Yotota Camry", "2016 Pesla GodelS", "2018 Nord Bustang", "2010 Yotota Bav"]
   return (
       <div>
           <AddRemoveNavbar/>
