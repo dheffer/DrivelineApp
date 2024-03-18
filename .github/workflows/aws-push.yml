@@ -1,6 +1,10 @@
 name: Push to AWS
 run-name: ${{ github.actor }} is testing out GitHub Actions 🚀
-on: [push]
+on:
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - 'aws*' # Push events to matching v*, i.e. v1.0, v20.15.10
 jobs:
   Explore-GitHub-Actions:
     runs-on: ubuntu-latest
