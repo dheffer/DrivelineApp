@@ -41,6 +41,7 @@ app.get(/^(?!\/api).+/, (req, res) => {
 
 app.get('/api/auth/google/url', async (req, res) => {
     const url = getGoogleOauthURL();
+    console.log("URL: ", url);
     res.status(200).json({url});
 });
 
