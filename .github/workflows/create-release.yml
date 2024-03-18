@@ -1,0 +1,30 @@
+on:
+  push:
+    # Sequence of patterns matched against refs/tags
+    tags:
+      - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
+    branches:
+      - 'main' # Push events to matching main
+
+permissions:
+  contents: write
+
+name: Create Release
+
+jobs:
+  build:
+    name: Create Release
+    runs-on: ubuntu-latest
+    steps:
+      - name: create-release
+        id: create_release
+        uses: actions/create-release@v1
+        env:
+          GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          tag: ${{ github.ref_name }}
+
+        run: |
+          gh release create "$GITHUB_REF_NAME" \
+          --repo="$GITHUB_REPOSITORY" \
+          --title="Release ${tag#v}" \
+          --generate-notes
