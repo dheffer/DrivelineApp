@@ -19,5 +19,5 @@ jobs:
         name: Auto Tag
         with:
           github-token: ${{ secrets.GITHUB_TOKEN}}
-          tag_prefix: "v"
+          with-v: true
           version: "${{ steps.previous_step.outputs.version }}"
