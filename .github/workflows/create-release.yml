@@ -4,8 +4,9 @@ on:
     tags:
       - 'v*' # Push events to matching v*, i.e. v1.0, v20.15.10
   pull_request:
-    types:
-      - closed
+    branches:
+      - main
+    types: [closed]
 
 permissions:
   contents: write
@@ -20,9 +21,6 @@ jobs:
 
     steps:
       - uses: actions/checkout@v1
-      - name: Exit if not on main branch
-        if: endsWith(github.ref, 'main') == false
-        run: exit -1
 
       - uses: "marvinpinto/action-automatic-releases@latest"
         with:
