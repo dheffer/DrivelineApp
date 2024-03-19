@@ -1,23 +1,19 @@
-name: Create Tag
-on:
-  push
+name: Auto.Tag
 
-permissions:
-  contents: write
+on:
+  - push
 
 jobs:
   tag:
-    name: "New Tag"
-    runs-on: "ubuntu-latest"
-
+    runs-on: ubuntu-latest
+    strategy:
+      matrix:
+        node-version:
+          - 12
+          - 21.x
     steps:
-      - name: Checkout
-        uses: actions/checkout@v2
+      - uses: phish108/autotag-action@v1.1.55
         with:
-          fetch-depth: 0
-
-      - name: tag-version
-        id: version
-        uses: juliansangillo/tag-version@v1
-        with:
-          production-branch: main
+          github-token: ${{ secrets.GITHUB_TOKEN}}
+          release-branch: "main"
+          issue-labels: "enhancement"
