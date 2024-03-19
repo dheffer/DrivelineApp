@@ -10,6 +10,11 @@ jobs:
       matrix:
         node-version: [21.x]
     steps:
+      - uses: actions/checkout@main
+      - name: Use node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
       - uses: phish108/autotag-action@v1.1.55
         name: Auto Tag
         with:
