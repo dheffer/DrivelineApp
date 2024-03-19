@@ -1,4 +1,3 @@
-
 import express, { response } from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
@@ -8,12 +7,11 @@ import { getGoogleOauthURL } from './OauthClient.js';
 import { oauthClient } from './OauthClient.js';
 import 'dotenv/config'
 
-console.log("PROCESS APP PAGE"+process.env.GOOGLE_CLIENT_ID)
-
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 
-
+console.log("\n\nPROCESS APP PAGE"+CLIENT_ID)
+console.log("PROCESS APP PAGE"+CLIENT_SECRET)
 
 //import jwt from 'jsonwebtoken'; // TODO - add a jsonwebtoken package or module
 
