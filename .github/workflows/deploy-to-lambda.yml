@@ -1,0 +1,5 @@
+#name: Deploy to AWS Lambda
+#on:
+#  release:
+#    types: [published]
+#jobs:
