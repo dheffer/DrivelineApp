@@ -1,6 +1,0 @@
-name: Deploy to AWS Lambda
-on:
-  push:
-    branches:
-      - cool-feature
-jobs:
