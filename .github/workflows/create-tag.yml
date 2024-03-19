@@ -8,12 +8,9 @@ jobs:
     runs-on: ubuntu-latest
     strategy:
       matrix:
-        node-version:
-          - 12
-          - 21.x
+        node-version: [21.x]
     steps:
       - uses: phish108/autotag-action@v1.1.55
+        name: Auto Tag
         with:
           github-token: ${{ secrets.GITHUB_TOKEN}}
-          release-branch: "main"
-          issue-labels: "enhancement"
