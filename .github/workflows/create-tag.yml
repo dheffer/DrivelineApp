@@ -1,10 +1,9 @@
+name: Create Tag
 on:
   push
 
 permissions:
   contents: write
-
-name: Create Tag
 
 jobs:
   tag:
