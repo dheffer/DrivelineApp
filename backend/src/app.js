@@ -2,7 +2,10 @@ import express from 'express';
 import path from 'path';
 import { fileURLToPath } from 'url';
 import bodyParser from 'body-parser';
-import jwt from 'jsonwebtoken'; // TODO - add a jsonwebtoken package or module
+// import jwt from 'jsonwebtoken'; // TODO - add a jsonwebtoken package or module
+import * as jwt from 'jsonwebtoken'
+import mongo from "./mongo.js";
+//import 'dotenv/config'
 
 const app = express()
 
@@ -31,4 +34,5 @@ app.get(/^(?!\/api).+/, (req, res) => {
 
 app.listen(port, () => {
     console.log(`Predictive Vehicle Maintenance app listening on port ${port}`)
+    console.log(mongo)
 })
