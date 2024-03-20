@@ -8,6 +8,7 @@ import UploadVehicleHistory from "./UploadVehicleHistory";
 import ManualVehicleHistory from "./ManualVehicleHistory";
 import AddVehicle from "./AddVehicle";
 import RemoveVehicle from "./RemoveVehicle";
+import Settings from "./Settings";
 
 function App() {
   return (
@@ -27,7 +28,7 @@ function App() {
         <Route path="/garage/vehicle-history/upload" element={<UploadVehicleHistory />} />
         <Route path="/garage/vehicle-history/manual" element={<ManualVehicleHistory />} />
 
-        <Route path="/settings" />
+        <Route path="/settings" element={<Settings />}/>
       </Routes>
     </div>
     </BrowserRouter>

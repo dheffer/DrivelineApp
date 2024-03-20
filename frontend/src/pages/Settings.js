@@ -1,3 +1,5 @@
+import {Link, Routes, Route} from "react-router-dom";
+
 
 export const Settings = () => {
     return (
@@ -8,3 +10,5 @@ export const Settings = () => {
         </div>
     );
 }
+
+export default Settings;
