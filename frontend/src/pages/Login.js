@@ -1,38 +1,34 @@
-import { useState } from 'react';
+import { useEffect, useState } from 'react';
+import { useSearchParams } from 'react-router-dom';
+import { useNavigate } from 'react-router-dom';
 
 
 export const Login = () => {
-    const [email, setEmail] = useState('');
-    const [password, setPassword] = useState('');
+    const [googleOauthURL, setGoogleOauthURL] = useState('');
+    const [searchParams, setSearchParams] = useSearchParams();
 
-    const onLoginClick = async () => {
-    const requestOptions = {
-        method: "GET",
-        redirect: "follow",
-    }
+    let navigate = useNavigate();
 
-    fetch("/api/login", requestOptions)
-    .then((response) => response.json())
-    .then((result) => {
-        console.log(result);
-        localStorage.setItem("token", result.token);
-    })
-    .catch((error) => console.error(error));
-};
+    useEffect( () => {
+        const token = searchParams.get('token');
+        if(token) {
+            localStorage.setItem('token', token);
+            navigate('/');
+        }
+    }, [])
 
-    return (
-        <div>
-        <h1>Login</h1>
-        <form>
-            <input value={email} onChange={e => setEmail(e.target.value)}
-            type="text" placeholder="info@gmail.ca" />
+    useEffect( () => {
+            fetch("/api/auth/google/url")
+            .then( response => response.json())
+            .then( data => setGoogleOauthURL(data.url))
+            .catch( e => {
+                console.log('error');
+                console.log(e.message);
+                localStorage.clear()
+            })
+    }, []);
 
-            <input value={password} onChange={e => setPassword(e.target.value)} 
-            type="password" placeholder="Password" />
-            <button onClick={onLoginClick}>Login</button>
-        </form>
-        </div>
-    );
-    }
+    return <button disabled={!googleOauthURL} onClick={() => window.location.href = googleOauthURL}>Click to Login to Google</button>
+}
 
     export default Login;
