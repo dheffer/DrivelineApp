@@ -1,8 +1,8 @@
 import { google } from 'googleapis';
-// import { config as dotenvConfig } from 'dotenv';
+import 'dotenv/config'
 
-// dotenvConfig();
-console.log("PROCESS"+process.env)
+
+console.log("PROCESS OAUTH "+process.env.GOOGLE_CLIENT_ID)
 
 
 export const oauthClient = new google.auth.OAuth2(

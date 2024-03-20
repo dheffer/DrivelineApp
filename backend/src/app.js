@@ -35,14 +35,15 @@ const getAccessAndBearerTokenUrl = (access_token) => {
 }
 
 app.get( '/api/auth/google/callback', async (req, res) => {
-    console.log("hit Callback Route")
+    console.log("Hit callback route");
 
     const { code } = req.query;
 
-    console.log("code: ", code);
+    console.log(code);
 
     const { tokens } = await oauthClient.getToken(code);
-    console.log("token: ", tokens);
+
+    console.log(tokens);
 
     const url = getAccessAndBearerTokenUrl(tokens.access_token);
 
@@ -51,32 +52,34 @@ app.get( '/api/auth/google/callback', async (req, res) => {
     myHeaders.append("Authorization", bearerToken);
 
     const requestOptions = {
-        method: 'GET',
+        method: "GET",
         headers: myHeaders,
-        redirect: 'follow'
+        redirect: "follow"
     };
 
     fetch(url, requestOptions)
         .then((response) => response.json())
-        .then((result) => {
-            console.log(result);
-            console.log("CLIENT ID " + CLIENT_ID);
-            console.log("CLIENT SECRET " + CLIENT_SECRET);
-            jwt.sign( {"name":result.name, "email":result.email, "accountId":result.id}, JWTSecret, {expiresIn: '2d'}, (err, token) => 
-            {
+        .then((result) => updateOrCreateUserFromOauth(result))
+        .then((user) => {
+            console.log(user)
+            jwt.sign( {"name":user.name, "email":user.email, "accountId":user.id}, JWTSecret, {expiresIn: '2d'}, (err, token) => {
                 if(err) {
                     res.status(500).json(err);
                 }
                 res.redirect(`http://localhost:3000/login?token=${token}`);
-            })
-            .catch((error) => {
-                console.log('error', error);
-                res.status(500).json(error);
             });
         })
-});
+        .catch((error) => 
+         {
+            console.error(error);
+            res.status(500).json(err);
+         });
+})
 
 app.get('/api/auth/google/url', async (req, res) => {
+    console.log("hit /api/auth/google/url")
+    console.log("CLIENT ID " + CLIENT_ID);
+    console.log("CLIENT SECRET " + CLIENT_SECRET);
     res.status(200).json({url: googleOAuthURL});
 });
 
@@ -84,15 +87,30 @@ app.get(/^(?!\/api).+/, (req, res) => {
     res.sendFile(path.join(__dirname, '../build/index.html'));
 })
 
-//TEST get
-app.get('/api/users', async (req, res) => {
-    const users = [
-        { id: 1, name: "Brandon"},
-        { id: 2, name: "Delaney"},
-        { id: 3, name: "Noah"}
-    ]
-        res.status(200).json(users);
-});
+const updateOrCreateUserFromOauth = async (oauthUserInfo) => {
+    const {
+        email,
+        name
+    } = oauthUserInfo;
+
+    console.log("OAUTH USER INFO: " + email + " " + name);
+
+    // const database = client.db("PredictiveVehicleMaintenance");
+    // const collection = database.collection("users");
+
+    // const existingUser = await users.findOne({email})
+
+    //if(existingUser) {
+        // const result = await users.findOneAndUpdate({email})
+            //{ $set: {name, email}},
+            //{ returnDocument: "after"}
+        //);
+        //return result;
+    //} else {
+        // const result = await users.insertOne({name, email});
+        //return { email, name, _id: result.insertedId };
+
+    }
 
 
 app.listen(port, () => {
