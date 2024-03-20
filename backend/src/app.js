@@ -5,15 +5,14 @@ import bodyParser from 'body-parser';
 import jwt from 'jsonwebtoken';
 import { getGoogleOauthURL } from './OauthClient.js';
 import { oauthClient } from './OauthClient.js';
-import 'dotenv/config'
+import 'dotenv/config';
+import mongo from "./mongo.js"
 
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 
 console.log("\n\nPROCESS APP PAGE"+CLIENT_ID)
 console.log("PROCESS APP PAGE"+CLIENT_SECRET)
-
-//import jwt from 'jsonwebtoken'; // TODO - add a jsonwebtoken package or module
 
 const app = express()
 
@@ -115,4 +114,5 @@ const updateOrCreateUserFromOauth = async (oauthUserInfo) => {
 
 app.listen(port, () => {
     console.log(`Predictive Vehicle Maintenance app listening on port ${port}`)
+    console.log(mongo)
 })
