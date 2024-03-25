@@ -2,6 +2,7 @@ import {BrowserRouter, Routes, Route, Link, useNavigate} from "react-router-dom"
 import GarageNavbar from "./GarageNavbar";
 import AddRemoveNavbar from "./AddRemoveNavbar";
 import VehicleInfo from "./VehicleInfo";
+import Settings from "./Settings";
 
 function Garage() {
     // TODO: REPLACE WITH REAL VALUES, THESE ARE USED AS TEST VALUES

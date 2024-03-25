@@ -28,7 +28,7 @@ function App() {
         <Route path="/garage/vehicle-history/upload" element={<UploadVehicleHistory />} />
         <Route path="/garage/vehicle-history/manual" element={<ManualVehicleHistory />} />
 
-        <Route path="/settings" element={<Settings />}/>
+        <Route path="/." element={<Settings />}/>
       </Routes>
     </div>
     </BrowserRouter>

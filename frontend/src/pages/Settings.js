@@ -1,17 +1,14 @@
 import { useState } from 'react';
-import ReactDOM from 'react-dom';
-import Offcanvas from "react-bootstrap/Offcanvas";
-import Button from "react-bootstrap/Button";
+import Button from 'react-bootstrap/Button';
+import Offcanvas from 'react-bootstrap/Offcanvas';
 
 export const Settings = () => {
     const [darkMode, setDarkMode] = useState(false);
     const [notifications, setNotifications] = useState(false);
     const [unitOfMeasurement, setUnitOfMeasurement] = useState('metric');
 
-    const [visibility, setVisibility] = useState(false);
-    const handleVisibilityChange = () => {
-        setVisibility(!visibility);
-    }
+    const [show, setShow] = useState(false);
+    const handleShow = () => setShow(!show);
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -19,14 +16,14 @@ export const Settings = () => {
 
     return (
         <div>
-            <Button variant="primary" onClick={handleVisibilityChange} placement="right">Settings</Button>
-            <Offcanvas show={visibility}>
+            <Button variant="primary" onClick={handleShow}>Settings</Button>
+            <Offcanvas show={show} onHide={handleShow} placement="end">
                 <Offcanvas.Header closeButton>
-                    <Offcanvas.Title></Offcanvas.Title>
+                    <Offcanvas.Title>Settings</Offcanvas.Title>
                 </Offcanvas.Header>
                 <Offcanvas.Body>
                     <div>
-                        <label>Dark Mode</label>
+                        <label >Dark Mode</label>
                         <input type="checkbox" checked={darkMode} onChange={(e) => setDarkMode(e.target.checked)}/>
                     </div>
                     <div>
