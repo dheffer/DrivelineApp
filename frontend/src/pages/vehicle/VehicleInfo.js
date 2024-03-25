@@ -1,5 +1,5 @@
 import {BrowserRouter, Routes, Route, useParams} from "react-router-dom";
-import GarageNavbar from "./GarageNavbar";
+import VehicleNavbar from "./VehicleNavbar";
 
 function VehicleInfo() {
     let { vehicle } = useParams();
@@ -11,10 +11,10 @@ function VehicleInfo() {
     make = make[0].toUpperCase() + make.slice(1);
     return (
         <div>
-            <GarageNavbar />
+            <VehicleNavbar />
             <Routes>
-                <Route path="/garage/vehicle-info" />
-                <Route path="/garage/vehicle-history" />
+                <Route path="/garage/vehicle-info/:vehicle" />
+                <Route path="/garage/vehicle-history/:vehicle" />
             </Routes>
 
             <p>{year} {model} {make}</p>

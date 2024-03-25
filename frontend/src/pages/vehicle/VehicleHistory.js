@@ -1,6 +1,6 @@
 import {BrowserRouter, Routes, Route, useParams} from "react-router-dom";
-import GarageNavbar from "./GarageNavbar";
-import UploadNavbar from "./UploadNavbar";
+import VehicleNavbar from "./VehicleNavbar";
+import UploadNavbar from "../maintenance-history/UploadNavbar";
 
 function VehicleHistory() {
     let { vehicle } = useParams();
@@ -12,10 +12,10 @@ function VehicleHistory() {
     make.charAt(0).toUpperCase();
     return (
         <div>
-            <GarageNavbar />
+            <VehicleNavbar />
             <Routes>
-                <Route path="/garage/vehicle-info" />
-                <Route path="/garage/vehicle-history" />
+                <Route path="/garage/vehicle-info/:vehicle" />
+                <Route path="/garage/vehicle-history/:vehicle" />
             </Routes>
 
             <UploadNavbar />
