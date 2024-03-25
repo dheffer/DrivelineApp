@@ -1,10 +1,17 @@
 import { useState } from 'react';
 import ReactDOM from 'react-dom';
+import Offcanvas from "react-bootstrap/Offcanvas";
+import Button from "react-bootstrap/Button";
 
 export const Settings = () => {
     const [darkMode, setDarkMode] = useState(false);
     const [notifications, setNotifications] = useState(false);
     const [unitOfMeasurement, setUnitOfMeasurement] = useState('metric');
+
+    const [visibility, setVisibility] = useState(false);
+    const handleVisibilityChange = () => {
+        setVisibility(!visibility);
+    }
 
     const handleSubmit = (e) => {
         e.preventDefault();
@@ -12,32 +19,31 @@ export const Settings = () => {
 
     return (
         <div>
-            <h1>Settings</h1>
-            <form>
-                <label>
-                    <input type="checkbox" id="darkMode" name="darkMode" value="darkMode"
-                    onChange={() => setDarkMode(!darkMode)} />
-                    Dark Mode
-                </label>
-                <br/>
+            <Button variant="primary" onClick={handleVisibilityChange} placement="right">Settings</Button>
+            <Offcanvas show={visibility}>
+                <Offcanvas.Header closeButton>
+                    <Offcanvas.Title></Offcanvas.Title>
+                </Offcanvas.Header>
+                <Offcanvas.Body>
+                    <div>
+                        <label>Dark Mode</label>
+                        <input type="checkbox" checked={darkMode} onChange={(e) => setDarkMode(e.target.checked)}/>
+                    </div>
+                    <div>
+                        <label>Notifications</label>
+                        <input type="checkbox" checked={notifications}
+                               onChange={(e) => setNotifications(e.target.checked)}/>
+                    </div>
+                    <div>
+                        <label>Unit of Measurement</label>
+                        <select value={unitOfMeasurement} onChange={(e) => setUnitOfMeasurement(e.target.value)}>
+                            <option value="metric">Metric</option>
+                            <option value="imperial">Imperial</option>
+                        </select>
+                    </div>
+                </Offcanvas.Body>
+            </Offcanvas>
 
-                <label>
-                    <input type="checkbox" id="notifications" name="notifications" value="notifications"
-                    onChange={() => setNotifications(!notifications)} />
-                    Notifications
-                </label>
-                <br/>
-
-                <label>
-                    <select id="unitOfMeasurement" name="unitOfMeasurement"
-                    onChange={(e) => setUnitOfMeasurement(e.target.value)} >
-                        <option value="metric">Metric</option>
-                        <option value="imperial">Imperial</option>
-                    </select>
-                    Unit of Measurement
-                </label>
-                <br/>
-            </form>
         </div>
     );
 }
