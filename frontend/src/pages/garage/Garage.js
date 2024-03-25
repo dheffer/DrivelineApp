@@ -40,7 +40,7 @@ function Garage() {
                                   Some quick example text to build on the card title and make up the
                                   bulk of the card's content.
                               </Card.Text>
-                              <Button variant="primary"><Link to={"/garage/vehicle-info/"+param} ></Link>View Info</Button>
+                              <Link to={"/garage/vehicle-info/"+param} ><Button variant="primary">View Info</Button></Link>
                           </Card.Body>
                       </Card>
                   )
