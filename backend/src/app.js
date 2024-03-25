@@ -7,6 +7,7 @@ import { getGoogleOauthURL } from './OauthClient.js';
 import { oauthClient } from './OauthClient.js';
 import 'dotenv/config';
 import mongo from "./mongo.js"
+import client from "./mongo.js";
 
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
@@ -14,7 +15,7 @@ const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 console.log("\n\nPROCESS APP PAGE"+CLIENT_ID)
 console.log("PROCESS APP PAGE"+CLIENT_SECRET)
 
-const app = express()
+const app = express();
 
 const googleOAuthURL = getGoogleOauthURL();
 
@@ -110,9 +111,16 @@ const updateOrCreateUserFromOauth = async (oauthUserInfo) => {
         //return { email, name, _id: result.insertedId };
 
     }
+app.get('/api/get-configuration', async (req, res) => {
+    const database = client.db("vehicleDB");
+    const message = database.collection("configurations");
 
+    const docObject = await message.findOne({config_id: 402001368});
+    await console.log(docObject);
+    res.send(docObject.message);
+})
 
 app.listen(port, () => {
     console.log(`Predictive Vehicle Maintenance app listening on port ${port}`)
-    console.log(mongo)
+    //console.log(mongo)
 })
