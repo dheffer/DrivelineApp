@@ -46,7 +46,7 @@ function NavBar() {
                     </Nav>
                 </Navbar.Collapse>
                 <Nav className={"ms-auto"}>
-                    <Navbar.Text >Signed in as: {user || 'LOADING...'}</Navbar.Text>
+                    <Navbar.Text ><Settings greeting={`Signed in as: ${user || 'LOADING...'}`}/></Navbar.Text>
                     <Settings />
                 </Nav>
             </Container>

@@ -3,7 +3,7 @@ import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import {Nav} from "react-bootstrap";
 
-export const Settings = () => {
+export const Settings = (props) => {
     const [darkMode, setDarkMode] = useState(false);
     const [notifications, setNotifications] = useState(false);
     const [unitOfMeasurement, setUnitOfMeasurement] = useState('metric');
@@ -18,7 +18,7 @@ export const Settings = () => {
     return (
         <div>
             {/*<Button variant="primary" onClick={handleShow}>Settings</Button>*/}
-            <Nav.Link onClick={handleShow} className={".align-items-center"} >JohnDoe123</Nav.Link>
+            <Nav.Link onClick={handleShow} className={".align-items-center"} >{props.greeting}</Nav.Link>
             <Offcanvas show={show} onHide={handleShow} placement="end">
                 <Offcanvas.Header closeButton>
                     <Offcanvas.Title>Settings</Offcanvas.Title>
