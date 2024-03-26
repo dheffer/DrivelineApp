@@ -11,6 +11,8 @@ import RemoveVehicle from "./garage/RemoveVehicle";
 import {Settings} from "./Settings";
 
 function App() {
+
+  const authenticated = localStorage.getItem('token') !== null;
   return (
     <BrowserRouter>
     <div>
@@ -18,17 +20,21 @@ function App() {
       <Routes>
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
+        {authenticated && (
+          console.log("authenticated"+authenticated),
+          <>
+          <Route path="/garage" element={<Garage />}/>
+          <Route path="/garage/add" element={<AddVehicle />}/>
+          <Route path="/garage/remove/:vehicle" element={<RemoveVehicle />}/>
 
-        <Route path="/garage" element={<Garage />}/>
-        <Route path="/garage/add" element={<AddVehicle />}/>
-        <Route path="/garage/remove/:vehicle" element={<RemoveVehicle />}/>
+          <Route path="/garage/vehicle-info/:vehicle" element={<VehicleInfo />} />
+          <Route path="/garage/vehicle-history/:vehicle" element={<VehicleHistory />}  />
+          <Route path="/garage/vehicle-history/upload" element={<UploadVehicleHistory />} />
+          <Route path="/garage/vehicle-history/manual" element={<ManualVehicleHistory />} />
 
-        <Route path="/garage/vehicle-info/:vehicle" element={<VehicleInfo />} />
-        <Route path="/garage/vehicle-history/:vehicle" element={<VehicleHistory />}  />
-        <Route path="/garage/vehicle-history/upload" element={<UploadVehicleHistory />} />
-        <Route path="/garage/vehicle-history/manual" element={<ManualVehicleHistory />} />
-
-        <Route path="/settings" element={<Settings />}/>
+          <Route path="/settings" element={<Settings />}/>
+          </>
+        )}
       </Routes>
     </div>
     </BrowserRouter>
