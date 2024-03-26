@@ -1,6 +1,7 @@
-import { useState } from 'react';
+import React, { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
+import {Nav} from "react-bootstrap";
 
 export const Settings = () => {
     const [darkMode, setDarkMode] = useState(false);
@@ -16,23 +17,24 @@ export const Settings = () => {
 
     return (
         <div>
-            <Button variant="primary" onClick={handleShow}>Settings</Button>
+            {/*<Button variant="primary" onClick={handleShow}>Settings</Button>*/}
+            <Nav.Link onClick={handleShow} className={".align-items-center"} >JohnDoe123</Nav.Link>
             <Offcanvas show={show} onHide={handleShow} placement="end">
                 <Offcanvas.Header closeButton>
                     <Offcanvas.Title>Settings</Offcanvas.Title>
                 </Offcanvas.Header>
-                <Offcanvas.Body>
+                <Offcanvas.Body >
                     <div>
-                        <label >Dark Mode</label>
-                        <input type="checkbox" checked={darkMode} onChange={(e) => setDarkMode(e.target.checked)}/>
+                        <label className={"pe-1"}>Dark Mode </label>
+                        <input type="checkbox" checked={darkMode} onChange={(e) => setDarkMode(!darkMode)}/>
                     </div>
                     <div>
-                        <label>Notifications</label>
+                        <label className={"pe-1"}>Notifications </label>
                         <input type="checkbox" checked={notifications}
-                               onChange={(e) => setNotifications(e.target.checked)}/>
+                               onChange={(e) => setNotifications(!notifications)}/>
                     </div>
                     <div>
-                        <label>Unit of Measurement</label>
+                        <label className={"pe-1"}>Unit of Measurement</label>
                         <select value={unitOfMeasurement} onChange={(e) => setUnitOfMeasurement(e.target.value)}>
                             <option value="metric">Metric</option>
                             <option value="imperial">Imperial</option>
@@ -40,7 +42,6 @@ export const Settings = () => {
                     </div>
                 </Offcanvas.Body>
             </Offcanvas>
-
         </div>
     );
 }
