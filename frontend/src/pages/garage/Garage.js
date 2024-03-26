@@ -13,12 +13,6 @@ function Garage(props) {
     const [loading, setLoading] = useState(true);
     const [refreshData, setRefreshData] = useState(false);
 
-    const vehicles = ["2009 Nord Campy", "2015 Yotota Bav", "2019 Pesla Godel3", "2014 Nord Bustang"]
-    const chunkedVehicles = []; // Divide the vehicles array into chunks of 3 for 3 vehicles per row
-    for (let i = 0; i < vehicles.length; i += 3) {
-        chunkedVehicles.push(vehicles.slice(i, i + 3));
-    }
-
     const garageVehicles = [];
     if (props.info != null) {
         console.log(props.info.length);
@@ -76,64 +70,36 @@ function Garage(props) {
                         </Routes>
                     </div>
 
+                    {
+                        props.info != null ?
+                            props.info.map((vehicle, index) => {
+                                console.log(vehicle.configurations.year);
+                                console.log(vehicle.configurations.make)
+                            })
+                            : null
+                    }
 
                     {
-                        garageVehicles.map((vehicle, index) => {
+                        props.info != null ?
+                        props.info.map((vehicle, index) => {
+                            //console.log(garageVehicles[0][0].configurations.year);
                             vehicle_count++;
                             if (vehicle_count === 1 || vehicle_count % 3 === 0) {
                                 return (
                                     <Row key={index} xs={1} md={3} className="g-4">
-                                        <Col key={vehicle.name}>
+                                        <Col key={vehicle.configurations.name}>
                                             <Vehicle vehicle={vehicle} id={index}/>
                                         </Col>
                                     </Row>
                                 )
                             }
                             return (
-                                <Col key={vehicle.name}>
-                                    <Vehicle vehicle={vehicle} key={index}/>
+                                <Col key={vehicle.configurations.name}>
+                                    <Vehicle vehicle={vehicle} id={index}/>
                                 </Col>
                             )
-                        })
+                        }) : null
                     }
-
-                    {chunkedVehicles.map((row, rowIndex) => (
-                        <Row key={rowIndex} xs={1} md={3} className="g-4">
-                            {/* Map over vehicles in the current row */}
-                            {row.map((vehicle, colIndex) => {
-                                let param = vehicle.replaceAll(" ", "-").toLowerCase();
-                                let year = vehicle.split(" ")[0];
-                                let model = vehicle.split(" ")[1];
-                                let make = vehicle.split(" ")[2];
-                                model = model[0].toUpperCase() + model.slice(1);
-                                make = make[0].toUpperCase() + make.slice(1);
-
-                                return (
-                                    <Col key={colIndex}>
-                                        <Card style={{width: '22rem'}} id={rowIndex + "-" + colIndex}>
-                                            <Card.Img variant="top"
-                                                      src="https://cdn.dealerk.it/cars/placeholder/placeholder-800.png"/>
-                                            <Card.Body>
-                                                <Card.Title>{vehicle}</Card.Title>
-                                                <Card.Text>
-                                                    Some quick example text to build on the card title and make up the bulk of
-                                                    the card's content.
-                                                </Card.Text>
-                                                <Card.Footer className="d-flex justify-content-around">
-                                                    <Link to={"/garage/vehicle-info/" + param}>
-                                                        <Button className={"btn btn-primary"}>View Info</Button>
-                                                    </Link>
-                                                    <Link to={"/garage/remove/" + param}>
-                                                        <Button>Remove</Button>
-                                                    </Link>
-                                                </Card.Footer>
-                                            </Card.Body>
-                                        </Card>
-                                    </Col>
-                                );
-                            })}
-                        </Row>
-                    ))}
                 </div>
                 <div className="col-md-1 order-md-3"></div>
             </div>
