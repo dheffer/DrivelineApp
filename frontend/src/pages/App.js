@@ -9,8 +9,12 @@ import ManualVehicleHistory from "./maintenance-history/ManualVehicleHistory";
 import AddVehicle from "./garage/AddVehicle";
 import RemoveVehicle from "./garage/RemoveVehicle";
 import {Settings} from "./Settings";
+import {useState} from "react";
 
 function App() {
+
+  const [garageInfo, setGarageInfo] = useState();
+
   return (
     <BrowserRouter>
     <div>
@@ -19,7 +23,7 @@ function App() {
         <Route path="/" element={<Login />} />
         <Route path="/login" element={<Login />} />
 
-        <Route path="/garage" element={<Garage />}/>
+        <Route path="/garage" element={<Garage info={garageInfo} setInfo={setGarageInfo}/>}/>
         <Route path="/garage/add" element={<AddVehicle />}/>
         <Route path="/garage/remove/:vehicle" element={<RemoveVehicle />}/>
 

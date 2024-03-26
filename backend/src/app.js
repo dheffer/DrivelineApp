@@ -118,8 +118,7 @@ app.get('/api/get-configuration', async (req, res) => {
     const message = database.collection("configurations");
 
     const docObject = await message.findOne({config_id: 402001368});
-    await console.log(docObject);
-    res.send(docObject.message);
+    res.send(docObject);
 });
 
 const getVehicleConfig = async (config_id) => {
@@ -127,7 +126,6 @@ const getVehicleConfig = async (config_id) => {
     const message = database.collection("configurations");
 
     const docObject = await message.findOne({config_id: config_id});
-    await console.log(docObject);
     return docObject;
 }
 
@@ -138,19 +136,43 @@ app.get('/api/get-user-vehicles', async (req, res) => {
     const database = client.db("vehicleDB");
     const garage = database.collection("user_garage");
 
-    const docObject = await garage.findOne({user_id: "dheffer"});
-    const vehicles = [];
-    let vehicle = {};
+    const vehicles = await garage.aggregate([
+        {
+            $match: {
+                user_id: 'dheffer'
+            }
+        },
+        {
+            $lookup: {
+                from: 'configurations',
+                localField: 'vehicle_config_ids',
+                foreignField: 'config_id',
+                as: 'configurations'
+            }
+        },
+        {
+            $unwind: '$configurations'
+        },
+        {
+            $project: {
+                _id: 0,
+                configurations: 1
+            }
+        }
+    ]).toArray();
 
-    for await (const vehicle_id of docObject.vehicle_config_ids) {
-        vehicles.push(await getVehicleConfig(vehicle_id));
+    /*
+    for (let vehicle of vehicles) {
+        let v = vehicle.configurations
+        console.log(`Year: ${v.year}\t Make: ${v.make}\t Model: ${v.model}`);
     }
+     */
 
-    //await console.log(vehicles);
+
     res.send(vehicles);
 });
 
 app.listen(port, () => {
     console.log(`Predictive Vehicle Maintenance app listening on port ${port}`)
-    //console.log(mongo)
+    //console.log(mongo);
 });

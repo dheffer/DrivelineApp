@@ -13,9 +13,7 @@ function NavBar() {
                 <Navbar.Collapse>
                     <Nav>
                         <Nav.Link href="/garage"><Button variant="primary">Garage</Button></Nav.Link>
-
                     </Nav>
-
                 </Navbar.Collapse>
                 <Nav className={"ms-auto"}>
                     <Settings />
