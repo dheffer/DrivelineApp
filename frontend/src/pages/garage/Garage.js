@@ -9,8 +9,7 @@ import Container from 'react-bootstrap/Container';
 
 function Garage() {
         // Divide the vehicles array into chunks of 3
-    const vehicles = ["2009 Nord Campy", "2015 Yotota Bav", "2019 Pesla Godel3", "2014 Nord Bustang",
-        "2017 Yotota Camry", "2016 Pesla GodelS", "2018 Nord Bustang", "2010 Yotota Bav"]
+    const vehicles = ["2009 Nord Campy", "2015 Yotota Bav", "2019 Pesla Godel3", "2014 Nord Bustang"]
     const chunkedVehicles = [];
     let length = 0;
     for (let i = 0; i < vehicles.length; i += 3) {
@@ -23,7 +22,7 @@ function Garage() {
                 <div className="col-md-1 order-md-1"></div>
                 <div className="col-md-10 order-md-2">
                     <div className="d-flex justify-content-evenly">
-                        <Link to="/garage/add"><Button>Add</Button></Link>
+                        <Link to="/garage/add" className={"pb-2"}><Button>Add Vehicle</Button></Link>
                         <Routes>
                             <Route path="/garage/add"/>
                             <Route path="/garage/remove/:vehicle"/>
