@@ -16,7 +16,7 @@ const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 console.log("\n\nPROCESS APP PAGE"+CLIENT_ID)
 console.log("PROCESS APP PAGE"+CLIENT_SECRET)
 
-const app = express()
+const app = express();
 
 const googleOAuthURL = getGoogleOauthURL();
 
@@ -135,9 +135,9 @@ const updateOrCreateUserFromOauth = async (oauthUserInfo) => {
     const existingUser = await users.findOne({email})
 
     if( existingUser ) {
-        const result = await users.findOneAndUpdate({email}, 
+        const result = await users.findOneAndUpdate({email},
             { $set: {name, email}},
-            { returnDocument: "after"} 
+            { returnDocument: "after"}
         );
         return result;
     }
@@ -147,8 +147,67 @@ const updateOrCreateUserFromOauth = async (oauthUserInfo) => {
     }
 }
 
+// TODO: Configure this route using the getVehicleConfig function below
+app.get('/api/get-configuration', async (req, res) => {
+    const database = client.db("vehicleDB");
+    const message = database.collection("configurations");
+
+    const docObject = await message.findOne({config_id: 402001368});
+    res.send(docObject);
+});
+
+const getVehicleConfig = async (config_id) => {
+    const database = client.db("vehicleDB");
+    const message = database.collection("configurations");
+
+    const docObject = await message.findOne({config_id: config_id});
+    return docObject;
+}
+
+/***
+ * This route is used to get the user's vehicles from the database
+ */
+app.get('/api/get-user-vehicles', async (req, res) => {
+    const database = client.db("vehicleDB");
+    const garage = database.collection("user_garage");
+
+    const vehicles = await garage.aggregate([
+        {
+            $match: {
+                user_id: 'dheffer'
+            }
+        },
+        {
+            $lookup: {
+                from: 'configurations',
+                localField: 'vehicle_config_ids',
+                foreignField: 'config_id',
+                as: 'configurations'
+            }
+        },
+        {
+            $unwind: '$configurations'
+        },
+        {
+            $project: {
+                _id: 0,
+                configurations: 1
+            }
+        }
+    ]).toArray();
+
+    /*
+    for (let vehicle of vehicles) {
+        let v = vehicle.configurations
+        console.log(`Year: ${v.year}\t Make: ${v.make}\t Model: ${v.model}`);
+    }
+     */
+
+
+    res.send(vehicles);
+});
 
 app.listen(port, () => {
     console.log(`Predictive Vehicle Maintenance app listening on port ${port}`)
-    console.log(mongo)
-})
+    //console.log(mongo);
+});
