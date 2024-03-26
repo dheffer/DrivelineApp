@@ -6,7 +6,6 @@ import jwt from 'jsonwebtoken';
 import { getGoogleOauthURL } from './OauthClient.js';
 import { oauthClient } from './OauthClient.js';
 import 'dotenv/config';
-import mongo from "./mongo.js"
 import client from "./mongo.js";
 
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
@@ -115,8 +114,29 @@ app.get('/api/get-configuration', async (req, res) => {
     const database = client.db("vehicleDB");
     const message = database.collection("configurations");
 
-    const docObject = await message.findOne({config_id: 402001368});
+    const docObject = await message.findOne({config_id: 401988727});
     await console.log(docObject);
+    res.send(docObject.message);
+})
+
+//const config_id = 401988727;
+// app.get('/api/get-maintenance', async (req , res) => {
+//     const database = client.db("vehicleDB");
+//     const message = database.collection("maintenance");
+//
+//     const docObject =   await message.findOne({config_id: 401988727});
+//     await console.log(docObject);
+//     res.send(docObject.message);
+// })
+
+    app.get('/api/get-maintenance', async (req , res) => {
+    const database = client.db("vehicleDB");
+    const message = database.collection("maintenance");
+
+    // const docObject = await message.findOne({ config_id: { $eq: 401988727} });
+
+    const docObject = await message.findOne({});
+    await console.log(docObject.schedules[0].tasks);
     res.send(docObject.message);
 })
 
