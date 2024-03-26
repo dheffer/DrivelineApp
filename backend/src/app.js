@@ -129,7 +129,7 @@ app.get('/api/get-configuration', async (req, res) => {
 //     res.send(docObject.message);
 // })
 
-    app.get('/api/get-maintenance', async (req , res) => {
+app.get('/api/get-maintenance', async (req , res) => {
     const database = client.db("vehicleDB");
     const message = database.collection("maintenance");
 
@@ -139,6 +139,46 @@ app.get('/api/get-configuration', async (req, res) => {
     await console.log(docObject.schedules[0].tasks);
     res.send(docObject.message);
 })
+
+const selected_year = 2024;
+const selected_make = "Toyota";
+const selected_model = "Camry";
+const selected_engine = "2.5L 4cyl";
+const selected_transmission = "8A";
+// 401999975
+
+//TODO: Request to get a config_id given a vehicle's Year, Make, Model, Engine, and Transmission.
+app.get('/api/get-config-id', async (req, res) => {
+    const database = client.db("vehicleDB");
+    const message = database.collection("configurations");
+
+    //Use for loop to iterate through all the objects in the collection and get the config_id for the object that matches the selected year, make, model, engine, and transmission.
+    const docObject = await message.find({year: selected_year, make: selected_make, model: selected_model, engine: selected_engine, transmission: selected_transmission});
+    for await (const doc of docObject) {
+        console.log(doc.config_id);
+    }
+
+    //await console.log(docObject);
+
+    res.send(docObject.message);
+})
+
+//TODO: Request to get a list of all years (Non-repeating).
+
+//TODO: Request to get a list of all makes given a year (Non-repeating).
+
+//TODO: Request to get a list of all models given a year and make (Non-repeating).
+
+//TODO: Request to get a list of all engines given a year, make, and model (Non-repeating).
+
+//TODO: Request to get a list of all transmissions given a year, make, model, and engine (Non-repeating).
+
+//TODO: Request to get a list of all maintenance intervals given a vehicle's config_id.
+
+//TODO: Request to get a list of all maintenance tasks given a vehicle's config_id and mileage.
+
+//TODO: Request to get maintenance data given a vehicle's config_id and mileage.
+
 
 app.listen(port, () => {
     console.log(`Predictive Vehicle Maintenance app listening on port ${port}`)
