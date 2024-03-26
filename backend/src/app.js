@@ -111,6 +111,8 @@ const updateOrCreateUserFromOauth = async (oauthUserInfo) => {
         //return { email, name, _id: result.insertedId };
 
     }
+
+// TODO: Configure this route using the getVehicleConfig function below
 app.get('/api/get-configuration', async (req, res) => {
     const database = client.db("vehicleDB");
     const message = database.collection("configurations");
@@ -118,9 +120,37 @@ app.get('/api/get-configuration', async (req, res) => {
     const docObject = await message.findOne({config_id: 402001368});
     await console.log(docObject);
     res.send(docObject.message);
-})
+});
+
+const getVehicleConfig = async (config_id) => {
+    const database = client.db("vehicleDB");
+    const message = database.collection("configurations");
+
+    const docObject = await message.findOne({config_id: config_id});
+    await console.log(docObject);
+    return docObject;
+}
+
+/***
+ * This route is used to get the user's vehicles from the database
+ */
+app.get('/api/get-user-vehicles', async (req, res) => {
+    const database = client.db("vehicleDB");
+    const garage = database.collection("user_garage");
+
+    const docObject = await garage.findOne({user_id: "dheffer"});
+    const vehicles = [];
+    let vehicle = {};
+
+    for await (const vehicle_id of docObject.vehicle_config_ids) {
+        vehicles.push(await getVehicleConfig(vehicle_id));
+    }
+
+    //await console.log(vehicles);
+    res.send(vehicles);
+});
 
 app.listen(port, () => {
     console.log(`Predictive Vehicle Maintenance app listening on port ${port}`)
     //console.log(mongo)
-})
+});
