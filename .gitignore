@@ -1,4 +1,4 @@
 # ignoring modules
 node_modules
 backend/.env
-package-lock.json!/backend/.env
+.env

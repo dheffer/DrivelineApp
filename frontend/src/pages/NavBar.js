@@ -1,14 +1,25 @@
-import {Link} from "react-router-dom";
-import Settings from "./Settings";
+import {Nav, Navbar} from "react-bootstrap";
+import Container from "react-bootstrap/Container";
+import React from "react";
 
 function NavBar() {
     return (
-        <div>
-            <Link to="/">Home</Link>
-            <Link to="/login">Login</Link>
-            <Link to="/garage">Garage</Link>
-            <Settings />
-        </div>
+        <Navbar expand="lg" className="bg-body-tertiary">
+            <Container>
+                <Navbar.Brand href="/garage">Driveline</Navbar.Brand>
+                <Navbar.Toggle />
+                <Navbar.Collapse>
+                    <Nav>
+                        <Nav.Link href="/garage">Garage</Nav.Link>
+                        <Nav.Link href="/settings">Settings</Nav.Link>
+                    </Nav>
+
+                </Navbar.Collapse>
+                <Nav className={"ms-auto"}>
+                    <Navbar.Text >Signed in as: placeholder</Navbar.Text>
+                </Nav>
+            </Container>
+        </Navbar>
     );
 }
 
