@@ -6,29 +6,51 @@ import { useNavigate } from 'react-router-dom';
 export const Login = () => {
     const [googleOauthURL, setGoogleOauthURL] = useState('');
     const [searchParams, setSearchParams] = useSearchParams();
+    const [error, setError] = useState('');
 
     let navigate = useNavigate();
+
+    useEffect( () => {
+        fetchGoogleOauthURL();
+    }, []);
+
+    const fetchGoogleOauthURL = async () => {
+        fetch("/api/auth/google/url")
+        .then( response => response.json())
+        .then( data => setGoogleOauthURL(data.url))
+        .catch( e => {
+            console.log('error');
+            console.log(e.message);
+            localStorage.clear()
+        })
+};
+
 
     useEffect( () => {
         const token = searchParams.get('token');
         if(token) {
             localStorage.setItem('token', token);
-            navigate('/');
+            navigate('/garage');
         }
-    }, [])
+    }, [searchParams, navigate])
 
-    useEffect( () => {
-            fetch("/api/auth/google/url")
-            .then( response => response.json())
-            .then( data => setGoogleOauthURL(data.url))
-            .catch( e => {
-                console.log('error');
-                console.log(e.message);
-                localStorage.clear()
-            })
-    }, []);
+    const handleLogin = () => {
+        if(googleOauthURL) {
+            window.location.href = googleOauthURL;
+        }
+        else {
+            setError('Google OAuth URL not found');
+        }
+    }
 
-    return <button disabled={!googleOauthURL} onClick={() => window.location.href = googleOauthURL}>Click to Login to Google</button>
+    return (
+        <div>
+            {error && <p>{error}</p>}
+            <h1>Welcome to Vehicle Maintenance Prediction</h1>
+            <button disabled={!googleOauthURL} onClick={handleLogin}>Login with Google</button>
+        </div>
+    )
+
 }
 
     export default Login;

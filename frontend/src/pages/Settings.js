@@ -1,15 +1,49 @@
+import React, { useState } from 'react';
+import Button from 'react-bootstrap/Button';
+import Offcanvas from 'react-bootstrap/Offcanvas';
+import {Nav} from "react-bootstrap";
 
-export const Settings = () => {
+export const Settings = (props) => {
+    const [darkMode, setDarkMode] = useState(false);
+    const [notifications, setNotifications] = useState(false);
+    const [unitOfMeasurement, setUnitOfMeasurement] = useState('metric');
+
+    const [show, setShow] = useState(false);
+    const handleShow = () => setShow(!show);
+
+    const handleSubmit = (e) => {
+        e.preventDefault();
+    }
+
     return (
         <div>
-            <h1>Settings</h1>
-            <p>Change your settings here</p>
-            <p>Placeholder</p>
-
-            <footer>
-                <a target="_blank" href="https://icons8.com/icon/vGQkspHvmobZ/settings">Settings</a> icon by <a
-                target="_blank" href="https://icons8.com">Icons8</a>
-            </footer>
+            {/*<Button variant="primary" onClick={handleShow}>Settings</Button>*/}
+            <Nav.Link onClick={handleShow} className={".align-items-center"} >{props.greeting}</Nav.Link>
+            <Offcanvas show={show} onHide={handleShow} placement="end">
+                <Offcanvas.Header closeButton>
+                    <Offcanvas.Title>Settings</Offcanvas.Title>
+                </Offcanvas.Header>
+                <Offcanvas.Body >
+                    <div>
+                        <label className={"pe-1"}>Dark Mode </label>
+                        <input type="checkbox" checked={darkMode} onChange={(e) => setDarkMode(!darkMode)}/>
+                    </div>
+                    <div>
+                        <label className={"pe-1"}>Notifications </label>
+                        <input type="checkbox" checked={notifications}
+                               onChange={(e) => setNotifications(!notifications)}/>
+                    </div>
+                    <div>
+                        <label className={"pe-1"}>Unit of Measurement</label>
+                        <select value={unitOfMeasurement} onChange={(e) => setUnitOfMeasurement(e.target.value)}>
+                            <option value="metric">Metric</option>
+                            <option value="imperial">Imperial</option>
+                        </select>
+                    </div>
+                </Offcanvas.Body>
+            </Offcanvas>
         </div>
     );
 }
+
+export default Settings;

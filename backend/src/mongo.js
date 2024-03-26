@@ -6,6 +6,8 @@ import 'dotenv/config'
 
 // const uri = process.env.MONGO_URI;
 const uri = 'mongodb+srv://user:pass@driveline-cluster-01.kiepke5.mongodb.net/'
+const uri = 'mongodb+srv://brandon:mAzie2019@driveline-cluster-01.kiepke5.mongodb.net/';
+// const uri ='mongodb+srv://<username>:<password>]@driveline-cluster-01.kiepke5.mongodb.net/'
 
 // Create a MongoClient with a MongoClientOptions object to set the Stable API version
 const client = new MongoClient(uri,  {
