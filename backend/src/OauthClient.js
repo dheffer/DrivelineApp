@@ -1,13 +1,9 @@
 import { google } from 'googleapis';
 import 'dotenv/config'
 
-
-console.log("PROCESS OAUTH "+process.env.GOOGLE_CLIENT_ID)
-
-
 export const oauthClient = new google.auth.OAuth2(
-    process.env.GOOGLE_CLIENT_ID,
-    process.env.GOOGLE_CLIENT_SECRET,
+    '947922305847-o7gbgmm9ngk02lrlp45vtu3g6h70aiun.apps.googleusercontent.com',
+    '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',
     'http://localhost:8080/api/auth/google/callback',
 );
 export const getGoogleOauthURL = () => {
