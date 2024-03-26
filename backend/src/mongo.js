@@ -4,6 +4,8 @@ import { MongoClient, ServerApiVersion } from "mongodb";
 import 'dotenv/config'
 
 
+// const uri = process.env.MONGO_URI;
+const uri = 'mongodb+srv://user:pass@driveline-cluster-01.kiepke5.mongodb.net/'
 const uri = 'mongodb+srv://brandon:mAzie2019@driveline-cluster-01.kiepke5.mongodb.net/';
 // const uri ='mongodb+srv://<username>:<password>]@driveline-cluster-01.kiepke5.mongodb.net/'
 
