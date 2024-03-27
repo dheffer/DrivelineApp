@@ -26,7 +26,6 @@ function App() {
           <>
           <Route path="/garage" element={<Garage info={garageInfo} setInfo={setGarageInfo}/>}/>
           <Route path="/garage/add" element={<AddVehicle />}/>
-          <Route path="/garage/remove/:vehicle" element={<RemoveVehicle />}/>
 
           <Route path="/garage/vehicle-info/:vehicle" element={<VehicleInfo />} />
           <Route path="/garage/vehicle-history/:vehicle" element={<VehicleHistory />}  />

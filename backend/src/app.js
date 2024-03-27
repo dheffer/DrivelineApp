@@ -147,23 +147,6 @@ const updateOrCreateUserFromOauth = async (oauthUserInfo) => {
     }
 }
 
-// TODO: Configure this route using the getVehicleConfig function below
-app.get('/api/get-configuration', async (req, res) => {
-    const database = client.db("vehicleDB");
-    const message = database.collection("configurations");
-
-
-    const docObject = await message.findOne({config_id: 402001368});
-    res.send(docObject);
-});
-
-const getVehicleConfig = async (config_id) => {
-    const database = client.db("vehicleDB");
-    const message = database.collection("configurations");
-
-    const docObject = await message.findOne({config_id: config_id});
-    return docObject;
-}
 
 /***
  * This route is used to get the user's vehicles from the database
@@ -175,7 +158,7 @@ app.get('/api/get-user-vehicles', async (req, res) => {
     const vehicles = await garage.aggregate([
         {
             $match: {
-                user_id: 'dheffer'
+                email: "11yomang11@gmail.com"
             }
         },
         {
@@ -196,16 +179,20 @@ app.get('/api/get-user-vehicles', async (req, res) => {
             }
         }
     ]).toArray();
-
-    /*
-    for (let vehicle of vehicles) {
-        let v = vehicle.configurations
-        console.log(`Year: ${v.year}\t Make: ${v.make}\t Model: ${v.model}`);
-    }
-     */
-
-
     res.send(vehicles);
+});
+
+app.delete('/api/delete-user-vehicle', async (req, res) => {
+    const database = client.db("vehicleDB");
+    const garage = database.collection("user_garage");
+
+    const { config_id } = req.body;
+    console.log(config_id);
+    const deletion = await garage.updateOne(
+        {email: 'placeholder'},
+        {$pull: { vehicle_config_ids: config_id } }
+    );
+    return res.json(deletion.modifiedCount);
 });
 
 //const config_id = 401988727;

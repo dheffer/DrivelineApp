@@ -15,21 +15,11 @@ function Garage(props) {
 
     const garageVehicles = [];
     if (props.info != null) {
-        console.log(props.info.length);
         for (let i = 0; i < props.info.length; i += 3) {
             garageVehicles.push(props.info.slice(i, i + 3));
 
         }
     }
-    /*
-    const garageVehicles = [];
-    if (props.info != null) {
-        props.info.forEach((vehicle) => {
-            garageVehicles.push(vehicle);
-        });
-    }
-
-     */
 
     useEffect(() => {
         const myHeaders = new Headers();
@@ -69,15 +59,6 @@ function Garage(props) {
                             <Route path={"/garage/vehicle-info/:vehicle"} element={<VehicleInfo/>}/>
                         </Routes>
                     </div>
-
-                    {
-                        props.info != null ?
-                            props.info.map((vehicle, index) => {
-                                console.log(vehicle.configurations.year);
-                                console.log(vehicle.configurations.make)
-                            })
-                            : null
-                    }
 
                     {
                         props.info != null ?
