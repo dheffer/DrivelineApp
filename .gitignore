@@ -2,3 +2,5 @@
 node_modules
 backend/.env
 .env
+Project_Default.xml
+package-lock.json
