@@ -1,8 +1,7 @@
-import {BrowserRouter, Routes, Route, useParams, useLocation} from "react-router-dom";
+import {Routes, Route, useLocation} from "react-router-dom";
 import VehicleNavbar from "./VehicleNavbar";
 import {Badge, Card, Col, Row} from "react-bootstrap";
 import React, {useEffect, useState} from "react";
-import Button from "react-bootstrap/Button";
 
 function VehicleInfo() {
     const location = useLocation();
