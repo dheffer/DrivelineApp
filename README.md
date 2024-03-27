@@ -1,9 +1,8 @@
-# **Predictive Vehicle Maintenance System**
+# **Driveline**
 [![GitHub privacy-policy](https://img.shields.io/badge/privacy-policy-blue.svg)](https://github.com/dheffer/PredictiveVehicleMaintenanceSystem/privacy-policy.md)
 [![GitHub issues](https://img.shields.io/github/issues/dheffer/PredictiveVehicleMaintenanceSystem.svg)](https://github.com/dheffer/PredictiveVehicleMaintenanceSystem/issues)
 [![GitHub stars](https://img.shields.io/github/stars/dheffer/PredictiveVehicleMaintenanceSystem.svg)](https://github.com/dheffer/PredictiveVehicleMaintenanceSystem/stargazers)
-
-#### Driveline - A predictive vehicle maintenance system for our Capstone Project in the Winter 2024 semester.
+#### A predictive vehicle maintenance system for our Capstone Project in the Winter 2024 semester.
 
 ## Description:
 Driveline is a web application designed to streamline and automate the process of vehicle maintenance tracking and notification. The primary goal of this application is to provide users with timely alerts regarding recommended upcoming maintenance tasks for their vehicles. Additionally, users will have access to their personalized 'Garage', where they can upload, manage, and view maintenance information about the vehicles they own.
