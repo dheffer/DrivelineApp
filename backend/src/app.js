@@ -147,6 +147,16 @@ const updateOrCreateUserFromOauth = async (oauthUserInfo) => {
     }
 }
 
+app.get('/api/get-vehicle-info', async (req, res) => {
+   const database = client.db("vehicleDB");
+   const vehicle = database.collection("configurations");
+
+   const configId = req.query.configId;
+
+   const getConfiguration = await vehicle.findOne({config_id: parseInt(configId)});
+
+    res.json(getConfiguration);
+});
 
 /***
  * This route is used to get the user's vehicles from the database
@@ -187,7 +197,6 @@ app.delete('/api/delete-user-vehicle', async (req, res) => {
     const garage = database.collection("user_garage");
 
     const { config_id } = req.body;
-    console.log(config_id);
     const deletion = await garage.updateOne(
         {email: 'placeholder'},
         {$pull: { vehicle_config_ids: config_id } }

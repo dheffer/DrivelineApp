@@ -6,9 +6,6 @@ import Container from 'react-bootstrap/Container';
 import {useEffect, useState} from "react";
 import Vehicle from "./Vehicle";
 
-// TODO: REPLACE WITH REAL VALUES, THESE ARE USED AS TEST VALUES
-
-
 function Garage(props) {
     const [loading, setLoading] = useState(true);
     const [refreshData, setRefreshData] = useState(false);

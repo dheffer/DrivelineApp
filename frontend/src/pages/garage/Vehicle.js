@@ -12,7 +12,7 @@ function Vehicle(props) {
                 <Card.Body>
                     <Card.Title className={'d-flex justify-content-center'}>{v.configurations.year} {v.configurations.make} {v.configurations.model}</Card.Title>
                     <Card.Text className="d-flex justify-content-around">
-                        <Link to={`/garage/vehicle-info/${v.configurations.year}-${v.configurations.make}-${v.configurations.model}`}>
+                        <Link to={`/garage/vehicle-info/${v.configurations.config_id}`} state={{configId: v.configurations.config_id}}>
                             <Button className={"btn btn-primary"}>View Info</Button>
                         </Link>
                         <RemoveVehicle configId={v.configurations.config_id}/>
