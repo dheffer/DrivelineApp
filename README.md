@@ -1,5 +1,5 @@
 # **Driveline**
-[![GitHub privacy-policy](https://img.shields.io/badge/privacy-policy-blue.svg)](https://github.com/dheffer/PredictiveVehicleMaintenanceSystem/privacy-policy.md)
+[![GitHub privacy-policy](https://img.shields.io/badge/privacy-policy-blue.svg)](https://github.com/dheffer/PredictiveVehicleMaintenanceSystem/blob/main/privacy-policy.md)
 [![GitHub issues](https://img.shields.io/github/issues/dheffer/PredictiveVehicleMaintenanceSystem.svg)](https://github.com/dheffer/PredictiveVehicleMaintenanceSystem/issues)
 [![GitHub stars](https://img.shields.io/github/stars/dheffer/PredictiveVehicleMaintenanceSystem.svg)](https://github.com/dheffer/PredictiveVehicleMaintenanceSystem/stargazers)
 #### A predictive vehicle maintenance system for our Capstone Project in the Winter 2024 semester.
