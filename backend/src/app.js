@@ -7,8 +7,8 @@ import { getGoogleOauthURL } from './OauthClient.js';
 import { oauthClient } from './OauthClient.js';
 import 'dotenv/config';
 import client from "./mongo.js";
-import mongo from "./mongo.js"
-import client from './mongo.js'
+// import mongo from "./mongo.js"
+// import client from './mongo.js'
 
 
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
@@ -237,33 +237,108 @@ const selected_engine = "2.5L 4cyl";
 const selected_transmission = "8A";
 // 401999975
 
-//TODO: Request to get a config_id given a vehicle's Year, Make, Model, Engine, and Transmission.
+// Request to get a config_id given a vehicle's Year, Make, Model, Engine, and Transmission.
 app.get('/api/get-config-id', async (req, res) => {
     const database = client.db("vehicleDB");
     const message = database.collection("configurations");
+    const docObject = await message.findOne({year: selected_year, make: selected_make, model: selected_model, engine: selected_engine, transmission: selected_transmission});
 
-    //Use for loop to iterate through all the objects in the collection and get the config_id for the object that matches the selected year, make, model, engine, and transmission.
-    const docObject = await message.find({year: selected_year, make: selected_make, model: selected_model, engine: selected_engine, transmission: selected_transmission});
-    for await (const doc of docObject) {
-        console.log(doc.config_id);
-    }
-
-    //await console.log(docObject);
-
+    await console.log(docObject);
     res.send(docObject.message);
+
+    console.log(docObject.config_id);
+    return(docObject.config_id);
 })
+
 
 //TODO: Request to get a list of all years (Non-repeating).
 
-//TODO: Request to get a list of all makes given a year (Non-repeating).
+// Request to get a list of all makes given a year (Non-repeating).
+app.get('/api/get-makes', async (req, res) => {
+    const database = client.db("vehicleDB");
+    const message = database.collection("configurations");
+    const docObject = await message.find({year: selected_year}).toArray();
 
-//TODO: Request to get a list of all models given a year and make (Non-repeating).
+    res.send(docObject);
 
-//TODO: Request to get a list of all engines given a year, make, and model (Non-repeating).
+    let makes = [];
+    for (let i = 0; i < docObject.length; i++) {
+        if (!makes.includes(docObject[i].make)) {
+            makes.push(docObject[i].make);
+        }
+    }
 
-//TODO: Request to get a list of all transmissions given a year, make, model, and engine (Non-repeating).
+    console.log(makes);
+    return makes;
+})
+
+// Request to get a list of all models given a year and make (Non-repeating).
+app.get('/api/get-models', async (req, res) => {
+    const database = client.db("vehicleDB");
+    const message = database.collection("configurations");
+    const docObject = await message.find({year: selected_year, make: selected_make}).toArray();
+
+    res.send(docObject);
+
+    let models = [];
+    for (let i = 0; i < docObject.length; i++) {
+        if (!models.includes(docObject[i].model)) {
+            models.push(docObject[i].model);
+        }
+    }
+
+    console.log(models);
+    return models;
+})
+
+// Request to get a list of all engines given a year, make, and model (Non-repeating).
+app.get('/api/get-engines', async (req, res) => {
+    const database = client.db("vehicleDB");
+    const message = database.collection("configurations");
+    const docObject = await message.find({year: selected_year, make: selected_make, model: selected_model}).toArray();
+
+    res.send(docObject);
+
+    let engines = [];
+    for (let i = 0; i < docObject.length; i++) {
+        if (!engines.includes(docObject[i].engine)) {
+            engines.push(docObject[i].engine);
+        }
+    }
+
+    console.log(engines);
+    return engines;
+})
+
+// Request to get a list of all transmissions given a year, make, model, and engine (Non-repeating).
+app.get('/api/get-transmissions', async (req, res) => {
+    const database = client.db("vehicleDB");
+    const message = database.collection("configurations");
+    const docObject = await message.find({year: selected_year, make: selected_make, model: selected_model, engine: selected_engine}).toArray();
+
+    res.send(docObject);
+
+    let transmissions = [];
+    for (let i = 0; i < docObject.length; i++) {
+        if (!transmissions.includes(docObject[i].transmission)) {
+            transmissions = docObject[i].transmission;
+        }
+    }
+
+    console.log(transmissions);
+    return transmissions;
+})
 
 //TODO: Request to get a list of all maintenance intervals given a vehicle's config_id.
+app.get('/api/get-maintenance-intervals', async (req, res) => {
+    const database = client.db("vehicleDB");
+    const message = database.collection("maintenance");
+
+    const docObject = await message.findOne({config_id: 401999975});
+
+    // forEach?
+
+})
 
 //TODO: Request to get a list of all maintenance tasks given a vehicle's config_id and mileage.
 
