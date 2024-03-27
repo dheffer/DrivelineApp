@@ -8,7 +8,6 @@ import { oauthClient } from './OauthClient.js';
 import 'dotenv/config';
 import client from "./mongo.js";
 import mongo from "./mongo.js"
-import client from './mongo.js'
 
 
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
