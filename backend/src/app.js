@@ -166,7 +166,7 @@ const getVehicleConfig = async (config_id) => {
 }
 
 /***
- * This route is used to get the user's vehicles from the database
+ * This route is used to get a user's vehicles from the database
  */
 app.get('/api/get-user-vehicles', async (req, res) => {
     const database = client.db("vehicleDB");
@@ -196,15 +196,6 @@ app.get('/api/get-user-vehicles', async (req, res) => {
             }
         }
     ]).toArray();
-
-    /*
-    for (let vehicle of vehicles) {
-        let v = vehicle.configurations
-        console.log(`Year: ${v.year}\t Make: ${v.make}\t Model: ${v.model}`);
-    }
-     */
-
-
     res.send(vehicles);
 });
 
