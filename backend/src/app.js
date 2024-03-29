@@ -12,6 +12,7 @@ import mongo from "./mongo.js"
 
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+const DATABASE = client.db("vehicleDB");
 
 console.log("\n\nPROCESS APP PAGE"+CLIENT_ID)
 console.log("PROCESS APP PAGE"+CLIENT_SECRET)
@@ -102,8 +103,8 @@ app.get('/api/user', async (req, res) => {
 
             console.log("Decoded:   "+decoded);
 
-            const database = client.db("vehicleDB");
-            const users = database.collection("users");
+            const DATABASE = client.db("vehicleDB");
+            const users = DATABASE.collection("users");
 
             const user = await users.findOne({email: decoded.email});
             console.log("AUTHORIZ USER: "+user);
@@ -128,9 +129,8 @@ const updateOrCreateUserFromOauth = async (oauthUserInfo) => {
 
     console.log(name);
     console.log(email);
-
-    const database = client.db("vehicleDB");
-    const users = database.collection("users");
+    
+    const users = DATABASE.collection("users");
 
     const existingUser = await users.findOne({email})
 
@@ -147,28 +147,58 @@ const updateOrCreateUserFromOauth = async (oauthUserInfo) => {
     }
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/***
+    * This route is used to get the vehicle information from the DATABASE
+ * @param configId - The config_id of the vehicle
+ */
 app.get('/api/get-vehicle-info', async (req, res) => {
-   const database = client.db("vehicleDB");
-   const vehicle = database.collection("configurations");
-
+   const vehicle = DATABASE.collection("configurations");
    const configId = req.query.configId;
-
    const getConfiguration = await vehicle.findOne({config_id: parseInt(configId)});
 
-    res.json(getConfiguration);
+   res.json(getConfiguration);
 });
 
 /***
- * This route is used to get the user's vehicles from the database
+    * This route is used to get the vehicle history from the DATABASE
+ * @param configId - The config_id of the vehicle
+ * @param email - The email of the user
+ */
+
+app.get('/api/get-vehicle-history', async (req, res) => {
+    const history = DATABASE.collection("user_vehicle_info");
+    const configId = req.query.configId;
+
+    const getHistory = await history.aggregate([
+        {
+            $match: {
+                config_id: parseInt(configId),
+                email: "placeholder"
+            }
+        },
+        {
+            $project: {
+                _id: 0,
+                completed_maintenance: 1
+            }
+        }
+    ]).toArray();
+    res.send(getHistory);
+});
+
+/***
+ * This route is used to get the user's vehicles from the DATABASE
  */
 app.get('/api/get-user-vehicles', async (req, res) => {
-    const database = client.db("vehicleDB");
-    const garage = database.collection("user_garage");
+    const garage = DATABASE.collection("user_garage");
 
     const vehicles = await garage.aggregate([
         {
             $match: {
-                email: "11yomang11@gmail.com"
+                email: "placeholder"
             }
         },
         {
@@ -191,10 +221,8 @@ app.get('/api/get-user-vehicles', async (req, res) => {
     ]).toArray();
     res.send(vehicles);
 });
-
 app.delete('/api/delete-user-vehicle', async (req, res) => {
-    const database = client.db("vehicleDB");
-    const garage = database.collection("user_garage");
+    const garage = DATABASE.collection("user_garage");
 
     const { config_id } = req.body;
     const deletion = await garage.updateOne(
@@ -204,10 +232,13 @@ app.delete('/api/delete-user-vehicle', async (req, res) => {
     return res.json(deletion.modifiedCount);
 });
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 //const config_id = 401988727;
 // app.get('/api/get-maintenance', async (req , res) => {
-//     const database = client.db("vehicleDB");
-//     const message = database.collection("maintenance");
+//     const DATABASE = client.db("vehicleDB");
+//     const message = DATABASE.collection("maintenance");
 //
 //     const docObject =   await message.findOne({config_id: 401988727});
 //     await console.log(docObject);
@@ -215,8 +246,7 @@ app.delete('/api/delete-user-vehicle', async (req, res) => {
 // })
 
 app.get('/api/get-maintenance', async (req , res) => {
-    const database = client.db("vehicleDB");
-    const message = database.collection("maintenance");
+    const message = DATABASE.collection("maintenance");
 
     // const docObject = await message.findOne({ config_id: { $eq: 401988727} });
 
@@ -234,8 +264,7 @@ const selected_transmission = "8A";
 
 //TODO: Request to get a config_id given a vehicle's Year, Make, Model, Engine, and Transmission.
 app.get('/api/get-config-id', async (req, res) => {
-    const database = client.db("vehicleDB");
-    const message = database.collection("configurations");
+    const message = DATABASE.collection("configurations");
 
     //Use for loop to iterate through all the objects in the collection and get the config_id for the object that matches the selected year, make, model, engine, and transmission.
     const docObject = await message.find({year: selected_year, make: selected_make, model: selected_model, engine: selected_engine, transmission: selected_transmission});

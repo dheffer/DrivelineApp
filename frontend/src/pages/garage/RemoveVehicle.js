@@ -30,8 +30,6 @@ function RemoveVehicle(props) {
         fetch("/api/delete-user-vehicle", reqOptions)
             .then((response) => response.text())
             .then((result) => {
-                console.log(result)
-                //props.setInfo(props.info.filter( (bike) => bike.name != evt.target.id));
                 setRefreshData(!refreshData);
             })
             .catch((error) => console.error(error));
