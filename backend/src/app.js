@@ -8,11 +8,14 @@ import { oauthClient } from './OauthClient.js';
 import 'dotenv/config';
 import client from "./mongo.js";
 import mongo from "./mongo.js"
+import {parse} from "dotenv";
 
 
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const DATABASE = client.db("vehicleDB");
+const EMAIL = process.env.EMAIL;
+
 
 console.log("\n\nPROCESS APP PAGE"+CLIENT_ID)
 console.log("PROCESS APP PAGE"+CLIENT_SECRET)
@@ -176,7 +179,7 @@ app.get('/api/get-vehicle-history', async (req, res) => {
         {
             $match: {
                 config_id: parseInt(configId),
-                email: "placeholder"
+                email: EMAIL
             }
         },
         {
@@ -189,6 +192,60 @@ app.get('/api/get-vehicle-history', async (req, res) => {
     res.send(getHistory);
 });
 
+app.post('/api/update-maintenance-history', async (req, res) => {
+    try {
+        const garage = DATABASE.collection("user_vehicle_info");
+
+        const {
+            old_type, old_date, old_maintenance, old_cost,
+            new_type, new_date, new_maintenance, new_cost
+        } = req.body;
+        const update = await garage.updateOne(
+            {
+                email: EMAIL,
+                "completed_maintenance.type": old_type,
+                "completed_maintenance.date": old_date,
+                "completed_maintenance.maintenance": old_maintenance,
+                "completed_maintenance.cost": parseInt(old_cost)
+            },
+            {
+                $set: {
+                    "completed_maintenance.$.type": new_type,
+                    "completed_maintenance.$.date": new_date,
+                    "completed_maintenance.$.maintenance": new_maintenance,
+                    "completed_maintenance.$.cost": parseInt(new_cost)
+                }
+            }
+        );
+        return res.json(update.modifiedCount);
+    } catch (error) {
+        return res.status(500).json({message: error.message});
+    }
+
+});
+
+app.delete('/api/delete-maintenance-history', async (req, res) => {
+    const garage = DATABASE.collection("user_vehicle_info");
+
+    const { type, date, maintenance, cost } = req.body;
+    const deletion = await garage.updateOne(
+        {
+            email: EMAIL
+        },
+        {$pull:
+                {
+                    completed_maintenance: {
+                        type: type,
+                        date: date,
+                        maintenance: maintenance,
+                        cost: cost
+                    }
+                }
+        }
+    );
+    return res.json(deletion.modifiedCount);
+});
+
 /***
  * This route is used to get the user's vehicles from the DATABASE
  */
@@ -198,7 +255,7 @@ app.get('/api/get-user-vehicles', async (req, res) => {
     const vehicles = await garage.aggregate([
         {
             $match: {
-                email: "placeholder"
+                email: EMAIL
             }
         },
         {
@@ -226,7 +283,7 @@ app.delete('/api/delete-user-vehicle', async (req, res) => {
 
     const { config_id } = req.body;
     const deletion = await garage.updateOne(
-        {email: 'placeholder'},
+        {email: EMAIL},
         {$pull: { vehicle_config_ids: config_id } }
     );
     return res.json(deletion.modifiedCount);
@@ -280,6 +337,55 @@ app.get('/api/get-config-id', async (req, res) => {
 //TODO: Request to get a list of all years (Non-repeating).
 
 //TODO: Request to get a list of all makes given a year (Non-repeating).
+app.get('/api/get-makes', async (req, res) => {
+    console.log("hit get makes route");
+
+    const carYear = req.query.year;
+    console.log("year INSIDE MAKES: "+carYear);
+
+    if(!carYear) {
+        return res.status(400).json({message: "Missing required fields"});
+    }
+
+    const database = client.db("vehicleDB");
+    const configurations = database.collection("configurations");
+
+    const makesYear = await configurations.find({year: parseInt(carYear)});
+    console.log("makesYear " + makesYear)
+
+    const makesGroup = await configurations.aggregate([
+        { $match: { year: parseInt(carYear) }},
+        { $group: { _id: "$make", makes: { $addToSet: "$make" } }}
+    ]).toArray();
+     /*
+    const makesGroup = await configurations.aggregate([
+        { $match: { year: parseInt(carYear) }},
+        { $project: { _id: 0, make: 1 }}
+    ]).toArray();
+
+     */
+    console.log("makesGroup " + makesGroup)
+
+    const makesSort = await configurations.aggregate([
+        { $match: { year: parseInt(carYear) }},
+        { $group: { _id: "$make", makes: { $addToSet: "$make" } }},
+        { $sort: { _id: 1 }}
+    ]).toArray();
+
+    console.log("makesSort " + makesSort)
+
+    //     const makes = await configurations.aggregate([
+    //     { $match: { year: year }},
+    //     { $group: { _id: "$make", makes: { $addToSet: "$make" } }},
+    //     { $sort: { _id: 1 }}
+    // ]).toArray();
+    // console.log("makes " + makes)
+
+    // const uniqueMakes = makes.map(make => make._id);
+
+    // console.log("makes " +uniqueMakes)
+    res.send(makesSort);
+})
 
 //TODO: Request to get a list of all models given a year and make (Non-repeating).
 
