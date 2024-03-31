@@ -24,7 +24,6 @@ function VehicleInfo() {
                 if (!res.ok) {
                     throw new Error('Network response was not ok');
                 }
-                console.log();
                 return res.json();
             })
             .then( (vehicle) => {
@@ -34,12 +33,12 @@ function VehicleInfo() {
             .catch( (error) => {
                 console.error('There has been a problem with your fetch operation:', error);
                 });
-    });
+    }, [refreshData]);
 
 
     return (
         <div className="container">
-            <VehicleNavbar/>
+            <VehicleNavbar selected={"info"}/>
             <Routes>
                 <Route path="/garage/vehicle-info/:vehicle/*" />
                 <Route path="/garage/vehicle-history/:vehicle/*" />
@@ -50,18 +49,18 @@ function VehicleInfo() {
                     <Card>
                         <Card.Header>
                             <Card.Title>
-                                <Badge bg="secondary">{info != null ? info.year : "Loading..."}</Badge> {info != null ? info.make+" "+info.model : "Loading..."}
+                                <Badge bg="success">{info != null ? info.year : "Loading..."}</Badge> {info != null ? info.make+" "+info.model : "Loading..."}
                             </Card.Title>
                         </Card.Header>
                         <Card.Body>
                             <Row>
                                 <Col>
-                                    <Card.Text>Year: {info != null ? info.year : "Loading..."}</Card.Text>
-                                    <Card.Text>Make: {info != null ? info.make : "Loading..."}</Card.Text>
-                                    <Card.Text>Model: {info != null ? info.model : "Loading..."}</Card.Text>
-                                    <Card.Text>Engine: {info != null ? info.engine : "Loading..."}</Card.Text>
-                                    <Card.Text>Transmission: {info != null ? info.transmission : "Loading..."}</Card.Text>
-                                    <Card.Text>Config ID: {info != null ? info.config_id: "Loading..."}</Card.Text>
+                                    <Card.Text><Badge bg="dark">Year</Badge> {info != null ? info.year : "Loading..."}</Card.Text>
+                                    <Card.Text><Badge bg="dark">Make</Badge> {info != null ? info.make : "Loading..."}</Card.Text>
+                                    <Card.Text><Badge bg="dark">Model</Badge> {info != null ? info.model : "Loading..."}</Card.Text>
+                                    <Card.Text><Badge bg="dark">Engine</Badge> {info != null ? info.engine : "Loading..."}</Card.Text>
+                                    <Card.Text><Badge bg="dark">Transmission</Badge> {info != null ? info.transmission : "Loading..."}</Card.Text>
+                                    <Card.Text><Badge bg="dark">Config ID</Badge> {info != null ? info.config_id: "Loading..."}</Card.Text>
                                 </Col>
                                 <Col>
                                     <Card.Text>x: {info != null ? null : "Loading..."}</Card.Text>

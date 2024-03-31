@@ -1,9 +1,16 @@
+import {useNavigate} from "react-router-dom";
+import Button from "react-bootstrap/Button";
+
 function UploadVehicleHistory() {
+    let navigate = useNavigate();
+
     return (
         <div>
             <h1>Upload Vehicle History</h1>
-            <p>Upload a file</p>
-            <p>Placeholder</p>
+            <p>Uh oh! This page isn't finished yet!</p>
+            <Button onClick={() => navigate(-1)}>
+                Go Back
+            </Button>
         </div>
     )
 }

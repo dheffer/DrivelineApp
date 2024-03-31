@@ -9,10 +9,14 @@ import 'dotenv/config';
 import client from "./mongo.js";
 import mongo from "./mongo.js"
 import e from 'express';
+import {parse} from "dotenv";
 
 const userEmail = "";
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
+const DATABASE = client.db("vehicleDB");
+const EMAIL = process.env.EMAIL;
+
 
 console.log("\n\nPROCESS APP PAGE"+CLIENT_ID)
 console.log("PROCESS APP PAGE"+CLIENT_SECRET)
@@ -103,8 +107,8 @@ app.get('/api/user', async (req, res) => {
 
             console.log("Decoded:   "+decoded);
 
-            const database = client.db("vehicleDB");
-            const users = database.collection("users");
+            const DATABASE = client.db("vehicleDB");
+            const users = DATABASE.collection("users");
 
             const user = await users.findOne({email: decoded.email});
             console.log("AUTHORIZ USER: "+user);
@@ -129,9 +133,8 @@ const updateOrCreateUserFromOauth = async (oauthUserInfo) => {
 
     console.log(name);
     console.log(email);
-
-    const database = client.db("vehicleDB");
-    const users = database.collection("users");
+    
+    const users = DATABASE.collection("users");
 
     const existingUser = await users.findOne({email})
 
@@ -148,28 +151,112 @@ const updateOrCreateUserFromOauth = async (oauthUserInfo) => {
     }
 }
 
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+/***
+    * This route is used to get the vehicle information from the DATABASE
+ * @param configId - The config_id of the vehicle
+ */
 app.get('/api/get-vehicle-info', async (req, res) => {
-   const database = client.db("vehicleDB");
-   const vehicle = database.collection("configurations");
-
+   const vehicle = DATABASE.collection("configurations");
    const configId = req.query.configId;
-
    const getConfiguration = await vehicle.findOne({config_id: parseInt(configId)});
 
-    res.json(getConfiguration);
+   res.json(getConfiguration);
 });
 
 /***
- * This route is used to get the user's vehicles from the database
+    * This route is used to get the vehicle history from the DATABASE
+ * @param configId - The config_id of the vehicle
+ * @param email - The email of the user
+ */
+
+app.get('/api/get-vehicle-history', async (req, res) => {
+    const history = DATABASE.collection("user_vehicle_info");
+    const configId = req.query.configId;
+
+    const getHistory = await history.aggregate([
+        {
+            $match: {
+                config_id: parseInt(configId),
+                email: EMAIL
+            }
+        },
+        {
+            $project: {
+                _id: 0,
+                completed_maintenance: 1
+            }
+        }
+    ]).toArray();
+    res.send(getHistory);
+});
+
+app.post('/api/update-maintenance-history', async (req, res) => {
+    try {
+        const garage = DATABASE.collection("user_vehicle_info");
+
+        const {
+            old_type, old_date, old_maintenance, old_cost,
+            new_type, new_date, new_maintenance, new_cost
+        } = req.body;
+        const update = await garage.updateOne(
+            {
+                email: EMAIL,
+                "completed_maintenance.type": old_type,
+                "completed_maintenance.date": old_date,
+                "completed_maintenance.maintenance": old_maintenance,
+                "completed_maintenance.cost": parseInt(old_cost)
+            },
+            {
+                $set: {
+                    "completed_maintenance.$.type": new_type,
+                    "completed_maintenance.$.date": new_date,
+                    "completed_maintenance.$.maintenance": new_maintenance,
+                    "completed_maintenance.$.cost": parseInt(new_cost)
+                }
+            }
+        );
+        return res.json(update.modifiedCount);
+    } catch (error) {
+        return res.status(500).json({message: error.message});
+    }
+
+});
+
+app.delete('/api/delete-maintenance-history', async (req, res) => {
+    const garage = DATABASE.collection("user_vehicle_info");
+
+    const { type, date, maintenance, cost } = req.body;
+    const deletion = await garage.updateOne(
+        {
+            email: EMAIL
+        },
+        {$pull:
+                {
+                    completed_maintenance: {
+                        type: type,
+                        date: date,
+                        maintenance: maintenance,
+                        cost: cost
+                    }
+                }
+        }
+    );
+    return res.json(deletion.modifiedCount);
+});
+
+/***
+ * This route is used to get the user's vehicles from the DATABASE
  */
 app.get('/api/get-user-vehicles', async (req, res) => {
-    const database = client.db("vehicleDB");
-    const garage = database.collection("user_garage");
+    const garage = DATABASE.collection("user_garage");
 
     const vehicles = await garage.aggregate([
         {
             $match: {
-                email: "11yomang11@gmail.com"
+                email: EMAIL
             }
         },
         {
@@ -192,22 +279,23 @@ app.get('/api/get-user-vehicles', async (req, res) => {
     ]).toArray();
     res.send(vehicles);
 });
-
 app.delete('/api/delete-user-vehicle', async (req, res) => {
-    const database = client.db("vehicleDB");
-    const garage = database.collection("user_garage");
+    const garage = DATABASE.collection("user_garage");
 
     const { config_id } = req.body;
     const deletion = await garage.updateOne(
-        {email: 'placeholder'},
+        {email: EMAIL},
         {$pull: { vehicle_config_ids: config_id } }
     );
     return res.json(deletion.modifiedCount);
 });
 
+
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
 app.get('/api/get-maintenance', async (req , res) => {
-    const database = client.db("vehicleDB");
-    const message = database.collection("maintenance");
+    const message = DATABASE.collection("maintenance");
 
     // const docObject = await message.findOne({ config_id: { $eq: 401988727} });
 
@@ -217,7 +305,6 @@ app.get('/api/get-maintenance', async (req , res) => {
 })
 
 
-//TODO: Request to get a config_id given a vehicle's Year, Make, Model, Engine, and Transmission.
 app.get('/api/get-config-id', async (req, res) => {
     const year = req.query.year;
     const make = req.query.make;
@@ -229,7 +316,8 @@ app.get('/api/get-config-id', async (req, res) => {
         return res.status(400).json({message: "Missing required fields"});
     }
     const database = client.db("vehicleDB");
-    const message = database.collection("configurations");
+
+    const message = DATABASE.collection("configurations");
 
     const config_id = await message.findOne({year: parseInt(year), make: make, model: model, engine: engine, transmission: transmission});
     console.log("config_id: "+config_id.config_id);
@@ -237,7 +325,6 @@ app.get('/api/get-config-id', async (req, res) => {
     res.send(config_id);
 })
 
-//TODO: Request to get a list of all years (Non-repeating).
 app.get('/api/get-years', async (req, res) => {
     const database = client.db("vehicleDB");
     const configurations = database.collection("configurations");
@@ -248,10 +335,9 @@ app.get('/api/get-years', async (req, res) => {
     res.send(years);
 })
 
-//TODO: Request to get a list of all makes given a year (Non-repeating).
 app.get('/api/get-makes', async (req, res) => {
     const carYear = req.query.year;
-
+  
     if(!carYear) {
         return res.status(400).json({message: "Missing required fields"});
     }
@@ -264,14 +350,12 @@ app.get('/api/get-makes', async (req, res) => {
         { $group: { _id: "$make", makes: { $addToSet: "$make" } }},
         { $sort: { _id: 1 }}
     ]).toArray();
-
+  
     const uniqueMakes = makes.map(make => make._id);
 
-    console.log("makes " +uniqueMakes)
-    res.send(uniqueMakes);
+    res.send(uniqueMakes);  
 })
 
-//TODO: Request to get a list of all models given a year and make (Non-repeating).
 app.get('/api/get-models', async (req, res) => {
     const year = req.query.year;
     const make = req.query.make;

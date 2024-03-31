@@ -59,25 +59,23 @@ function Garage(props) {
 
                     {
                         props.info != null ?
-                        props.info.map((vehicle, index) => {
-                            //console.log(garageVehicles[0][0].configurations.year);
-                            vehicle_count++;
-                            if (vehicle_count === 1 || vehicle_count % 3 === 0) {
-                                return (
-                                    <Row key={index} xs={1} md={3} className="g-4">
-                                        <Col key={vehicle.configurations.name}>
-                                            <Vehicle vehicle={vehicle} id={index}/>
-                                        </Col>
-                                    </Row>
-                                )
-                            }
-                            return (
-                                <Col key={vehicle.configurations.name}>
-                                    <Vehicle vehicle={vehicle} id={index}/>
-                                </Col>
-                            )
-                        }) : null
+                            props.info.reduce((rows, vehicle, index) => {
+                                if (index % 3 === 0) {
+                                    rows.push([]);
+                                }
+                                rows[rows.length - 1].push(
+                                    <Col key={vehicle.configurations.name}>
+                                        <Vehicle vehicle={vehicle} id={index}/>
+                                    </Col>
+                                );
+                                return rows;
+                            }, []).map((row, rowIndex) => (
+                                <Row key={rowIndex} xs={1} md={3} className="g-4">
+                                    {row}
+                                </Row>
+                            )) : null
                     }
+
                 </div>
                 <div className="col-md-1 order-md-3"></div>
             </div>
