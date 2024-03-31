@@ -23,22 +23,29 @@ export const Settings = (props) => {
                 <Offcanvas.Header closeButton>
                     <Offcanvas.Title>Settings</Offcanvas.Title>
                 </Offcanvas.Header>
-                <Offcanvas.Body >
+                <Offcanvas.Body>
                     <div>
                         <label className={"pe-1"}>Dark Mode </label>
-                        <input type="checkbox" checked={darkMode} onChange={(e) => setDarkMode(!darkMode)}/>
+                        <input type="checkbox" checked={darkMode}
+                               disabled
+                               onChange={(e) => setDarkMode(!darkMode)}/>
                     </div>
                     <div>
                         <label className={"pe-1"}>Notifications </label>
                         <input type="checkbox" checked={notifications}
+                               disabled
                                onChange={(e) => setNotifications(!notifications)}/>
                     </div>
                     <div>
                         <label className={"pe-1"}>Unit of Measurement</label>
-                        <select value={unitOfMeasurement} onChange={(e) => setUnitOfMeasurement(e.target.value)}>
+                        <select value={unitOfMeasurement} disabled
+                                onChange={(e) => setUnitOfMeasurement(e.target.value)}>
                             <option value="metric">Metric</option>
                             <option value="imperial">Imperial</option>
                         </select>
+                    </div>
+                    <div className={"mt-3"}>
+                        <Button variant="primary" onClick={() => localStorage.clear()}>Logout</Button>
                     </div>
                 </Offcanvas.Body>
             </Offcanvas>
