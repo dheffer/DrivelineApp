@@ -46,18 +46,26 @@ function VehicleHistory(props) {
                 <Route path="/garage/vehicle-history/:vehicle/*"/>
             </Routes>
 
-            <UploadNavbar/>
-            <Routes>
-                <Route path="/garage/vehicle-history/upload"/>
-                <Route path="/garage/vehicle-history/manual"/>
-            </Routes>
             <div className="row">
                 <div className="col-md-1 order-md-1"/>
                 <div className="col-md-10 order-md-2">
                     <div className="row">
                         <div className="col-md-1"/>
-                        <div className="col-md-10">
-                            <h1>Vehicle History</h1>
+                        <div className="col-md-10 mt-4">
+                            <Row>
+                                <Col>
+                                    <h1>Vehicle History</h1>
+                                </Col>
+                                <Col>
+                                    <UploadNavbar/>
+                                    <Routes>
+                                        <Route path="/garage/vehicle-history/upload"/>
+                                        <Route path="/garage/vehicle-history/manual"/>
+                                    </Routes>
+                                </Col>
+                                <Col/>
+                            </Row>
+
                         </div>
                         <div className="col-md-1"/>
                     </div>
