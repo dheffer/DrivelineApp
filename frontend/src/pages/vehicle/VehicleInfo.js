@@ -1,47 +1,85 @@
-import {BrowserRouter, Routes, Route, useParams} from "react-router-dom";
+import {Routes, Route, useLocation} from "react-router-dom";
 import VehicleNavbar from "./VehicleNavbar";
-import {Card, Col, Row} from "react-bootstrap";
+import {Badge, Card, Col, Row} from "react-bootstrap";
+import React, {useEffect, useState} from "react";
 
 function VehicleInfo() {
-    let { vehicle } = useParams();
-    let parsed = vehicle.replaceAll("-", " ");
-    let year = parsed.split(" ")[0];
-    let model = parsed.split(" ")[1]
-    let make = parsed.split(" ")[2];
-    model = model[0].toUpperCase() + model.slice(1);
-    make = make[0].toUpperCase() + make.slice(1);
+    const location = useLocation();
+    const { configId } = location.state;
+
+    const [loading, setLoading] = useState(true);
+    const [refreshData, setRefreshData] = useState(false);
+
+    const [info, setInfo] = useState(null);
+
+    useEffect(() => {
+        const myHeaders = new Headers();
+        const reqOptions = {
+            method: 'GET',
+            headers: myHeaders,
+            redirect: 'follow'
+        };
+        fetch('/api/get-vehicle-info?configId='+configId, reqOptions)
+            .then( (res) => {
+                if (!res.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return res.json();
+            })
+            .then( (vehicle) => {
+                setInfo(vehicle);
+                setLoading(false);
+                })
+            .catch( (error) => {
+                console.error('There has been a problem with your fetch operation:', error);
+                });
+    }, [refreshData]);
+
+
     return (
-        <div>
-            <VehicleNavbar />
+        <div className="container">
+            <VehicleNavbar selected={"info"}/>
             <Routes>
-                <Route path="/garage/vehicle-info/:vehicle" />
-                <Route path="/garage/vehicle-history/:vehicle" />
+                <Route path="/garage/vehicle-info/:vehicle/*" />
+                <Route path="/garage/vehicle-history/:vehicle/*" />
             </Routes>
-
-            <p>{year} {model} {make}</p>
-
+            <div className="row mt-3">
+                <div className="col-md-1 order-md-1" />
+                <div className="col-md-10 order-md-2">
+                    <Card>
+                        <Card.Header>
+                            <Card.Title>
+                                <Badge bg="success">{info != null ? info.year : "Loading..."}</Badge> {info != null ? info.make+" "+info.model : "Loading..."}
+                            </Card.Title>
+                        </Card.Header>
+                        <Card.Body>
+                            <Row>
+                                <Col>
+                                    <Card.Text><Badge bg="dark">Year</Badge> {info != null ? info.year : "Loading..."}</Card.Text>
+                                    <Card.Text><Badge bg="dark">Make</Badge> {info != null ? info.make : "Loading..."}</Card.Text>
+                                    <Card.Text><Badge bg="dark">Model</Badge> {info != null ? info.model : "Loading..."}</Card.Text>
+                                    <Card.Text><Badge bg="dark">Engine</Badge> {info != null ? info.engine : "Loading..."}</Card.Text>
+                                    <Card.Text><Badge bg="dark">Transmission</Badge> {info != null ? info.transmission : "Loading..."}</Card.Text>
+                                    <Card.Text><Badge bg="dark">Config ID</Badge> {info != null ? info.config_id: "Loading..."}</Card.Text>
+                                </Col>
+                                <Col>
+                                    <Card.Text>x: {info != null ? null : "Loading..."}</Card.Text>
+                                    <Card.Text>x: {info != null ? info.state : "Loading..."}</Card.Text>
+                                    <Card.Text>x: {info != null ? null : "Loading..."}</Card.Text>
+                                    <Card.Text>x: {info != null ? null : "Loading..."}</Card.Text>
+                                    <Card.Text>x: {info != null ? info.registration : "Loading..."}</Card.Text>
+                                    <Card.Text>x: {info != null ? null : "Loading..."}</Card.Text>
+                                    <Card.Text>x: {info != null ? null : "Loading..."}</Card.Text>
+                                    <Card.Text>x: {info != null ? null : "Loading..."}</Card.Text>
+                                </Col>
+                            </Row>
+                        </Card.Body>
+                    </Card>
+                </div>
+                <div className="col-md-1 order-md-3" />
+            </div>
         </div>
     );
 }
 
 export default VehicleInfo;
-
-
-
-<Row xs={1} md={2} className="g-4">
-    {Array.from({ length: 4 }).map((_, idx) => (
-        <Col key={idx}>
-            <Card>
-                <Card.Img variant="top" src="holder.js/100px160" />
-                <Card.Body>
-                    <Card.Title>Card title</Card.Title>
-                    <Card.Text>
-                        This is a longer card with supporting text below as a natural
-                        lead-in to additional content. This content is a little bit
-                        longer.
-                    </Card.Text>
-                </Card.Body>
-            </Card>
-        </Col>
-    ))}
-</Row>
