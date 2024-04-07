@@ -85,12 +85,12 @@ function VehicleHistory(props) {
                                         maintenance.completed_maintenance.map((service, index) => {
                                             return (
                                                 <tr key={index}>
-                                                    <td><UpdateMaintenanceHistory maintenanceInfo={service} /></td>
+                                                    <td><UpdateMaintenanceHistory maintenanceInfo={service} configId={configId}/></td>
                                                     <td>{service.type}</td>
                                                     <td>{service.date}</td>
                                                     <td>{service.maintenance}</td>
                                                     <td>{service.cost}</td>
-                                                    <td><DeleteMaintenanceHistory maintenanceInfo={service}/></td>
+                                                    <td><DeleteMaintenanceHistory maintenanceInfo={service} configId={configId}/></td>
                                                 </tr>
                                             )
                                         }) : <tr>
@@ -142,7 +142,7 @@ function UpdateMaintenanceHistory(props) {
             redirect: 'follow'
         };
 
-        fetch("/api/update-maintenance-history", reqOptions)
+        fetch("/api/update-maintenance-history?configId="+props.configId, reqOptions)
             .then((res) =>
                 res.json())
             .then((result) => {
@@ -244,7 +244,7 @@ function DeleteMaintenanceHistory(props) {
             redirect: "follow"
         };
 
-        fetch("/api/delete-maintenance-history", reqOptions)
+        fetch("/api/delete-maintenance-history?configId="+props.configId, reqOptions)
             .then((response) => response.text())
             .then((result) => {
                 setRefreshData(!refreshData);
