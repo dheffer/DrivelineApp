@@ -193,36 +193,69 @@ app.get('/api/get-vehicle-history', async (req, res) => {
     res.send(getHistory);
 });
 
+/***
+    * This route is used to add maintenance history to the DATABASE
+ * @param configId - The config_id of the vehicle
+ * @param type - The type of maintenance
+ * @param date - The date of the maintenance
+ * @param maintenance - The maintenance performed
+ * @param cost - The cost of the maintenance
+ * @param email - The email of the user
+ */
+app.post('/api/add-maintenance-history', async (req, res) => {
+    const garage = DATABASE.collection("user_vehicle_info");
+    const configId = req.query.configId;
+    const maintenance = {
+        type: req.body.type,
+        date: req.body.date,
+        maintenance: req.body.maintenance,
+        cost: parseInt(req.body.cost)
+    };
+    const add = await garage.updateOne(
+        { email: EMAIL, config_id: parseInt(configId) },
+        { $push: { completed_maintenance: maintenance } }
+    );
+    return res.json(add.modifiedCount);
+});
+
+/***
+    * This route is used to update maintenance history in the DATABASE
+ * @param configId - The config_id of the vehicle
+ * @param old_type - The old type of maintenance
+ * @param old_date - The old date of the maintenance
+ * @param old_maintenance - The old maintenance performed
+ * @param old_cost - The old cost of the maintenance
+ * @param new_type - The new type of maintenance
+ * @param new_date - The new date of the maintenance
+ * @param new_maintenance - The new maintenance performed
+ * @param new_cost - The new cost of the maintenance
+ * @param email - The email of the user
+ */
 app.post('/api/update-maintenance-history', async (req, res) => {
-    try {
-        const garage = DATABASE.collection("user_vehicle_info");
-
-        const {
-            old_type, old_date, old_maintenance, old_cost,
-            new_type, new_date, new_maintenance, new_cost
-        } = req.body;
-        const update = await garage.updateOne(
-            {
-                email: EMAIL,
-                "completed_maintenance.type": old_type,
-                "completed_maintenance.date": old_date,
-                "completed_maintenance.maintenance": old_maintenance,
-                "completed_maintenance.cost": parseInt(old_cost)
-            },
-            {
-                $set: {
-                    "completed_maintenance.$.type": new_type,
-                    "completed_maintenance.$.date": new_date,
-                    "completed_maintenance.$.maintenance": new_maintenance,
-                    "completed_maintenance.$.cost": parseInt(new_cost)
-                }
+    const garage = DATABASE.collection("user_vehicle_info");
+    const configId = req.query.configId;
+    const {
+        old_type, old_date, old_maintenance, old_cost,
+        new_type, new_date, new_maintenance, new_cost
+    } = req.body;
+    const update = await garage.updateOne(
+        {
+            email: EMAIL,
+            config_id: configId,
+            "completed_maintenance.type": old_type,
+            "completed_maintenance.date": old_date,
+            "completed_maintenance.maintenance": old_maintenance,
+            "completed_maintenance.cost": parseInt(old_cost)
+        },
+        {
+            $set: {
+                "completed_maintenance.$.type": new_type,
+                "completed_maintenance.$.date": new_date,
+                "completed_maintenance.$.maintenance": new_maintenance,
+                "completed_maintenance.$.cost": parseInt(new_cost)
             }
-        );
-        return res.json(update.modifiedCount);
-    } catch (error) {
-        return res.status(500).json({message: error.message});
-    }
-
+        });
+    return res.json(update.modifiedCount);
 });
 
 app.delete('/api/delete-maintenance-history', async (req, res) => {
@@ -432,8 +465,8 @@ app.post('/api/add-vehicle', async (req, res) => {
     const config_id = req.body.config_id;
     console.log("ADD: Config_id: "+config_id);
 
-    const database = client.db("vehicleDB");
-    const garage = database.collection("user_garage");
+    //const database = client.db("vehicleDB");
+    const garage = DATABASE.collection("user_garage");
 
     try{
         const exist = await garage.findOne({email});

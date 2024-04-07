@@ -1,4 +1,4 @@
-import {BrowserRouter, Routes, Route, useParams, useLocation} from "react-router-dom";
+import {Routes, Route, useLocation} from "react-router-dom";
 import VehicleNavbar from "./VehicleNavbar";
 import UploadNavbar from "../maintenance-history/UploadNavbar";
 import {useEffect, useRef, useState} from "react";
@@ -40,7 +40,7 @@ function VehicleHistory(props) {
 
     return (
         <div className="container">
-            <VehicleNavbar selected={"history"}/>
+            <VehicleNavbar selected={"history"} configId={configId}/>
             <Routes>
                 <Route path="/garage/vehicle-info/:vehicle/*"/>
                 <Route path="/garage/vehicle-history/:vehicle/*"/>
@@ -54,14 +54,10 @@ function VehicleHistory(props) {
                         <div className="col-md-10 mt-4">
                             <Row>
                                 <Col>
-                                    <h1>Vehicle History</h1>
+                                    <h1>Maintenance History</h1>
                                 </Col>
                                 <Col>
-                                    <UploadNavbar/>
-                                    <Routes>
-                                        <Route path="/garage/vehicle-history/upload"/>
-                                        <Route path="/garage/vehicle-history/manual"/>
-                                    </Routes>
+                                    <UploadNavbar configId={configId}/>
                                 </Col>
                                 <Col/>
                             </Row>
@@ -172,14 +168,20 @@ function UpdateMaintenanceHistory(props) {
                                     <Col>
                                         <InputGroup hasValidation>
                                             <InputGroup.Text>Type</InputGroup.Text>
-                                            <Form.Control type="text" placeholder={props.maintenanceInfo.type}
-                                                          ref={typeText} required/>
+                                            <Form.Select type="as" defaultValue={props.maintenanceInfo.type}
+                                                         ref={typeText} required>
+                                                <option value="Maintenance">Maintenance</option>
+                                                <option value="Repair">Repair</option>
+                                                <option value="Inspection">Inspection</option>
+                                                <option value="Replacement">Replacement</option>
+                                                <option value="Other">Other</option>
+                                            </Form.Select>
                                         </InputGroup>
                                     </Col>
                                     <Col>
                                         <InputGroup hasValidation>
                                             <InputGroup.Text>Date</InputGroup.Text>
-                                            <Form.Control type="text" placeholder={props.maintenanceInfo.date}
+                                            <Form.Control type="date" placeholder={props.maintenanceInfo.date}
                                                           ref={dateText} required/>
                                         </InputGroup>
                                     </Col>
@@ -195,7 +197,7 @@ function UpdateMaintenanceHistory(props) {
                                     <Col>
                                         <InputGroup hasValidation>
                                             <InputGroup.Text>Cost</InputGroup.Text>
-                                            <Form.Control type="text" placeholder={props.maintenanceInfo.cost}
+                                            <Form.Control type="number" placeholder={props.maintenanceInfo.cost}
                                                           ref={costText} required/>
                                         </InputGroup>
                                     </Col>
@@ -204,9 +206,9 @@ function UpdateMaintenanceHistory(props) {
                             </Form.Group>
                         </Form>
                     </Modal.Body>
-                    <Modal.Footer>
-                        <Button variant="primary" onClick={submit}>Save changes</Button>
+                    <Modal.Footer className={'mx-auto'}>
                         <Button variant="secondary" onClick={handleClose}>Close</Button>
+                        <Button variant="success" onClick={submit}>Save changes</Button>
                     </Modal.Footer>
                 </Modal.Dialog>
             </Modal>
