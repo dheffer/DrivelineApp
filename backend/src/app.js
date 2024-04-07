@@ -314,13 +314,17 @@ app.get('/api/get-user-vehicles', async (req, res) => {
 });
 app.delete('/api/delete-user-vehicle', async (req, res) => {
     const garage = DATABASE.collection("user_garage");
+    const vehicInfo = DATABASE.collection("user_vehicle_info");
 
     const { config_id } = req.body;
     const deletion = await garage.updateOne(
         {email: EMAIL},
         {$pull: { vehicle_config_ids: config_id } }
     );
-    return res.json(deletion.modifiedCount);
+    const deletionTwo = await vehicInfo.deleteOne(
+        {email: EMAIL, config_id: config_id}
+    );
+    return res.json(deletion.modifiedCount+deletionTwo.deletedCount);
 });
 
 
