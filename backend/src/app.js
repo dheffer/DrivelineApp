@@ -281,13 +281,17 @@ app.get('/api/get-user-vehicles', async (req, res) => {
 });
 app.delete('/api/delete-user-vehicle', async (req, res) => {
     const garage = DATABASE.collection("user_garage");
+    const vehicInfo = DATABASE.collection("user_vehicle_info");
 
     const { config_id } = req.body;
     const deletion = await garage.updateOne(
         {email: EMAIL},
         {$pull: { vehicle_config_ids: config_id } }
     );
-    return res.json(deletion.modifiedCount);
+    const deletionTwo = await vehicInfo.deleteOne(
+        {email: EMAIL, config_id: config_id}
+    );
+    return res.json(deletion.modifiedCount+deletionTwo.deletedCount);
 });
 
 
@@ -426,27 +430,23 @@ app.get('/api/get-transmissions', async (req, res) => {
 app.post('/api/add-vehicle', async (req, res) => {
     console.log("ADD: Hit add vehicle route");
 
-    const email = req.body.email;
-    console.log("ADD: Users email: "+email);
-
     const config_id = req.body.config_id;
-    console.log("ADD: Config_id: "+config_id);
 
     const database = client.db("vehicleDB");
     const garage = database.collection("user_garage");
 
     try{
-        const exist = await garage.findOne({email});
+        const exist = await garage.findOne({EMAIL});
         if(exist) {
             const result = await garage.updateOne(
-                { email },
+                { email: EMAIL },
                 { $addToSet: { vehicle_config_ids: config_id } }
             );
             return res.json(result);
         }
         else {
             const result = await garage.insertOne(
-                { email, vehicle_config_ids: [config_id] }
+                { email: EMAIL, vehicle_config_ids: [config_id] }
             );
             return res.json(result);
         }

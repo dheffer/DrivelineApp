@@ -71,7 +71,6 @@ function AddVehicle() {
     }
 
     const addVehicleToUser = async () => {
-        console.log("CONFIG ID in ADD vehicle: " + configId);
         try{
             const response = await fetch('/api/add-vehicle', {
                 method: 'POST',
@@ -79,7 +78,6 @@ function AddVehicle() {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    email: "johnson@gmail,com",
                     config_id: configId
                 })
             });
