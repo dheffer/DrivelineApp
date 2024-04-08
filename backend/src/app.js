@@ -312,6 +312,7 @@ app.get('/api/get-user-vehicles', async (req, res) => {
     ]).toArray();
     res.send(vehicles);
 });
+
 app.delete('/api/delete-user-vehicle', async (req, res) => {
     const garage = DATABASE.collection("user_garage");
     const vehicInfo = DATABASE.collection("user_vehicle_info");
