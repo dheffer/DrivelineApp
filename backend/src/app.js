@@ -329,7 +329,8 @@ app.get('/api/get-years', async (req, res) => {
     const database = client.db("vehicleDB");
     const configurations = database.collection("configurations");
     const years = await configurations.aggregate([
-        { $group: { _id: "$year", years: { $addToSet: "$year" } }}
+        { $group: { _id: "$year", years: { $addToSet: "$year" } }},
+        { $sort: { _id: 1 }}
     ]).toArray();
     console.log("years ", years);
     res.send(years);
@@ -424,6 +425,7 @@ app.get('/api/get-transmissions', async (req, res) => {
 });
 
 app.post('/api/add-vehicle', async (req, res) => {
+    const userEmail = process.env.EMAIL;
     console.log("ADD: Hit add vehicle route");
 
     const email = req.body.email;
@@ -434,21 +436,26 @@ app.post('/api/add-vehicle', async (req, res) => {
 
     const database = client.db("vehicleDB");
     const garage = database.collection("user_garage");
+    const userVehicle = database.collection("user_vehicle_info");
 
     try{
-        const exist = await garage.findOne({email});
+        const exist = await garage.findOne({email: userEmail});
         if(exist) {
-            const result = await garage.updateOne(
-                { email },
+            await garage.updateOne(
+                { email: userEmail },
                 { $addToSet: { vehicle_config_ids: config_id } }
             );
-            return res.json(result);
+            await userVehicle.insertOne(
+                { email: userEmail, config_id: config_id, odometer: 0, upcoming_maintenance: [], completed_maintenance: [] })
+            return res.status(200).json({message: "Vehicle added to garage"});
         }
         else {
-            const result = await garage.insertOne(
-                { email, vehicle_config_ids: [config_id] }
-            );
-            return res.json(result);
+            await garage.insertOne(
+                { email: userEmail, vehicle_config_ids: [config_id] }
+            )
+            await userVehicle.insertOne(
+                { email: userEmail, config_id: config_id, odometer: 0, upcoming_maintenance: [], completed_maintenance: [] })
+            return res.status(200).json({message: "User Vehicle added to info"});
         }
     }
     catch(err) {
