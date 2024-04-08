@@ -4,6 +4,8 @@ import React from "react";
 import {useState, useEffect} from 'react';
 import Settings from "./Settings";
 import Button from "react-bootstrap/Button";
+import { GearFill } from 'react-bootstrap-icons';
+import '../App.css';
 
 function NavBar() {
     const [user, setUser] = useState("Placeholder User");
@@ -22,7 +24,7 @@ function NavBar() {
                         const data = await response.json();
                         console.log("USERNAME DATA: "+data.name);
                         setUser(data.name);
-                    
+
                     }
                     else {
                         console.error("User not found");
@@ -35,18 +37,22 @@ function NavBar() {
         }
         fetchUser();
     }, []);
+
     return (
-        <Navbar expand="lg" className="bg-body-tertiary" sticky={"top"}>
+        <Navbar expand="lg" className="bg-body-tertiary" sticky="top">
             <Container>
                 <Navbar.Brand href="/garage">Driveline</Navbar.Brand>
                 <Navbar.Toggle />
                 <Navbar.Collapse>
-                    <Nav>
-                        <Nav.Link href="/garage"><Button variant="primary">Garage</Button></Nav.Link>
+                    <Nav className="me-auto">
+                        <Nav.Link href="/garage">Garage</Nav.Link>
                     </Nav>
                 </Navbar.Collapse>
-                <Nav className={"ms-auto"}>
-                    <Navbar.Text ><Settings greeting={`Signed in as: ${user || 'LOADING...'}`}/></Navbar.Text>
+                <Nav className="ms-auto">
+                    <Nav.Link>
+                        <Settings greeting={`${user || 'LOADING...'}`} />
+                        <GearFill className="mr-2" />
+                    </Nav.Link>
                     <Settings />
                 </Nav>
             </Container>

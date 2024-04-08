@@ -5,6 +5,7 @@ import {Button, Card, Col, Row} from "react-bootstrap";
 import Container from 'react-bootstrap/Container';
 import {useEffect, useState} from "react";
 import Vehicle from "./Vehicle";
+import '../../App.css';
 
 function Garage(props) {
     const [loading, setLoading] = useState(true);

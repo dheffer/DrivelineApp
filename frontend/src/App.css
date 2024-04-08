@@ -28,6 +28,41 @@
   color: #61dafb;
 }
 
+body, .navbar-nav .nav-link, .navbar-text {
+  font-family: 'Roboto Bold', sans-serif;
+    font-size: large;
+
+
+}
+
+.navbar-brand {
+  font-family: 'Roboto Slab', serif;
+  font-weight: 700;
+  font-size: large;
+}
+
+.navbar {
+  align-items: center;
+}
+
+.navbar-brand, .navbar-nav .nav-link, .navbar-text {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+button, .btn {
+  background-color: #2872a7 !important;
+  border-color: #2872a7 !important;
+  color: white !important;
+}
+
+.custom-button-primary, .custom-button-success {
+  background-color: #2872a7 !important;
+  border-color: #2872a7 !important;
+  color: white !important;
+}
+
 @keyframes App-logo-spin {
   from {
     transform: rotate(0deg);
