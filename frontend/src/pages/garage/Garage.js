@@ -41,6 +41,31 @@ function Garage(props) {
             });
     }, [refreshData]);
 
+    const updateOdometer = async (configID, email) => {
+        try{
+            const response = await fetch("/api/update-odometer", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    vehicle_config_ids : configID,
+                    email: email,
+                    //odometer: odometer
+                })
+            });
+            if(response.ok){
+                setRefreshData(!refreshData);
+            }
+            else{
+                console.error("Failed to update Odometer");
+            }
+        }
+        catch (error){
+            console.error("Catch Failed to update Odometer");
+        }
+    }
+
     let vehicle_count = 0;
 
     return (
@@ -66,6 +91,7 @@ function Garage(props) {
                                 rows[rows.length - 1].push(
                                     <Col key={vehicle.configurations.name}>
                                         <Vehicle vehicle={vehicle} id={index}/>
+                                        {console.log(vehicle)}
                                     </Col>
                                 );
                                 return rows;

@@ -46,7 +46,7 @@ export const Login = () => {
     return (
         <div>
             {error && <p>{error}</p>}
-            <h1>Welcome to Vehicle Maintenance Prediction</h1>
+            <h1>Welcome to DriveLine</h1>
             <button disabled={!googleOauthURL} onClick={handleLogin}>Login with Google</button>
         </div>
     )
