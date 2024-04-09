@@ -175,6 +175,7 @@ app.get('/api/get-vehicle-info', async (req, res) => {
 app.get('/api/get-vehicle-history', async (req, res) => {
     const history = DATABASE.collection("user_vehicle_info");
     const configId = req.query.configId;
+    
 
     const getHistory = await history.aggregate([
         {
@@ -252,11 +253,12 @@ app.delete('/api/delete-maintenance-history', async (req, res) => {
  */
 app.get('/api/get-user-vehicles', async (req, res) => {
     const garage = DATABASE.collection("user_garage");
+    const brandon = "johnson9713@gmail.com"
 
     const vehicles = await garage.aggregate([
         {
             $match: {
-                email: EMAIL
+                email: brandon
             }
         },
         {
@@ -273,7 +275,7 @@ app.get('/api/get-user-vehicles', async (req, res) => {
         {
             $project: {
                 _id: 0,
-                configurations: 1
+                configurations: 1,
             }
         }
     ]).toArray();
@@ -297,7 +299,7 @@ app.delete('/api/delete-user-vehicle', async (req, res) => {
 app.get('/api/get-maintenance', async (req , res) => {
     const message = DATABASE.collection("maintenance");
 
-    // const docObject = await message.findOne({ config_id: { $eq: 401988727} });
+    // const docObject = await message.findOne({ config_id: { $eq: 401988727} });    
 
     const docObject = await message.findOne({});
     await console.log(docObject.schedules[0].tasks);
@@ -329,7 +331,8 @@ app.get('/api/get-years', async (req, res) => {
     const database = client.db("vehicleDB");
     const configurations = database.collection("configurations");
     const years = await configurations.aggregate([
-        { $group: { _id: "$year", years: { $addToSet: "$year" } }}
+        { $group: { _id: "$year", years: { $addToSet: "$year" } }},
+        { $sort: { _id: 1 }}
     ]).toArray();
     console.log("years ", years);
     res.send(years);
@@ -424,6 +427,7 @@ app.get('/api/get-transmissions', async (req, res) => {
 });
 
 app.post('/api/add-vehicle', async (req, res) => {
+    const userEmail = process.env.EMAIL;
     console.log("ADD: Hit add vehicle route");
 
     const email = req.body.email;
@@ -434,26 +438,99 @@ app.post('/api/add-vehicle', async (req, res) => {
 
     const database = client.db("vehicleDB");
     const garage = database.collection("user_garage");
+    const userVehicle = database.collection("user_vehicle_info");
 
     try{
-        const exist = await garage.findOne({email});
+        const exist = await garage.findOne({email: userEmail});
         if(exist) {
-            const result = await garage.updateOne(
-                { email },
+            await garage.updateOne(
+                { email: userEmail },
                 { $addToSet: { vehicle_config_ids: config_id } }
             );
-            return res.json(result);
+            await userVehicle.insertOne(
+                { email: userEmail, vehicle_config_ids: config_id, odometer: 0, upcoming_maintenance: [], completed_maintenance: [] })
+            return res.status(200).json({message: "Vehicle added to garage"});
         }
         else {
-            const result = await garage.insertOne(
-                { email, vehicle_config_ids: [config_id] }
-            );
-            return res.json(result);
+            await garage.insertOne(
+                { email: userEmail, vehicle_config_ids: [config_id] }
+            )
+            await userVehicle.insertOne(
+                { email: userEmail, vehicle_config_ids: config_id, odometer: 0, upcoming_maintenance: [], completed_maintenance: [] })
+            return res.status(200).json({message: "User Vehicle added to info"});
         }
     }
     catch(err) {
         return res.status(500).json(err);
     }
+});
+
+app.post('/api/update-odometer', async (req, res) => {
+    console.log("HIT UPDATE ODOMETER")
+    const userEmail = process.env.EMAIL;
+    const odometer = req.body.odometer;
+    const config_id = req.body.config_id;
+    console.log("UPDATE ODOMETER: "+odometer);
+    console.log("UPDATE config_id: "+config_id);
+    console.log("UPDATE EMAIL: "+userEmail)
+
+    const database = client.db("vehicleDB");
+    const userVehicle = database.collection("user_vehicle_info");
+
+    try{
+        await userVehicle.updateOne(
+            { email: userEmail, vehicle_config_ids: config_id },
+            { $set: { odometer: odometer }}
+        );
+        return res.status(200).json({message: "Odometer updated"});
+    }
+    catch(err) {
+        return res.status(500).json(err);
+    }
+});
+
+app.get('/api/get-user-vehicle-odometers', async (req, res) => {
+    console.log("HIT GET USER VEHICLE ODOMETERS")
+    const userEmail = process.env.EMAIL;
+    const database = client.db("vehicleDB");
+    const garage = database.collection("user_garage");
+    const userVehicle = database.collection("user_vehicle_info");
+    const userGarage = await garage.findOne({email: userEmail});
+    if(!userGarage){
+        return res.status(404).json({message: "User not found"});
+    }
+
+    const vehicleConfigIds = userGarage.vehicle_config_ids;
+    if(!vehicleConfigIds){
+        return res.status(404).json({message: "User has no vehicles"});
+    }
+    console.log("VEHICLE CONFIG IDS in get ODOMETERS: "+vehicleConfigIds)
+
+    const odometerReadings = await userVehicle.find(
+        {email: userEmail, vehicle_config_ids: {$in: vehicleConfigIds} },
+        {_id: 0, vehicle_config_ids: 1, odometer: 1}
+    ).toArray();
+
+    console.log("ODOMETER READINGS: "+JSON.stringify(odometerReadings))
+
+    const odometerMap = {};
+    odometerReadings.forEach(reading => {
+        odometerMap[reading.vehicle_config_ids] = reading.odometer;
+    });
+
+    console.log("ODOMETER MAP: "+JSON.stringify(odometerMap))
+
+    const response = vehicleConfigIds.map(configId => ({
+        vehicle_config_ids: configId,
+        odometer: odometerMap[configId]}));
+
+    console.log("RESPONSE: "+JSON.stringify(response))
+
+    response.forEach((item, index) => {
+        console.log(`${index + 1}. vehicle_config_ids: ${item.vehicle_config_ids}, odometer: ${item.odometer}`);
+    })
+
+        res.status(200).json(response);
 });
 
 //TODO: Request to get a list of all engines given a year, make, and model (Non-repeating).
