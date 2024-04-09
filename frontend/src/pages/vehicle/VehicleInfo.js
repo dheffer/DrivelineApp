@@ -38,7 +38,7 @@ function VehicleInfo() {
 
     return (
         <div className="container">
-            <VehicleNavbar selected={"info"}/>
+            <VehicleNavbar selected={"info"} configId={configId}/>
             <Routes>
                 <Route path="/garage/vehicle-info/:vehicle/*" />
                 <Route path="/garage/vehicle-history/:vehicle/*" />
