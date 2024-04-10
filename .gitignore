@@ -6,4 +6,4 @@ Project_Default.xml
 package-lock.json
 
 # ignore any zip files
-.zip
+*.zip
