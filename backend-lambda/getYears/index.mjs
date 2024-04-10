@@ -1,5 +1,5 @@
 import { MongoClient, ServerApiVersion } from "mongodb";
-import 'dotenv/config'
+import 'dotenv/config';
 
 export const handler = async (event, context) => {
 
@@ -21,18 +21,15 @@ export const handler = async (event, context) => {
             return configurations.aggregate([
                 { $group: { _id: "$year", years: { $addToSet: "$year" } }}
             ]).toArray();
-        })
-        .then(years => {
+        }).then(years => {
             return {
                 statusCode: 200,
                 body: years
             };
-        })
-        .catch(err => {
+        }).catch(err => {
             return {
                 statusCode: 500,
                 body: JSON.stringify({ message: "Internal Server Error" })
             };
-        })
-        .finally(() => client.close());
+        }).finally(() => client.close());
 };
