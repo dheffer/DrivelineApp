@@ -12,48 +12,45 @@ function NavBar() {
 
     useEffect(() => {
         const fetchUser = async () => {
-            try{
+            try {
                 const token = localStorage.getItem('token');
-                if(token) {
+                if (token) {
                     const response = await fetch('/api/user', {
                         headers: {
                             'Authorization': `Bearer ${token}`
                         }
                     });
-                    if(response.ok){
+                    if (response.ok) {
                         const data = await response.json();
-                        console.log("USERNAME DATA: "+data.name);
+                        console.log("USERNAME DATA: ", data.name);
                         setUser(data.name);
-
-                    }
-                    else {
+                    } else {
                         console.error("User not found");
                     }
-            }
-        }
-            catch (error) {
+                }
+            } catch (error) {
                 console.log(error);
             }
-        }
+        };
         fetchUser();
     }, []);
 
     return (
-        <Navbar expand="lg" className="bg-body-tertiary" sticky="top">
+        <Navbar expand="lg" className="bg-body-tertiary navbar-bottom-margin" sticky="top">
             <Container>
-                <Navbar.Brand href="/garage">Driveline</Navbar.Brand>
-                <Navbar.Toggle />
+                <Navbar.Brand href="/garage"><span className="drive">Drive</span><span
+                    className="line">line</span></Navbar.Brand>
+                <Navbar.Toggle/>
                 <Navbar.Collapse>
-                    <Nav className="me-auto">
+                <Nav className="me-auto">
                         <Nav.Link href="/garage">Garage</Nav.Link>
                     </Nav>
                 </Navbar.Collapse>
                 <Nav className="ms-auto">
                     <Nav.Link>
                         <Settings greeting={`${user || 'LOADING...'}`} />
-                        <GearFill className="mr-2" />
+                        <GearFill className="ml-2" />
                     </Nav.Link>
-                    <Settings />
                 </Nav>
             </Container>
         </Navbar>

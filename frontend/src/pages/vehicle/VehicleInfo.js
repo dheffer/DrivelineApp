@@ -29,16 +29,16 @@ function VehicleInfo() {
             .then( (vehicle) => {
                 setInfo(vehicle);
                 setLoading(false);
-                })
+            })
             .catch( (error) => {
                 console.error('There has been a problem with your fetch operation:', error);
-                });
+            });
     }, [refreshData]);
 
 
     return (
         <div className="container">
-            <VehicleNavbar selected={"info"}/>
+            <VehicleNavbar selected={"info"} configId={configId}/>
             <Routes>
                 <Route path="/garage/vehicle-info/:vehicle/*" />
                 <Route path="/garage/vehicle-history/:vehicle/*" />

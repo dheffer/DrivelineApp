@@ -296,12 +296,20 @@ app.delete('/api/delete-user-vehicle', async (req, res) => {
 
 app.get('/api/get-maintenance', async (req , res) => {
     const message = DATABASE.collection("maintenance");
+    const config_id = req.query.config_id;
+    const odometer = req.query.odometer;
+    let maintenance = null;
 
-    // const docObject = await message.findOne({ config_id: { $eq: 401988727} });
+    const docObject = await message.findOne({config_id});
 
-    const docObject = await message.findOne({});
-    await console.log(docObject.schedules[0].tasks);
-    res.send(docObject.message);
+    for (const schedule of docObject.schedules) {
+        const mileage = parseInt(schedule.service_schedule_mileage.replace(',', ''));
+        if (mileage > odometer) {
+            maintenance = schedule;
+            break;
+        }
+    }
+    res.send(maintenance);
 })
 
 

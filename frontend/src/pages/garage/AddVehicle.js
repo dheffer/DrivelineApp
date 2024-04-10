@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 // import { Button, Form } from 'react-bootstrap';
 import { Button, Form, Container, Row, Col } from 'react-bootstrap';
 import '../../App.css';
+import {useNavigate} from "react-router-dom";
 
 function AddVehicle() {
     const [vehicleAdded, setVehicleAdded] = useState(false);
@@ -20,6 +21,36 @@ function AddVehicle() {
         engine: "",
         transmission: ""
     });
+
+    const [user, setUser] = useState("Loading...");
+    const navigate = useNavigate();
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                if (token) {
+                    const response = await fetch('/api/user', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        const firstName = data.name.split(' ')[0];
+                        setUser(`${firstName}'s`);
+                    } else {
+                        console.error("User not found");
+                        setUser("User's");
+                    }
+                }
+            } catch (error) {
+                console.error(error);
+                setUser("User's");
+            }
+        };
+        fetchUser();
+    }, []);
 
     useEffect(() => {
         getDropdownValues('years');
@@ -78,8 +109,7 @@ function AddVehicle() {
         }
     };
 
-    //TODO: Combine the following two functions into one
-    const selectVehicle = async () => {
+    const handleSelectAndAddVehicle = async () => {
         const queryParameters = new URLSearchParams(selectedVehicle).toString();
         try {
             const response = await fetch(`/api/get-config-id?${queryParameters}`);
@@ -89,6 +119,7 @@ function AddVehicle() {
             const data = await response.json();
             if (data.config_id) {
                 setConfigId(data.config_id);
+                await addVehicleToUser(data.config_id);
             } else {
                 console.log("No config ID found for the selected vehicle.");
             }
@@ -97,7 +128,7 @@ function AddVehicle() {
         }
     };
 
-    const addVehicleToUser = async () => {
+    const addVehicleToUser = async (configId) => {
         try {
             const response = await fetch('/api/add-vehicle', {
                 method: 'POST',
@@ -119,12 +150,18 @@ function AddVehicle() {
     };
 
     return (
-        <Container>
+        <Container className="mt-5">
             <Row className="justify-content-md-center">
-                <Col md={6}> {/* This sets the max width of the column to half the parent width */}
+                <h2>
+                    <span onClick={() => navigate('/garage')} style={{ cursor: 'pointer', color: '#644A77', fontWeight: 'bold' }}>
+                        {user} Garage
+                    </span>
+                    <span style={{ color: '#644A77', fontWeight: 'normal' }}> > Add New Vehicle</span>
+                </h2>
+                <Col md={6}>
                     <Form>
                         <Form.Group controlId="yearSelect">
-                            <Form.Label>Year</Form.Label>
+                            <Form.Label style={{ fontWeight: 'bold', color: '#644A77' }}>Year</Form.Label>
                             <Form.Select name="year" value={selectedVehicle.year} onChange={handleChange}>
                                 <option value="">Select Year</option>
                                 {dropdownValues.years.map((year, index) => (
@@ -135,7 +172,7 @@ function AddVehicle() {
 
                         {selectedVehicle.year && (
                             <Form.Group controlId="makeSelect">
-                                <Form.Label>Make</Form.Label>
+                                <Form.Label style={{ fontWeight: 'bold', color: '#644A77' }}>Make</Form.Label>
                                 <Form.Select name="make" value={selectedVehicle.make} onChange={handleChange}>
                                     <option value="">Select Make</option>
                                     {dropdownValues.makes.map((make, index) => (
@@ -147,7 +184,7 @@ function AddVehicle() {
 
                         {selectedVehicle.make && (
                             <Form.Group controlId="modelSelect">
-                                <Form.Label>Model</Form.Label>
+                                <Form.Label style={{ fontWeight: 'bold', color: '#644A77' }}>Model</Form.Label>
                                 <Form.Select name="model" value={selectedVehicle.model} onChange={handleChange}>
                                     <option value="">Select Model</option>
                                     {dropdownValues.models.map((model, index) => (
@@ -159,7 +196,7 @@ function AddVehicle() {
 
                         {selectedVehicle.model && (
                             <Form.Group controlId="engineSelect">
-                                <Form.Label>Engine</Form.Label>
+                                <Form.Label style={{ fontWeight: 'bold', color: '#644A77' }}>Engine</Form.Label>
                                 <Form.Select name="engine" value={selectedVehicle.engine} onChange={handleChange}>
                                     <option value="">Select Engine</option>
                                     {dropdownValues.engines.map((engine, index) => (
@@ -171,7 +208,7 @@ function AddVehicle() {
 
                         {selectedVehicle.engine && (
                             <Form.Group controlId="transmissionSelect">
-                                <Form.Label>Transmission</Form.Label>
+                                <Form.Label style={{ fontWeight: 'bold', color: '#644A77' }}>Transmission</Form.Label>
                                 <Form.Select name="transmission" value={selectedVehicle.transmission} onChange={handleChange}>
                                     <option value="">Select Transmission</option>
                                     {dropdownValues.transmissions.map((transmission, index) => (
@@ -181,9 +218,8 @@ function AddVehicle() {
                             </Form.Group>
                         )}
 
-                        <div className="text-center mt-4"> {/* Center the buttons and add some top margin */}
-                            <Button className="custom-button-primary mx-2" onClick={selectVehicle} disabled={!selectedVehicle.transmission}>Select Vehicle</Button>
-                            <Button className="custom-button-success mx-2" onClick={addVehicleToUser} disabled={!configId}>Add Vehicle</Button>
+                        <div className="text-center mt-4">
+                            <Button className="btn btn-primary" onClick={handleSelectAndAddVehicle} disabled={!selectedVehicle.transmission || vehicleAdded}>Select and Add Vehicle</Button>
                         </div>
                         {vehicleAdded && <div className="alert alert-success mt-4" role="alert">
                             Vehicle has been added successfully!
@@ -193,7 +229,6 @@ function AddVehicle() {
             </Row>
         </Container>
     );
-
 }
 
 export default AddVehicle;
