@@ -1,17 +1,18 @@
 import { MongoClient, ServerApiVersion } from "mongodb";
 import 'dotenv/config'
 
-const uri = process.env.MONGO_URI;
-const client = new MongoClient(uri,  {
-        serverApi: {
-            version: ServerApiVersion.v1,
-            strict: true,
-            deprecationErrors: true,
-        }
-    }
-);
+export const handler = async (event, context) => {
 
-exports.handler = (event, context) => {
+    const uri = process.env.MONGO_URI;
+    const client = new MongoClient(uri,  {
+            serverApi: {
+                version: ServerApiVersion.v1,
+                strict: true,
+                deprecationErrors: true,
+            }
+        }
+    );
+
     return client.connect()
         .then(() => {
             const database = client.db("vehicleDB");
@@ -22,15 +23,12 @@ exports.handler = (event, context) => {
             ]).toArray();
         })
         .then(years => {
-            console.log("years ", years);
-
             return {
                 statusCode: 200,
-                body: JSON.stringify(years)
+                body: years
             };
         })
         .catch(err => {
-            console.error("Error occurred:", err);
             return {
                 statusCode: 500,
                 body: JSON.stringify({ message: "Internal Server Error" })

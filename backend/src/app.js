@@ -7,9 +7,6 @@ import { getGoogleOauthURL } from './OauthClient.js';
 import { oauthClient } from './OauthClient.js';
 import 'dotenv/config';
 import client from "./mongo.js";
-import mongo from "./mongo.js"
-import e from 'express';
-import {parse} from "dotenv";
 
 const userEmail = "";
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
@@ -286,12 +283,11 @@ app.delete('/api/delete-maintenance-history', async (req, res) => {
  */
 app.get('/api/get-user-vehicles', async (req, res) => {
     const garage = DATABASE.collection("user_garage");
-    const brandon = "johnson9713@gmail.com"
 
     const vehicles = await garage.aggregate([
         {
             $match: {
-                email: brandon
+                email: EMAIL
             }
         },
         {

@@ -7,6 +7,8 @@ function Vehicle(props) {
     const [odometerValue, setOdometerValue] = useState(0);
     const [odometerReading, setOdometerReading] = useState([]);
 
+    const EMAIL = process.env.EMAIL;
+
     useEffect(() => {
         fetchReadings();
     }, []);
@@ -39,7 +41,7 @@ function Vehicle(props) {
                 },
                 body: JSON.stringify({
                     vehicle_config_ids : v.configurations.config_id,
-                    email: "johnson9713@gmail.com",
+                    email: EMAIL,
                     odometer: odometerValue
                 })
             });
