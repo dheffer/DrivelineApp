@@ -9,6 +9,7 @@ function Garage(props) {
     const [loading, setLoading] = useState(true);
     const [user, setUser] = useState("Loading...");
     const navigate = useNavigate();
+    const [refreshData, setRefreshData] = useState(false);
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -58,16 +59,43 @@ function Garage(props) {
             .catch(error => {
                 console.error('There has been a problem with your fetch operation:', error);
             });
-    }, [props.setInfo]);
+    }, [refreshData]);
+
+    const updateOdometer = async (configID, email) => {
+        try{
+            const response = await fetch("/api/update-odometer", {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json'
+                },
+                body: JSON.stringify({
+                    vehicle_config_ids : configID,
+                    email: email,
+                    //odometer: odometer
+                })
+            });
+            if(response.ok){
+                setRefreshData(!refreshData);
+            }
+            else{
+                console.error("Failed to update Odometer");
+            }
+        }
+        catch (error){
+            console.error("Catch Failed to update Odometer");
+        }
+    }
+
+    let vehicle_count = 0;
 
     return (
-        <Container className="mt-5">
+        <Contatiner className="mt-5">
             <Row className="mb-4 justify-content-between align-items-center">
                 <Col>
-                    <h2 className="d-inline-block mr-4" onClick={() => navigate('/garage')} style={{ cursor: 'pointer', fontWeight: 'bold' }}>
+                    <h2 className="d-inline-block mr-4" onClick={()=> navigate('/garage')} style={{ cursor: 'pointer', fontWeight: 'bold' }}>
                         {user} Garage
                     </h2>
-                    <Link to="/garage/add" className="btn btn-primary" style={{ verticalAlign: 'baseline', marginLeft: '10px'}}>
+                    <Link to="/garage/add" className="btn btn-primary" style={{verticalAlign: 'baseline', marginLeft: '10px'}}>
                         Add New Vehicle
                     </Link>
                 </Col>
@@ -79,7 +107,14 @@ function Garage(props) {
                     </Col>
                 )) : !loading && <Col>No vehicles found.</Col>}
             </Row>
-        </Container>
+            <Row>
+                <Col md={{ span: 10, offset: 1 }}>
+                    <div className="d-flex justify-content-evenly">
+                        <Link to="/garage/add" className={"pb-2"}><Button>Add Vehicle</Button></Link>
+                    </div>
+                </Col>
+            </Row>
+        </Contatiner>
     );
 }
 

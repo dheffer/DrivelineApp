@@ -176,6 +176,7 @@ app.get('/api/get-vehicle-history', async (req, res) => {
     const history = DATABASE.collection("user_vehicle_info");
     const configId = req.query.configId;
 
+
     const getHistory = await history.aggregate([
         {
             $match: {
@@ -193,36 +194,68 @@ app.get('/api/get-vehicle-history', async (req, res) => {
     res.send(getHistory);
 });
 
+/***
+    * This route is used to add maintenance history to the DATABASE
+ * @param configId - The config_id of the vehicle
+ * @param type - The type of maintenance
+ * @param date - The date of the maintenance
+ * @param maintenance - The maintenance performed
+ * @param cost - The cost of the maintenance
+ * @param email - The email of the user
+ */
+app.post('/api/add-maintenance-history', async (req, res) => {
+    const garage = DATABASE.collection("user_vehicle_info");
+    const configId = req.query.configId;
+    const maintenance = {
+        type: req.body.type,
+        date: req.body.date,
+        maintenance: req.body.maintenance,
+        cost: parseInt(req.body.cost)
+    };
+    const add = await garage.updateOne(
+        { email: EMAIL, config_id: parseInt(configId) },
+        { $push: { completed_maintenance: maintenance } }
+    );
+    return res.json(add.modifiedCount);
+});
+
+/***
+    * This route is used to update maintenance history in the DATABASE
+ * @param configId - The config_id of the vehicle
+ * @param old_type - The old type of maintenance
+ * @param old_date - The old date of the maintenance
+ * @param old_maintenance - The old maintenance performed
+ * @param old_cost - The old cost of the maintenance
+ * @param new_type - The new type of maintenance
+ * @param new_date - The new date of the maintenance
+ * @param new_maintenance - The new maintenance performed
+ * @param new_cost - The new cost of the maintenance
+ * @param email - The email of the user
+ */
 app.post('/api/update-maintenance-history', async (req, res) => {
-    try {
-        const garage = DATABASE.collection("user_vehicle_info");
-
-        const {
-            old_type, old_date, old_maintenance, old_cost,
-            new_type, new_date, new_maintenance, new_cost
-        } = req.body;
-        const update = await garage.updateOne(
-            {
-                email: EMAIL,
-                "completed_maintenance.type": old_type,
-                "completed_maintenance.date": old_date,
-                "completed_maintenance.maintenance": old_maintenance,
-                "completed_maintenance.cost": parseInt(old_cost)
-            },
-            {
-                $set: {
-                    "completed_maintenance.$.type": new_type,
-                    "completed_maintenance.$.date": new_date,
-                    "completed_maintenance.$.maintenance": new_maintenance,
-                    "completed_maintenance.$.cost": parseInt(new_cost)
-                }
+    const garage = DATABASE.collection("user_vehicle_info");
+    const {
+        old_type, old_date, old_maintenance, old_cost,
+        new_type, new_date, new_maintenance, new_cost
+    } = req.body;
+    const update = await garage.updateOne(
+        {
+            email: EMAIL,
+            config_id: parseInt(req.query.configId),
+            "completed_maintenance.type": old_type,
+            "completed_maintenance.date": old_date,
+            "completed_maintenance.maintenance": old_maintenance,
+            "completed_maintenance.cost": parseInt(old_cost)
+        },
+        {
+            $set: {
+                "completed_maintenance.$.type": new_type,
+                "completed_maintenance.$.date": new_date,
+                "completed_maintenance.$.maintenance": new_maintenance,
+                "completed_maintenance.$.cost": parseInt(new_cost)
             }
-        );
-        return res.json(update.modifiedCount);
-    } catch (error) {
-        return res.status(500).json({message: error.message});
-    }
-
+        });
+    return res.json(update.modifiedCount);
 });
 
 app.delete('/api/delete-maintenance-history', async (req, res) => {
@@ -231,7 +264,8 @@ app.delete('/api/delete-maintenance-history', async (req, res) => {
     const { type, date, maintenance, cost } = req.body;
     const deletion = await garage.updateOne(
         {
-            email: EMAIL
+            email: EMAIL,
+            config_id: parseInt(req.query.configId)
         },
         {$pull:
                 {
@@ -253,6 +287,7 @@ app.delete('/api/delete-maintenance-history', async (req, res) => {
 app.get('/api/get-user-vehicles', async (req, res) => {
     const garage = DATABASE.collection("user_garage");
 
+
     const vehicles = await garage.aggregate([
         {
             $match: {
@@ -273,7 +308,7 @@ app.get('/api/get-user-vehicles', async (req, res) => {
         {
             $project: {
                 _id: 0,
-                configurations: 1
+                configurations: 1,
             }
         }
     ]).toArray();
@@ -281,13 +316,17 @@ app.get('/api/get-user-vehicles', async (req, res) => {
 });
 app.delete('/api/delete-user-vehicle', async (req, res) => {
     const garage = DATABASE.collection("user_garage");
+    const vehicInfo = DATABASE.collection("user_vehicle_info");
 
     const { config_id } = req.body;
     const deletion = await garage.updateOne(
         {email: EMAIL},
         {$pull: { vehicle_config_ids: config_id } }
     );
-    return res.json(deletion.modifiedCount);
+    const deletionTwo = await vehicInfo.deleteOne(
+        {email: EMAIL, config_id: config_id}
+    );
+    return res.json(deletion.modifiedCount+deletionTwo.deletedCount);
 });
 
 
@@ -471,6 +510,96 @@ app.post('/api/add-vehicle', async (req, res) => {
     }
 });
 
+app.post('/api/update-odometer', async (req, res) => {
+    console.log("HIT UPDATE ODOMETER")
+    const userEmail = process.env.EMAIL;
+    const odometer = req.body.odometer;
+    const config_id = req.body.config_id;
+    const picture_url = req.body.picture_url;
+
+    console.log("UPDATE BODY: "+JSON.stringify(req.body));
+    console.log("UPDATE ODOMETER: "+odometer);
+    console.log("UPDATE config_id: "+config_id);
+    console.log("UPDATE EMAIL: "+userEmail)
+    console.log("UPDATE PICTURE URL: "+picture_url)
+
+    const database = client.db("vehicleDB");
+    const userVehicle = database.collection("user_vehicle_info");
+
+    try{
+        const updateFields = { email: userEmail, config_id: config_id};
+        const updateData = {};
+        console.log("IN TRY BLOCK")
+
+        if(odometer !== undefined) {
+            console.log("ODOMETER DEFINED")
+            updateData.odometer = parseInt(odometer);
+            console.log("ODOMETER UPDATED")
+        }
+        if(picture_url !== undefined) {
+            console.log("PICTURE DEFINED")
+            updateData.picture_url = picture_url;
+            console.log("PICTURE UPDATED")
+        }
+
+        await userVehicle.updateOne(
+            updateFields,
+            { $set: updateData }
+        );
+        console.log("ODOMETER/PICTURE UPDATED")
+        return res.status(200).json({message: "Odometer updated"});
+    }
+    catch(err) {
+        return res.status(500).json(err);
+    }
+});
+
+app.get('/api/get-user-vehicle-odometers', async (req, res) => {
+    console.log("HIT GET USER VEHICLE ODOMETERS")
+    const database = client.db("vehicleDB");
+    const garage = database.collection("user_garage");
+    const userVehicle = database.collection("user_vehicle_info");
+    const userGarage = await garage.findOne({email: EMAIL});
+    if(!userGarage){
+        return res.status(404).json({message: "User not found"});
+    }
+
+    const vehicleConfigIds = userGarage.vehicle_config_ids;
+    if(!vehicleConfigIds){
+        return res.status(404).json({message: "User has no vehicles"});
+    }
+
+    const odometerReadings = await userVehicle.find(
+        {email: EMAIL, config_id: {$in: vehicleConfigIds} },
+        {_id: 0, undefined: 1, odometer: 1}
+    ).toArray();
+
+    const pictureReadings = await userVehicle.find(
+        {email: EMAIL, config_id: {$in: vehicleConfigIds} },
+        {_id: 0, undefined: 1, picture_url: 1}
+    ).toArray();
+
+    const odometerMap = {};
+    odometerReadings.forEach(reading => {
+        odometerMap[reading.config_id] = reading.odometer;
+    });
+
+    const pictureMap = {};
+    pictureReadings.forEach(reading => {
+        pictureMap[reading.config_id] = reading.picture_url;
+    });
+
+    const response = vehicleConfigIds.map(configId => ({
+        config_id: configId,
+        odometer: odometerMap[configId],
+        picture_url: pictureMap[configId]
+    }));
+
+
+        res.status(200).json(response);
+});
+
+
 //TODO: Request to get a list of all engines given a year, make, and model (Non-repeating).
 
 //TODO: Request to get a list of all transmissions given a year, make, model, and engine (Non-repeating).
@@ -483,6 +612,6 @@ app.post('/api/add-vehicle', async (req, res) => {
 
 
 app.listen(port, () => {
-    console.log(`Predictive Vehicle Maintenance app listening on port ${port}`)
+    console.log(`Driveline app listening on port ${port}`)
     //console.log(mongo);
 });
