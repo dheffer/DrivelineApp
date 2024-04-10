@@ -23,14 +23,14 @@ export const handler = async (event, content) => {
             ]).toArray();
             return makes.map(make => make._id);
         }).then(makes => {
-        return {
-        statusCode: 200,
-        body: JSON.stringify(makes)
-        };
-    }).catch(err => {
-        return {
-            statusCode: 500,
-            body: JSON.stringify({ message: `Internal Server Error: ${err.message}` })
-        };
-    }).finally(() => client.close());
+            return {
+                statusCode: 200,
+                body: JSON.stringify(makes)
+            };
+        }).catch(err => {
+            return {
+                statusCode: 500,
+                body: JSON.stringify({ message: `Internal Server Error: ${err.message}` })
+            };
+        }).finally(() => client.close());
 };
