@@ -1,6 +1,5 @@
 import { MongoClient, ServerApiVersion } from "mongodb";
 import 'dotenv/config';
-import client from "../../backend/src/mongo.js";
 
 export const handler = async (event, context) => {
 
@@ -13,8 +12,8 @@ export const handler = async (event, context) => {
             }
         }
     );
-    const year = event['carYear'];
-    const make = event['carMake'];
+    const year = event['year'];
+    const make = event['make'];
 
     return client.connect()
         .then(async () => {

@@ -10,7 +10,7 @@ export const handler = async (event, content) => {
       deprecationErrors: true
     }
   });
-  const carYear = event['carYear'];
+  const carYear = event['year'];
 
     return client.connect()
         .then(async () => {

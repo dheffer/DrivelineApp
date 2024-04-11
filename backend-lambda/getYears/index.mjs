@@ -24,7 +24,7 @@ export const handler = async (event, context) => {
         }).then(years => {
             return {
                 statusCode: 200,
-                body: years
+                body: JSON.stringify(years)
             };
         }).catch(err => {
             return {
