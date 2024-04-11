@@ -175,7 +175,7 @@ app.get('/api/get-vehicle-info', async (req, res) => {
 app.get('/api/get-vehicle-history', async (req, res) => {
     const history = DATABASE.collection("user_vehicle_info");
     const configId = req.query.configId;
-    
+
 
     const getHistory = await history.aggregate([
         {
@@ -332,6 +332,33 @@ app.delete('/api/delete-user-vehicle', async (req, res) => {
 
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
+
+app.get('/api/get-maintenance', async (req , res) => {
+    const message = DATABASE.collection("maintenance");
+    const config_id = req.query.config_id;
+    const odometer = req.query.odometer;
+    let maintenance = null;
+
+    const docObject = await message.findOne({config_id});
+
+    if(docObject && docObject.schedules){
+        for (const schedule of docObject.schedules) {
+            const mileage = parseInt(schedule.service_schedule_mileage.replace(',', ''));
+
+            if (mileage > odometer) {
+                maintenance = schedule;
+                break;
+            }
+        }
+    }
+
+    if(maintenance){
+        res.send(maintenance);
+    } else{
+        res.status(404).json({message: "No maintenance found for this vehicle"});
+    }
+})
+
 
 app.get('/api/get-config-id', async (req, res) => {
     const year = req.query.year;
@@ -497,7 +524,7 @@ app.post('/api/update-odometer', async (req, res) => {
     const odometer = req.body.odometer;
     const config_id = req.body.config_id;
     const picture_url = req.body.picture_url;
-    
+
     console.log("UPDATE BODY: "+JSON.stringify(req.body));
     console.log("UPDATE ODOMETER: "+odometer);
     console.log("UPDATE config_id: "+config_id);
@@ -507,7 +534,7 @@ app.post('/api/update-odometer', async (req, res) => {
     const database = client.db("vehicleDB");
     const userVehicle = database.collection("user_vehicle_info");
 
-    try{ 
+    try{
         const updateFields = { email: userEmail, config_id: config_id};
         const updateData = {};
         console.log("IN TRY BLOCK")

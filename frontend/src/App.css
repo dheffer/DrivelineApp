@@ -2,6 +2,130 @@
   text-align: center;
 }
 
+body, h1, h2, h3, h4, h5, h6, p {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+h1, h3, h4, h5, h6 {
+  margin-bottom: 20px;
+  color: #4a4a4a;
+  text-align: center;
+}
+
+p {
+  line-height: 1.5;
+  text-align: center;
+}
+
+.btn {
+  color: #fff;
+  border: none;
+  cursor: pointer;
+  transition: background-color 0.3s ease, box-shadow 0.3s ease;
+  border-radius: 25px;
+}
+
+.btn:hover {
+  background-color: #a48cb3;
+  box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
+}
+
+.form-control {
+  border: 1px solid #ccc;
+  border-radius: 5px;
+  transition: border-color 0.3s ease;
+}
+
+.form-control:focus {
+  border-color: #8c7498;
+  outline: none;
+}
+
+.drive {
+  font-family: 'Roboto Slab', serif;
+  font-weight: bold;
+  color: #644A77;
+}
+
+.line {
+  font-family: 'Roboto Slab', serif;
+  font-weight: bold;
+  color: #A78EB8;
+}
+
+/* Additional styles for positioning and alignment */
+.page-container {
+  position: relative;
+  min-height: 500px;
+  text-align: center;
+  padding: 50px 0;
+}
+
+#driveline-diamond-logo {
+  width: 180px;
+  height: 180px;
+  display: block;
+  margin: 0 auto 20px;
+  border-radius: 50%;
+  overflow: hidden;
+}
+
+#intro-text {
+  margin-bottom: 30px;
+}
+
+#driveline-diamond-logo {
+  margin-top: 10px;
+  margin-bottom: 10px;
+}
+
+.navbar-bottom-margin {
+  margin-bottom: 30px;
+}
+
+.custom-add-vehicle-btn {
+  font-weight: bold;
+  color: #fff;
+  background-color: #644A77; /* Adjust the color to match your theme */
+  border: none;
+}
+
+.custom-add-vehicle-btn:hover, .custom-add-vehicle-btn:focus {
+  background-color: #A78EB8; /* Lighter shade for hover/focus */
+  color: #fff;
+}
+
+.add-vehicle-link {
+  display: inline-flex;
+  align-items: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #2872a7; /* Custom color */
+  text-decoration: none; /* Removes underline */
+}
+
+.add-vehicle-link:hover, .add-vehicle-link:focus {
+  text-decoration: underline; /* Adds underline on hover/focus for better UX */
+  color: #1d5a8c; /* Darker shade on hover/focus */
+}
+
+.add-vehicle-link {
+  display: inline-flex;
+  align-items: center;
+  font-size: 1.2rem;
+  font-weight: bold;
+  color: #8EB8A7; /* Updated color */
+  text-decoration: none; /* Removes underline */
+}
+
+.add-vehicle-link:hover, .add-vehicle-link:focus {
+  text-decoration: underline;
+  color: #7da992; /* Manually chosen darker shade */
+}
+
+
 .App-logo {
   height: 40vmin;
   pointer-events: none;
@@ -26,6 +150,41 @@
 
 .App-link {
   color: #61dafb;
+}
+
+body, .navbar-nav .nav-link, .navbar-text {
+  font-family: 'Roboto Bold', sans-serif;
+    font-size: large;
+
+
+}
+
+.navbar-brand {
+  font-family: 'Roboto Slab', serif;
+  font-weight: 700;
+  font-size: large;
+}
+
+.navbar {
+  align-items: center;
+}
+
+.navbar-brand, .navbar-nav .nav-link, .navbar-text {
+  display: flex;
+  align-items: center;
+  height: 100%;
+}
+
+button, .btn {
+  background-color: #8c7498 !important;
+  border-color: #8c7498 !important;
+  color: white !important;
+}
+
+.custom-button-primary, .custom-button-success {
+  background-color: #2872a7 !important;
+  border-color: #2872a7 !important;
+  color: white !important;
 }
 
 @keyframes App-logo-spin {

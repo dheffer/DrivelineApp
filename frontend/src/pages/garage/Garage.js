@@ -1,22 +1,42 @@
-import {BrowserRouter, Routes, Route, Link, useNavigate, useParams} from "react-router-dom";
+import { BrowserRouter, Routes, Route, Link, useNavigate, useParams } from "react-router-dom";
 import VehicleInfo from "../vehicle/VehicleInfo";
-import Accordion from 'react-bootstrap/Accordion';
-import {Button, Card, Col, Row} from "react-bootstrap";
-import Container from 'react-bootstrap/Container';
-import {useEffect, useState} from "react";
+import { Button, Card, Col, Row, Container } from "react-bootstrap";
+import { useEffect, useState } from "react";
 import Vehicle from "./Vehicle";
+import '../../App.css';
 
 function Garage(props) {
     const [loading, setLoading] = useState(true);
+    const [user, setUser] = useState("Loading...");
+    const navigate = useNavigate();
     const [refreshData, setRefreshData] = useState(false);
 
-    const garageVehicles = [];
-    if (props.info != null) {
-        for (let i = 0; i < props.info.length; i += 3) {
-            garageVehicles.push(props.info.slice(i, i + 3));
-
-        }
-    }
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                if (token) {
+                    const response = await fetch('/api/user', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        const firstName = data.name.split(' ')[0];
+                        setUser(`${firstName}'s`);
+                    } else {
+                        console.error("User not found");
+                        setUser("User's");
+                    }
+                }
+            } catch (error) {
+                console.error(error);
+                setUser("User's");
+            }
+        };
+        fetchUser();
+    }, []);
 
     useEffect(() => {
         const myHeaders = new Headers();
@@ -32,7 +52,7 @@ function Garage(props) {
                 }
                 return res.json();
             })
-            .then( vehicles => {
+            .then(vehicles => {
                 props.setInfo(vehicles);
                 setLoading(false);
             })
@@ -69,43 +89,25 @@ function Garage(props) {
     let vehicle_count = 0;
 
     return (
-        <div className="container">
-            <div className="row">
-                <div className="col-md-1 order-md-1"></div>
-                <div className="col-md-10 order-md-2">
-                    <div className="d-flex justify-content-evenly">
-                        <Link to="/garage/add" className={"pb-2"}><Button>Add Vehicle</Button></Link>
-                        <Routes>
-                            <Route path="/garage/add"/>
-                            <Route path="/garage/remove/:vehicle"/>
-                            <Route path={"/garage/vehicle-info/:vehicle"} element={<VehicleInfo/>}/>
-                        </Routes>
-                    </div>
-
-                    {
-                        props.info != null ?
-                            props.info.reduce((rows, vehicle, index) => {
-                                if (index % 3 === 0) {
-                                    rows.push([]);
-                                }
-                                rows[rows.length - 1].push(
-                                    <Col key={vehicle.configurations.name}>
-                                        <Vehicle vehicle={vehicle} id={index}/>
-                                        {console.log(vehicle)}
-                                    </Col>
-                                );
-                                return rows;
-                            }, []).map((row, rowIndex) => (
-                                <Row key={rowIndex} xs={1} md={3} className="g-4">
-                                    {row}
-                                </Row>
-                            )) : null
-                    }
-
-                </div>
-                <div className="col-md-1 order-md-3"></div>
-            </div>
-        </div>
+        <Container className="mt-5">
+            <Row className="mb-4 justify-content-between align-items-center">
+                <Col>
+                    <h2 className="d-inline-block mr-4" onClick={()=> navigate('/garage')} style={{ cursor: 'pointer', color: '#644A77', fontWeight: 'bold' }}>
+                        {user} Garage
+                    </h2>
+                    <Link to="/garage/add" className="btn btn-primary" style={{verticalAlign: 'baseline', marginLeft: '10px'}}>
+                        Add New Vehicle
+                    </Link>
+                </Col>
+            </Row>
+            <Row>
+                {props.info ? props.info.map((vehicle, index) => (
+                    <Col key={index} xs={12} md={4} className="mb-4">
+                        <Vehicle vehicle={vehicle} id={index} />
+                    </Col>
+                )) : !loading && <Col>No vehicles found.</Col>}
+            </Row>
+        </Container>
     );
 }
 
