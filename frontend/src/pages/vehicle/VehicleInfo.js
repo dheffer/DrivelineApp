@@ -1,85 +1,241 @@
-import {Routes, Route, useLocation} from "react-router-dom";
+import {Routes, Route, useLocation, useNavigate, Link} from "react-router-dom";
 import VehicleNavbar from "./VehicleNavbar";
-import {Badge, Card, Col, Row} from "react-bootstrap";
+import {Badge, Card, Col, Row, Button, Container, Table, Form} from "react-bootstrap";
 import React, {useEffect, useState} from "react";
 
 function VehicleInfo() {
     const location = useLocation();
-    const { configId } = location.state;
+    const {configId} = location.state;
+    const email = process.env.EMAIL;
 
     const [loading, setLoading] = useState(true);
     const [refreshData, setRefreshData] = useState(false);
 
     const [info, setInfo] = useState(null);
+    const [maintenance, setMaintenance] = useState(null);
+
+    const [upcomingMaintenance, setUpcomingMaintenance] = useState(null);
+    const [odometer, setOdometer] = useState(0);
+    const [newOdometerValue, setNewOdometerValue] = useState(0);
+
+
+    const [user, setUser] = useState("Loading...");
+    const navigate = useNavigate();
 
     useEffect(() => {
-        const myHeaders = new Headers();
-        const reqOptions = {
-            method: 'GET',
-            headers: myHeaders,
-            redirect: 'follow'
+        const fetchUser = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                if (token) {
+                    const response = await fetch('/api/user', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        const firstName = data.name.split(' ')[0];
+                        setUser(`${firstName}'s`);
+                    } else {
+                        console.error("User not found");
+                        setUser("User's");
+                    }
+                }
+            } catch (error) {
+                console.error(error);
+                setUser("User's");
+            }
         };
-        fetch('/api/get-vehicle-info?configId='+configId, reqOptions)
-            .then( (res) => {
+        fetchUser();
+    }, []);
+
+    useEffect(() => {
+        fetch('/api/get-vehicle-info?configId=' + configId)
+            .then((res) => {
                 if (!res.ok) {
                     throw new Error('Network response was not ok');
                 }
                 return res.json();
             })
-            .then( (vehicle) => {
+            .then((vehicle) => {
                 setInfo(vehicle);
-                setLoading(false);
+                return fetch("/api/get-user-vehicle-odometers");
             })
-            .catch( (error) => {
+            .then((odometerResponse) => {
+                if (!odometerResponse.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return odometerResponse.json();
+            })
+            .then((odometerData) => {
+                const currentOdometer = odometerData.find(reading => reading.config_id === configId).odometer;
+                setOdometer(currentOdometer);
+                return fetch(`/api/get-maintenance?config_id=${configId}&odometer=${currentOdometer}`);
+            })
+            .then((maintenanceResponse) => {
+                if (!maintenanceResponse.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return maintenanceResponse.json();
+            })
+            .then((maintenanceData) => {
+                console.log("MAINTENANCE DATA: " + JSON.stringify(maintenanceData));
+                setMaintenance(maintenanceData);
+                setLoading(false);
+                setUpcomingMaintenance(maintenanceData.service_schedule_mileage)
+            })
+            .catch((error) => {
                 console.error('There has been a problem with your fetch operation:', error);
             });
-    }, [refreshData]);
+        fetchReadings();
+    }, [configId, refreshData]);
 
+    const fetchReadings = async () => {
+        try{
+            const response = await fetch("/api/get-user-vehicle-odometers");
+            if(response.ok){
+                const data = await response.json();
+                console.log("READINGS "+ JSON.stringify(data));
+                setNewOdometerValue(data);
+            }
+            else{
+                console.log("Failed to fetch odometer readings");
+            }
+        }
+        catch (e) {
+            console.error('There has been a problem with your fetch operation:', e);
+        }
+    }
+
+    const handleUpdateOdometer = () => {
+        console.log("Updating odometer");
+        console.log(configId+ "= config");
+        console.log(newOdometerValue+ "= odometer");
+
+        const reqOptions = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                config_id : configId,
+                email: email,
+                odometer: newOdometerValue,
+            }),
+            redirect: 'follow'
+        };
+        console.log("reqOptions " + reqOptions);
+
+        fetch('/api/update-odometer', reqOptions)
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return res.json();
+            })
+            .then(data => {
+                console.log("Odometer Updated! "+data);
+                fetchReadings();
+                setNewOdometerValue(0);
+                setRefreshData(!refreshData);
+            })
+            .catch(error => {
+                console.error('There has been a problem with your fetch operation:', error);
+            });
+    }
 
     return (
-        <div className="container">
-            <VehicleNavbar selected={"info"} configId={configId}/>
-            <Routes>
-                <Route path="/garage/vehicle-info/:vehicle/*" />
-                <Route path="/garage/vehicle-history/:vehicle/*" />
-            </Routes>
-            <div className="row mt-3">
-                <div className="col-md-1 order-md-1" />
-                <div className="col-md-10 order-md-2">
+        <Container className="mt-5">
+            <Row className="mb-3">
+                <Col>
+                    <h2 onClick={() => navigate('/garage')}
+                        style={{cursor: 'pointer', color: '#644A77', fontWeight: 'bold'}}>
+                        {user} Garage
+                        <span style={{fontWeight: 'normal', color: '#644A77'}}> >
+                        {info ? ` ${info.year} ${info.make} ${info.model}` : ' Loading Vehicle Info...'}
+                    </span>
+                    </h2>
+                </Col>
+            </Row>
+            <Row className="mb-3">
+                <Col className="text-start">
+                    <Button variant="primary"
+                            onClick={() => navigate(`/garage/vehicle-history/${configId}`, {state: {configId}})}>
+                        View Maintenance History
+                    </Button>
+                </Col>
+            </Row>
+            <Row>
+                <Col md={5}>
                     <Card>
-                        <Card.Header>
-                            <Card.Title>
-                                <Badge bg="success">{info != null ? info.year : "Loading..."}</Badge> {info != null ? info.make+" "+info.model : "Loading..."}
-                            </Card.Title>
-                        </Card.Header>
-                        <Card.Body>
-                            <Row>
-                                <Col>
-                                    <Card.Text><Badge bg="dark">Year</Badge> {info != null ? info.year : "Loading..."}</Card.Text>
-                                    <Card.Text><Badge bg="dark">Make</Badge> {info != null ? info.make : "Loading..."}</Card.Text>
-                                    <Card.Text><Badge bg="dark">Model</Badge> {info != null ? info.model : "Loading..."}</Card.Text>
-                                    <Card.Text><Badge bg="dark">Engine</Badge> {info != null ? info.engine : "Loading..."}</Card.Text>
-                                    <Card.Text><Badge bg="dark">Transmission</Badge> {info != null ? info.transmission : "Loading..."}</Card.Text>
-                                    <Card.Text><Badge bg="dark">Config ID</Badge> {info != null ? info.config_id: "Loading..."}</Card.Text>
-                                </Col>
-                                <Col>
-                                    <Card.Text>x: {info != null ? null : "Loading..."}</Card.Text>
-                                    <Card.Text>x: {info != null ? info.state : "Loading..."}</Card.Text>
-                                    <Card.Text>x: {info != null ? null : "Loading..."}</Card.Text>
-                                    <Card.Text>x: {info != null ? null : "Loading..."}</Card.Text>
-                                    <Card.Text>x: {info != null ? info.registration : "Loading..."}</Card.Text>
-                                    <Card.Text>x: {info != null ? null : "Loading..."}</Card.Text>
-                                    <Card.Text>x: {info != null ? null : "Loading..."}</Card.Text>
-                                    <Card.Text>x: {info != null ? null : "Loading..."}</Card.Text>
-                                </Col>
-                            </Row>
+                        <Card.Header style={{backgroundColor: '#644A77', color: '#FFFFFF', fontSize: '1.25rem'}}>Vehicle
+                            Specifications</Card.Header>
+                        <Card.Body className="text-left" style={{fontSize: '1.1rem'}}>
+                            {info ? (
+                                <>
+                                    <p><strong>Year:</strong> {info.year}</p>
+                                    <p><strong>Make:</strong> {info.make}</p>
+                                    <p><strong>Model:</strong> {info.model}</p>
+                                    <p><strong>Engine:</strong> {info.engine}</p>
+                                    <p><strong>Transmission:</strong> {info.transmission}</p>
+                                    <p><strong>Odometer:</strong> {odometer ? `${odometer} miles` : "Loading..."}</p>
+                                </>
+                            ) : "Loading vehicle specifications..."}
                         </Card.Body>
                     </Card>
-                </div>
-                <div className="col-md-1 order-md-3" />
-            </div>
-        </div>
+                    <Card className="mt-3">
+                        <Card.Header style={{backgroundColor: '#644A77', color: '#FFFFFF', fontSize: '1.25rem'}}>Update Vehicle Odometer</Card.Header>
+                        <Card.Body>
+                            <Form>
+                                <Form.Group as={Row} className="mb-3 justify-content-center">
+                                    <Col sm="8">
+                                        <Form.Control
+                                            type="number"
+                                            placeholder="Enter new odometer reading"
+                                            value={newOdometerValue}
+                                            onChange={(e) => setNewOdometerValue(e.target.value)}
+                                            style={{textAlign: 'center'}}
+                                        />
+                                    </Col>
+                                </Form.Group>
+                                <div className="d-flex justify-content-center">
+                                    <Button variant="primary" onClick={handleUpdateOdometer}>Update Odometer</Button>
+                                </div>
+                            </Form>
+                        </Card.Body>
+                    </Card>
+                </Col>
+                <Col md={7}>
+                    {upcomingMaintenance && (
+                        <Card>
+                            <Card.Header style={{backgroundColor: '#644A77', color: '#FFFFFF', fontSize: '1.25rem'}}>Upcoming
+                                Maintenance Procedures | Due at: {upcomingMaintenance} miles</Card.Header>
+                            <Card.Body className="text-left" style={{fontSize: '1.1rem'}}>
+                                {maintenance && maintenance.tasks.length > 0 ? (
+                                    <Table striped bordered hover size="sm">
+                                        <thead>
+                                        <tr>
+                                            <th>Action</th>
+                                            <th>Part</th>
+                                        </tr>
+                                        </thead>
+                                        <tbody>
+                                        {maintenance.tasks.map((task, index) => (
+                                            <tr key={index}>
+                                                <td>{task.action}</td>
+                                                <td>{task.part}</td>
+                                            </tr>
+                                        ))}
+                                        </tbody>
+                                    </Table>
+                                ) : "Loading upcoming maintenance..."}
+                            </Card.Body>
+                        </Card>
+                    )}
+                </Col>
+            </Row>
+        </Container>
     );
 }
 
-export default VehicleInfo;
+    export default VehicleInfo;

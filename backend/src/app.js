@@ -341,14 +341,22 @@ app.get('/api/get-maintenance', async (req , res) => {
 
     const docObject = await message.findOne({config_id});
 
-    for (const schedule of docObject.schedules) {
-        const mileage = parseInt(schedule.service_schedule_mileage.replace(',', ''));
-        if (mileage > odometer) {
-            maintenance = schedule;
-            break;
+    if(docObject && docObject.schedules){
+        for (const schedule of docObject.schedules) {
+            const mileage = parseInt(schedule.service_schedule_mileage.replace(',', ''));
+
+            if (mileage > odometer) {
+                maintenance = schedule;
+                break;
+            }
         }
     }
-    res.send(maintenance);
+
+    if(maintenance){
+        res.send(maintenance);
+    } else{
+        res.status(404).json({message: "No maintenance found for this vehicle"});
+    }
 })
 
 

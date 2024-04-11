@@ -113,7 +113,9 @@ function Vehicle(props) {
         <div>
             <Card style={{width: '22rem'}} id={v.configurations.year+v.configurations.make+v.configurations.model}>
                 <Card.Img variant="top"
-                          src={getPicture(v.configurations.config_id) || "https://cdn.dealerk.it/cars/placeholder/placeholder-800.png"}/>
+                          src={getPicture(v.configurations.config_id) || "https://cdn.dealerk.it/cars/placeholder/placeholder-800.png"}
+                          style={{ height: '200px', width: '100%', objectFit: 'cover' }}
+                />
                 <Card.Body>
                     <Card.Title className={'d-flex justify-content-center'}>{v.configurations.year} {v.configurations.make} {v.configurations.model}</Card.Title>
                     <Card.Text className="d-flex justify-content-around">
@@ -123,19 +125,14 @@ function Vehicle(props) {
                         <RemoveVehicle configId={v.configurations.config_id}/>
                     </Card.Text>
                     <Card.Footer className="d-flex justify-content-around">
-                        <p><Badge bg='secondary' >CONFIG ID</Badge> {v.configurations.config_id}</p>
-                        <p><Badge bg='secondary'>ODOMETER</Badge> {getOdometer(v.configurations.config_id)}</p>
-                    </Card.Footer>
-                    <Card.Footer className="d-flex justify-content-around">
-                        <Form.Group>
-                            <Form.Control
-                                type="number"
-                                placeholder="Enter Odometer Value"
-                                value={odometerValue}
-                                onChange={e => setOdometerValue(e.target.value)}
-                            />
-                        </Form.Group>
-                        <Button variant="primary" size="sm" onClick={handleUpdateOdometer}>Update Odometer</Button>
+                        <div className="d-flex flex-column align-items-center">
+                            <Badge bg='secondary'>CONFIG ID</Badge>
+                            <div>{v.configurations.config_id}</div>
+                        </div>
+                        <div className="d-flex flex-column align-items-center">
+                            <Badge bg='secondary'>ODOMETER</Badge>
+                            <div>{getOdometer(v.configurations.config_id)}</div>
+                        </div>
                     </Card.Footer>
                     <Card.Footer className="d-flex justify-content-around">
                         <Form.Group>

@@ -38,8 +38,9 @@ function NavBar() {
     return (
         <Navbar expand="lg" className="bg-body-tertiary navbar-bottom-margin" sticky="top">
             <Container>
-                <Navbar.Brand href="/garage"><span className="drive">Drive</span><span
-                    className="line">line</span></Navbar.Brand>
+                <Navbar.Brand href="/garage" style={{ display: 'flex', alignItems: 'center' }}>
+                    <span className="drive">Drive</span><span className="line">line</span>
+                </Navbar.Brand>
                 <Navbar.Toggle/>
                 <Navbar.Collapse>
                 <Nav className="me-auto">

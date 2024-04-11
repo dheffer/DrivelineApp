@@ -89,10 +89,10 @@ function Garage(props) {
     let vehicle_count = 0;
 
     return (
-        <Contatiner className="mt-5">
+        <Container className="mt-5">
             <Row className="mb-4 justify-content-between align-items-center">
                 <Col>
-                    <h2 className="d-inline-block mr-4" onClick={()=> navigate('/garage')} style={{ cursor: 'pointer', fontWeight: 'bold' }}>
+                    <h2 className="d-inline-block mr-4" onClick={()=> navigate('/garage')} style={{ cursor: 'pointer', color: '#644A77', fontWeight: 'bold' }}>
                         {user} Garage
                     </h2>
                     <Link to="/garage/add" className="btn btn-primary" style={{verticalAlign: 'baseline', marginLeft: '10px'}}>
@@ -107,14 +107,7 @@ function Garage(props) {
                     </Col>
                 )) : !loading && <Col>No vehicles found.</Col>}
             </Row>
-            <Row>
-                <Col md={{ span: 10, offset: 1 }}>
-                    <div className="d-flex justify-content-evenly">
-                        <Link to="/garage/add" className={"pb-2"}><Button>Add Vehicle</Button></Link>
-                    </div>
-                </Col>
-            </Row>
-        </Contatiner>
+        </Container>
     );
 }
 
