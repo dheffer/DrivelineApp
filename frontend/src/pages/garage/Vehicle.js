@@ -6,8 +6,8 @@ import {useEffect, useState} from "react";
 function Vehicle(props) {
     const [odometerValue, setOdometerValue] = useState(0);
     const [odometerReading, setOdometerReading] = useState([]);
-
-    const EMAIL = process.env.EMAIL;
+    const [pictureUrl, setPictureUrl] = useState("");
+    const email = process.env.EMAIL;
 
     useEffect(() => {
         fetchReadings();
@@ -18,6 +18,7 @@ function Vehicle(props) {
             const response = await fetch("/api/get-user-vehicle-odometers");
             if(response.ok){
                 const data = await response.json();
+                console.log("READINGS "+ JSON.stringify(data));
                 setOdometerReading(data);
             }
             else{
@@ -29,45 +30,92 @@ function Vehicle(props) {
         }
     }
 
-
     const v = props.vehicle;
+    
     const handleUpdateOdometer = () => {
         console.log("Updating odometer");
-        try{
-            const response = fetch("/api/update-odometer", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    vehicle_config_ids : v.configurations.config_id,
-                    email: EMAIL,
-                    odometer: odometerValue
-                })
-            });
-            if(response.ok){
-                console.log("Odometer updated");
+        console.log(v.configurations.config_id+ "= config");
+        console.log(odometerValue+ "= odometer");
+
+        const reqOptions = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                config_id : v.configurations.config_id,
+                email: email,
+                odometer: odometerValue,
+            }),
+            redirect: 'follow'
+        };
+        console.log("reqOptions " + reqOptions);
+
+        fetch('/api/update-odometer', reqOptions)
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return res.json();
+            })
+            .then(data => {
+                console.log("Odometer Updated! "+data);
                 fetchReadings();
-            }
-            else{
-                console.log("Odometer update failed");
-            }
+                setOdometerValue(0);
+            })
+            .catch(error => {
+                console.error('There has been a problem with your fetch operation:', error);
+            });
         }
-        catch (e) {
-            console.error('There has been a problem with your fetch operation:', e);
-        }
-    }
 
     const getOdometer = (config) => {
-        const reading = odometerReading.find(vehicle => vehicle.vehicle_config_ids === config);
+        const reading = odometerReading.find(vehicle => vehicle.config_id === config);
         return reading ? reading.odometer : -9999;
     }
+    
+    const getPicture = (config) => {
+        const reading = odometerReading.find(vehicle => vehicle.config_id === config);
+        return reading ? reading.picture_url : "https://cdn.dealerk.it/cars/placeholder/placeholder-800.png";
+    }
+
+
+    const handleUpdatePicture = () => {
+        const reqOptions = {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json'
+            },
+            body: JSON.stringify({
+                config_id : v.configurations.config_id,
+                email: email,
+                picture_url: pictureUrl
+            }),
+            redirect: 'follow'
+        };
+        fetch('/api/update-odometer', reqOptions)
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return res.json();
+            })
+            .then(data => {
+                console.log("Picture Updated! "+data);
+                pictureUrl = data.picture_url;
+            })
+            .catch(error => {
+                console.error('There has been a problem with your fetch operation:', error);
+            });
+    }
+
 
     return (
         <div>
             <Card style={{width: '22rem'}} id={v.configurations.year+v.configurations.make+v.configurations.model}>
                 <Card.Img variant="top"
-                          src="https://cdn.dealerk.it/cars/placeholder/placeholder-800.png"/>
+                          src={getPicture(v.configurations.config_id) || "https://cdn.dealerk.it/cars/placeholder/placeholder-800.png"}
+                          style={{ height: '200px', width: '100%', objectFit: 'cover' }}
+                />
                 <Card.Body>
                     <Card.Title className={'d-flex justify-content-center'}>{v.configurations.year} {v.configurations.make} {v.configurations.model}</Card.Title>
                     <Card.Text className="d-flex justify-content-around">
@@ -77,19 +125,25 @@ function Vehicle(props) {
                         <RemoveVehicle configId={v.configurations.config_id}/>
                     </Card.Text>
                     <Card.Footer className="d-flex justify-content-around">
-                        <p><Badge bg='secondary' >CONFIG ID</Badge> {v.configurations.config_id}</p>
-                        <p><Badge bg='secondary'>ODOMETER</Badge> {getOdometer(v.configurations.config_id)}</p>
+                        <div className="d-flex flex-column align-items-center">
+                            <Badge bg='secondary'>CONFIG ID</Badge>
+                            <div>{v.configurations.config_id}</div>
+                        </div>
+                        <div className="d-flex flex-column align-items-center">
+                            <Badge bg='secondary'>ODOMETER</Badge>
+                            <div>{getOdometer(v.configurations.config_id)}</div>
+                        </div>
                     </Card.Footer>
                     <Card.Footer className="d-flex justify-content-around">
                         <Form.Group>
                             <Form.Control
-                                type="number"
-                                placeholder="Enter Odometer Value"
-                                value={odometerValue}
-                                onChange={e => setOdometerValue(e.target.value)}
+                                type="text"
+                                placeholder="Enter a Picture URL"
+                                value={pictureUrl}
+                                onChange={e => setPictureUrl(e.target.value)}
                             />
                         </Form.Group>
-                        <Button variant="primary" onClick={handleUpdateOdometer}>Update Odometer</Button>
+                        <Button variant="primary" size="sm" onClick={handleUpdatePicture}>Update Picture</Button>
                     </Card.Footer>
                 </Card.Body>
             </Card>

@@ -172,7 +172,7 @@ app.get('/api/get-vehicle-info', async (req, res) => {
 app.get('/api/get-vehicle-history', async (req, res) => {
     const history = DATABASE.collection("user_vehicle_info");
     const configId = req.query.configId;
-    
+
 
     const getHistory = await history.aggregate([
         {
@@ -284,6 +284,7 @@ app.delete('/api/delete-maintenance-history', async (req, res) => {
 app.get('/api/get-user-vehicles', async (req, res) => {
     const garage = DATABASE.collection("user_garage");
 
+
     const vehicles = await garage.aggregate([
         {
             $match: {
@@ -331,12 +332,28 @@ app.delete('/api/delete-user-vehicle', async (req, res) => {
 
 app.get('/api/get-maintenance', async (req , res) => {
     const message = DATABASE.collection("maintenance");
+    const config_id = req.query.config_id;
+    const odometer = req.query.odometer;
+    let maintenance = null;
 
-    // const docObject = await message.findOne({ config_id: { $eq: 401988727} });    
+    const docObject = await message.findOne({config_id});
 
-    const docObject = await message.findOne({});
-    await console.log(docObject.schedules[0].tasks);
-    res.send(docObject.message);
+    if(docObject && docObject.schedules){
+        for (const schedule of docObject.schedules) {
+            const mileage = parseInt(schedule.service_schedule_mileage.replace(',', ''));
+
+            if (mileage > odometer) {
+                maintenance = schedule;
+                break;
+            }
+        }
+    }
+
+    if(maintenance){
+        res.send(maintenance);
+    } else{
+        res.status(404).json({message: "No maintenance found for this vehicle"});
+    }
 })
 
 
@@ -460,8 +477,8 @@ app.get('/api/get-transmissions', async (req, res) => {
 });
 
 app.post('/api/add-vehicle', async (req, res) => {
-    console.log("ADD: Hit add vehicle route");
 
+    const email = req.body.email;
     const config_id = req.body.config_id;
 
     const database = client.db("vehicleDB");
@@ -498,18 +515,32 @@ app.post('/api/update-odometer', async (req, res) => {
     const userEmail = process.env.EMAIL;
     const odometer = req.body.odometer;
     const config_id = req.body.config_id;
-    console.log("UPDATE ODOMETER: "+odometer);
-    console.log("UPDATE config_id: "+config_id);
-    console.log("UPDATE EMAIL: "+userEmail)
+    const picture_url = req.body.picture_url;
 
     const database = client.db("vehicleDB");
     const userVehicle = database.collection("user_vehicle_info");
 
     try{
+        const updateFields = { email: userEmail, config_id: config_id};
+        const updateData = {};
+        console.log("IN TRY BLOCK")
+
+        if(odometer !== undefined) {
+            console.log("ODOMETER DEFINED")
+            updateData.odometer = parseInt(odometer);
+            console.log("ODOMETER UPDATED")
+        }
+        if(picture_url !== undefined) {
+            console.log("PICTURE DEFINED")
+            updateData.picture_url = picture_url;
+            console.log("PICTURE UPDATED")
+        }
+
         await userVehicle.updateOne(
-            { email: userEmail, vehicle_config_ids: config_id },
-            { $set: { odometer: odometer }}
+            updateFields,
+            { $set: updateData }
         );
+        console.log("ODOMETER/PICTURE UPDATED")
         return res.status(200).json({message: "Odometer updated"});
     }
     catch(err) {
@@ -519,11 +550,10 @@ app.post('/api/update-odometer', async (req, res) => {
 
 app.get('/api/get-user-vehicle-odometers', async (req, res) => {
     console.log("HIT GET USER VEHICLE ODOMETERS")
-    const userEmail = process.env.EMAIL;
     const database = client.db("vehicleDB");
     const garage = database.collection("user_garage");
     const userVehicle = database.collection("user_vehicle_info");
-    const userGarage = await garage.findOne({email: userEmail});
+    const userGarage = await garage.findOne({email: EMAIL});
     if(!userGarage){
         return res.status(404).json({message: "User not found"});
     }
@@ -532,34 +562,37 @@ app.get('/api/get-user-vehicle-odometers', async (req, res) => {
     if(!vehicleConfigIds){
         return res.status(404).json({message: "User has no vehicles"});
     }
-    console.log("VEHICLE CONFIG IDS in get ODOMETERS: "+vehicleConfigIds)
 
     const odometerReadings = await userVehicle.find(
-        {email: userEmail, vehicle_config_ids: {$in: vehicleConfigIds} },
-        {_id: 0, vehicle_config_ids: 1, odometer: 1}
+        {email: EMAIL, config_id: {$in: vehicleConfigIds} },
+        {_id: 0, undefined: 1, odometer: 1}
     ).toArray();
 
-    console.log("ODOMETER READINGS: "+JSON.stringify(odometerReadings))
+    const pictureReadings = await userVehicle.find(
+        {email: EMAIL, config_id: {$in: vehicleConfigIds} },
+        {_id: 0, undefined: 1, picture_url: 1}
+    ).toArray();
 
     const odometerMap = {};
     odometerReadings.forEach(reading => {
-        odometerMap[reading.vehicle_config_ids] = reading.odometer;
+        odometerMap[reading.config_id] = reading.odometer;
     });
 
-    console.log("ODOMETER MAP: "+JSON.stringify(odometerMap))
+    const pictureMap = {};
+    pictureReadings.forEach(reading => {
+        pictureMap[reading.config_id] = reading.picture_url;
+    });
 
     const response = vehicleConfigIds.map(configId => ({
-        vehicle_config_ids: configId,
-        odometer: odometerMap[configId]}));
+        config_id: configId,
+        odometer: odometerMap[configId],
+        picture_url: pictureMap[configId]
+    }));
 
-    console.log("RESPONSE: "+JSON.stringify(response))
-
-    response.forEach((item, index) => {
-        console.log(`${index + 1}. vehicle_config_ids: ${item.vehicle_config_ids}, odometer: ${item.odometer}`);
-    })
 
         res.status(200).json(response);
 });
+
 
 //TODO: Request to get a list of all engines given a year, make, and model (Non-repeating).
 
@@ -573,6 +606,6 @@ app.get('/api/get-user-vehicle-odometers', async (req, res) => {
 
 
 app.listen(port, () => {
-    console.log(`Predictive Vehicle Maintenance app listening on port ${port}`)
+    console.log(`Driveline app listening on port ${port}`)
     //console.log(mongo);
 });

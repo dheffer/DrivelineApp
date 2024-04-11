@@ -4,50 +4,54 @@ import React from "react";
 import {useState, useEffect} from 'react';
 import Settings from "./Settings";
 import Button from "react-bootstrap/Button";
+import { GearFill } from 'react-bootstrap-icons';
+import '../App.css';
 
 function NavBar() {
     const [user, setUser] = useState("Placeholder User");
 
     useEffect(() => {
         const fetchUser = async () => {
-            try{
+            try {
                 const token = localStorage.getItem('token');
-                if(token) {
+                if (token) {
                     const response = await fetch('/api/user', {
                         headers: {
                             'Authorization': `Bearer ${token}`
                         }
                     });
-                    if(response.ok){
+                    if (response.ok) {
                         const data = await response.json();
-                        console.log("USERNAME DATA: "+data.name);
+                        console.log("USERNAME DATA: ", data.name);
                         setUser(data.name);
-                    
-                    }
-                    else {
+                    } else {
                         console.error("User not found");
                     }
-            }
-        }
-            catch (error) {
+                }
+            } catch (error) {
                 console.log(error);
             }
-        }
+        };
         fetchUser();
     }, []);
+
     return (
-        <Navbar expand="lg" className="bg-body-tertiary" sticky={"top"}>
+        <Navbar expand="lg" className="bg-body-tertiary navbar-bottom-margin" sticky="top">
             <Container>
-                <Navbar.Brand href="/garage">Driveline</Navbar.Brand>
-                <Navbar.Toggle />
+                <Navbar.Brand href="/garage" style={{ display: 'flex', alignItems: 'center' }}>
+                    <span className="drive">Drive</span><span className="line">line</span>
+                </Navbar.Brand>
+                <Navbar.Toggle/>
                 <Navbar.Collapse>
-                    <Nav>
-                        <Nav.Link href="/garage"><Button variant="primary">Garage</Button></Nav.Link>
+                <Nav className="me-auto">
+                        <Nav.Link href="/garage">Garage</Nav.Link>
                     </Nav>
                 </Navbar.Collapse>
-                <Nav className={"ms-auto"}>
-                    <Navbar.Text ><Settings greeting={`Signed in as: ${user || 'LOADING...'}`}/></Navbar.Text>
-                    <Settings />
+                <Nav className="ms-auto">
+                    <Nav.Link>
+                        <Settings greeting={`${user || 'LOADING...'}`} />
+                        <GearFill className="ml-2" />
+                    </Nav.Link>
                 </Nav>
             </Container>
         </Navbar>
