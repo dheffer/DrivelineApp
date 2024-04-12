@@ -32,16 +32,15 @@ export const Login = () => {
             localStorage.setItem('token', token);
             navigate('/garage');
         }
-    }, [searchParams, navigate]);
+    }, [searchParams, navigate])
 
     const handleLogin = () => {
         if(googleOauthURL) {
             window.location.href = googleOauthURL;
-        }
-        else {
+        } else {
             setError('Google OAuth URL not found');
         }
-    }
+    };
 
     return (
         <div className="page-container">

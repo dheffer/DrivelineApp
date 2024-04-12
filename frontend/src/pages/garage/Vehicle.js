@@ -30,7 +30,6 @@ function Vehicle(props) {
             const response = await fetch("/api/get-user-vehicle-odometers", reqOptions);
             if(response.ok){
                 const data = await response.json();
-                console.log("READINGS "+ JSON.stringify(data));
                 setOdometerReading(data);
             }
             else{
@@ -41,6 +40,7 @@ function Vehicle(props) {
             console.error('There has been a problem with your fetch operation:', e);
         }
     }
+
 
     const v = props.vehicle;
 

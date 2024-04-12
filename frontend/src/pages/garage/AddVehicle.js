@@ -10,7 +10,6 @@ function AddVehicle() {
 
     const [vehicleAdded, setVehicleAdded] = useState(false);
     const [configId, setConfigId] = useState(null);
-
     const [dropdownValues, setDropdownValues] = useState({
         years: [],
         makes: [],
@@ -254,6 +253,5 @@ function AddVehicle() {
         </Container>
     );
 }
-
 
 export default AddVehicle;

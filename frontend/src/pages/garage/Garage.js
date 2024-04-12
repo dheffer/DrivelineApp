@@ -55,7 +55,7 @@ function Garage(props) {
                 }
                 return res.json();
             })
-            .then( vehicles => {
+            .then(vehicles => {
                 props.setInfo(vehicles);
                 setLoading(false);
                 setRefreshData(false)

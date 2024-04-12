@@ -3,25 +3,28 @@ import Container from "react-bootstrap/Container";
 import React, { useState, useEffect } from 'react';
 import Settings from "./Settings";
 import '../App.css';
+import Button from "react-bootstrap/Button";
+import { GearFill } from 'react-bootstrap-icons';
+import '../App.css';
 
 function NavBar() {
     const [user, setUser] = useState("Placeholder User");
 
     useEffect(() => {
         const fetchUser = async () => {
-            try {
+            try{
                 const token = localStorage.getItem('token');
-                if (token) {
+                if(token) {
                     const response = await fetch('/api/user', {
                         headers: {
                             'Authorization': `Bearer ${token}`
                         }
                     });
-                    if (response.ok) {
+                    if(response.ok){
                         const data = await response.json();
                         console.log("USERNAME DATA: " + data.name);
                         setUser(data.name);
-
+                    
                     }
                     else {
                         console.error("User not found");
@@ -34,7 +37,6 @@ function NavBar() {
         };
         fetchUser();
     }, []);
-
     return (
         <Navbar expand="lg" className="bg-body-tertiary navbar-bottom-margin" sticky="top">
             <Container>
@@ -47,9 +49,11 @@ function NavBar() {
                         <Nav.Link href="/garage">Garage</Nav.Link>
                     </Nav>
                 </Navbar.Collapse>
-                <Nav className={"ms-auto"}>
-                    <Navbar.Text><Settings greeting={`Signed in as: ${user || 'LOADING...'}`} /></Navbar.Text>
-                    <Settings />
+                <Nav className="ms-auto">
+                    <Nav.Link>
+                        <Settings greeting={`${user || 'LOADING...'}`} />
+                        <GearFill className="ml-2" />
+                    </Nav.Link>
                 </Nav>
             </Container>
         </Navbar>

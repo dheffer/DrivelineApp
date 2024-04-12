@@ -202,7 +202,7 @@ app.get('/api/get-vehicle-history', async (req, res) => {
             }
             const history = DATABASE.collection("user_vehicle_info");
             const configId = req.query.configId;
-            
+
 
             const getHistory = await history.aggregate([
                 {
@@ -518,7 +518,7 @@ app.get('/api/get-config-id', async (req, res) => {
             res.status(400).json({message: "Authorization Needed!"});
         }
         try{
-    
+
             const token = authorization.split(" ")[1];
             console.log(token+ ": TOKEN");
             jwt.verify(token, JWTSecret, async (err, decoded) => {
@@ -581,7 +581,7 @@ app.get('/api/get-makes', async (req, res) => {
             res.status(400).json({message: "Authorization Needed!"});
         }
         try{
-    
+
             const token = authorization.split(" ")[1];
             console.log(token+ ": TOKEN");
             jwt.verify(token, JWTSecret, async (err, decoded) => {
@@ -596,10 +596,10 @@ app.get('/api/get-makes', async (req, res) => {
                     { $group: { _id: "$make", makes: { $addToSet: "$make" } }},
                     { $sort: { _id: 1 }}
                 ]).toArray();
-            
+
                 const uniqueMakes = makes.map(make => make._id);
 
-                res.send(uniqueMakes);  
+                res.send(uniqueMakes);
             })}
         catch(err) {
             res.status(500).json({message: "Error Validating User"});
@@ -621,7 +621,7 @@ app.get('/api/get-models', async (req, res) => {
             res.status(400).json({message: "Authorization Needed!"});
         }
         try{
-    
+
             const token = authorization.split(" ")[1];
             console.log(token+ ": TOKEN");
             jwt.verify(token, JWTSecret, async (err, decoded) => {
@@ -660,7 +660,7 @@ app.get('/api/get-engines', async (req, res) => {
             res.status(400).json({message: "Authorization Needed!"});
         }
         try{
-    
+
             const token = authorization.split(" ")[1];
             console.log(token+ ": TOKEN");
             jwt.verify(token, JWTSecret, async (err, decoded) => {
@@ -699,7 +699,7 @@ app.get('/api/get-transmissions', async (req, res) => {
             res.status(400).json({message: "Authorization Needed!"});
         }
         try{
-    
+
             const token = authorization.split(" ")[1];
             console.log(token+ ": TOKEN");
             jwt.verify(token, JWTSecret, async (err, decoded) => {
@@ -713,7 +713,7 @@ app.get('/api/get-transmissions', async (req, res) => {
                     { $group: { _id: "$transmission", transmissions: { $addToSet: "$transmission" } }},
                     { $sort: { _id: 1 }}
                 ]).toArray();
-            
+
                 const uniqueTransmissions = transmissions.map(transmission => transmission._id);
                 res.send(uniqueTransmissions);
     })}
@@ -782,7 +782,7 @@ app.post('/api/update-odometer', async (req, res) => {
     const odometer = req.body.odometer;
     const config_id = req.body.config_id;
     const picture_url = req.body.picture_url;
-    
+
     const { authorization } = req.headers;
         console.log(authorization);
 
@@ -800,7 +800,7 @@ app.post('/api/update-odometer', async (req, res) => {
                 const database = client.db("vehicleDB");
                 const userVehicle = database.collection("user_vehicle_info");
 
-                try{ 
+                try{
                     const updateFields = { email: userEmail, config_id: config_id};
                     const updateData = {};
 
@@ -892,6 +892,6 @@ app.get('/api/get-user-vehicle-odometers', async (req, res) => {
 
 
 app.listen(port, () => {
-    console.log(`Predictive Vehicle Maintenance app listening on port ${port}`)
+    console.log(`Driveline app listening on port ${port}`)
     //console.log(mongo);
 });
