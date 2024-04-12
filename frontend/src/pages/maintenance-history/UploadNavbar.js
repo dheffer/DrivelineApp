@@ -12,7 +12,6 @@ function UploadNavbar(props) {
                     <div className="d-flex justify-content-center">
                         <Link to={"/garage/vehicle-history/upload"} className="me-3"
                               onClick={(e) => e.preventDefault()}>
-                            <Button variant="primary" disabled>Upload</Button>
                         </Link>
                         <ManualVehicleHistory configId={props.configId}/>
                     </div>

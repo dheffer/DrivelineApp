@@ -2,20 +2,35 @@ import {Badge, Button, Card, Form} from "react-bootstrap";
 import {Link} from "react-router-dom";
 import RemoveVehicle from "./RemoveVehicle";
 import {useEffect, useState} from "react";
+import Modal from "react-bootstrap/Modal";
 
 function Vehicle(props) {
     const [odometerValue, setOdometerValue] = useState(0);
     const [odometerReading, setOdometerReading] = useState([]);
+    const [refreshData, setRefreshData] = useState(false);
+    const [pictureUrl, setPictureUrl] = useState("");
+    const email = process.env.EMAIL;
+    const [showModal, setShowModal] = useState(false);
 
     useEffect(() => {
         fetchReadings();
-    }, []);
+    }, [refreshData]);
 
     const fetchReadings = async () => {
         try{
-            const response = await fetch("/api/get-user-vehicle-odometers");
+            const myHeaders = new Headers();
+            myHeaders.append("Authorization", "Bearer " + localStorage.getItem('token'));
+            myHeaders.append("Content-Type", "application/json");
+
+            const reqOptions = {
+                method: 'GET',
+                headers: myHeaders,
+                redirect: 'follow'
+            }
+            const response = await fetch("/api/get-user-vehicle-odometers", reqOptions);
             if(response.ok){
                 const data = await response.json();
+                console.log("READINGS "+ JSON.stringify(data));
                 setOdometerReading(data);
             }
             else{
@@ -27,45 +42,108 @@ function Vehicle(props) {
         }
     }
 
-
     const v = props.vehicle;
+
     const handleUpdateOdometer = () => {
         console.log("Updating odometer");
-        try{
-            const response = fetch("/api/update-odometer", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    vehicle_config_ids : v.configurations.config_id,
-                    email: "johnson9713@gmail.com",
-                    odometer: odometerValue
-                })
-            });
-            if(response.ok){
-                console.log("Odometer updated");
+        console.log(v.configurations.config_id+ "= config");
+        console.log(odometerValue+ "= odometer");
+
+        const myHeaders = new Headers();
+        myHeaders.append("Authorization", "Bearer " + localStorage.getItem('token'));
+        myHeaders.append("Content-Type", "application/json");
+
+        const reqOptions = {
+            method: 'POST',
+            headers: myHeaders,
+            body: JSON.stringify({
+                config_id : v.configurations.config_id,
+                email: email,
+                odometer: odometerValue,
+            }),
+            redirect: 'follow'
+        };
+        console.log("reqOptions " + reqOptions);
+
+        fetch('/api/update-odometer', reqOptions)
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return res.json();
+            })
+            .then(data => {
+                console.log("Odometer Updated! "+data);
                 fetchReadings();
-            }
-            else{
-                console.log("Odometer update failed");
-            }
-        }
-        catch (e) {
-            console.error('There has been a problem with your fetch operation:', e);
-        }
+                setOdometerValue(0);
+            })
+            .catch(error => {
+                console.error('There has been a problem with your fetch operation:', error);
+            });
     }
 
     const getOdometer = (config) => {
-        const reading = odometerReading.find(vehicle => vehicle.vehicle_config_ids === config);
+        const reading = odometerReading.find(vehicle => vehicle.config_id === config);
         return reading ? reading.odometer : -9999;
     }
+
+    const getPicture = (config) => {
+        const reading = odometerReading.find(vehicle => vehicle.config_id === config);
+        return reading ? reading.picture_url : "https://cdn.dealerk.it/cars/placeholder/placeholder-800.png";
+    }
+
+    const handleShowModal = () => {
+        setShowModal(true);
+        setPictureUrl(getPicture(v.configurations.config_id));
+    }
+
+    const handleCloseModal = () => {
+        setShowModal(false);
+    }
+
+    const handleUpdatePicture = () => {
+
+        const myHeaders = new Headers();
+        myHeaders.append("Authorization", "Bearer " + localStorage.getItem('token'));
+        myHeaders.append("Content-Type", "application/json");
+
+        const reqOptions = {
+            method: 'POST',
+            headers: myHeaders,
+            body: JSON.stringify({
+                config_id : v.configurations.config_id,
+                email: email,
+                picture_url: pictureUrl
+            }),
+            redirect: 'follow'
+        };
+        fetch('/api/update-odometer', reqOptions)
+            .then(res => {
+                if (!res.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return res.json();
+            })
+            .then(data => {
+                console.log("Picture Updated! "+data);
+                setPictureUrl(data.picture_url)
+                window.location.reload();
+                // pictureUrl = data.picture_url;
+            })
+            .catch(error => {
+                console.error('There has been a problem with your fetch operation:', error);
+            });
+    }
+
 
     return (
         <div>
             <Card style={{width: '22rem'}} id={v.configurations.year+v.configurations.make+v.configurations.model}>
                 <Card.Img variant="top"
-                          src="https://cdn.dealerk.it/cars/placeholder/placeholder-800.png"/>
+                          src={getPicture(v.configurations.config_id) || "https://cdn.dealerk.it/cars/placeholder/placeholder-800.png"}
+                          style={{ height: '200px', width: '100%', objectFit: 'cover' }}
+                          onClick={handleShowModal}
+                />
                 <Card.Body>
                     <Card.Title className={'d-flex justify-content-center'}>{v.configurations.year} {v.configurations.make} {v.configurations.model}</Card.Title>
                     <Card.Text className="d-flex justify-content-around">
@@ -75,20 +153,34 @@ function Vehicle(props) {
                         <RemoveVehicle configId={v.configurations.config_id}/>
                     </Card.Text>
                     <Card.Footer className="d-flex justify-content-around">
-                        <p><Badge bg='secondary' >CONFIG ID</Badge> {v.configurations.config_id}</p>
-                        <p><Badge bg='secondary'>ODOMETER</Badge> {getOdometer(v.configurations.config_id)}</p>
+                        <div className="d-flex flex-column align-items-center">
+                            <Badge bg='secondary'>CONFIG ID</Badge>
+                            <div>{v.configurations.config_id}</div>
+                        </div>
+                        <div className="d-flex flex-column align-items-center">
+                            <Badge bg='secondary'>ODOMETER</Badge>
+                            <div>{getOdometer(v.configurations.config_id)}</div>
+                        </div>
                     </Card.Footer>
-                    <Card.Footer className="d-flex justify-content-around">
-                        <Form.Group>
-                            <Form.Control
-                                type="number"
-                                placeholder="Enter Odometer Value"
-                                value={odometerValue}
-                                onChange={e => setOdometerValue(e.target.value)}
-                            />
-                        </Form.Group>
-                        <Button variant="primary" onClick={handleUpdateOdometer}>Update Odometer</Button>
-                    </Card.Footer>
+                    <Modal show={showModal} onHide={handleCloseModal}>
+                        <Modal.Header closeButton>
+                            <Modal.Title>Update Picture</Modal.Title>
+                        </Modal.Header>
+                        <Modal.Body>
+                            <Form.Group controlId={"formPictureUrl"}>
+                                <Form.Label>Picture URL</Form.Label>
+                                <Form.Control
+                                    type="text"
+                                    value={pictureUrl}
+                                    onChange={e => setPictureUrl(e.target.value)}
+                                />
+                            </Form.Group>
+                        </Modal.Body>
+                        <Modal.Footer>
+                            <Button variant="secondary" onClick={handleCloseModal}>Close</Button>
+                            <Button variant="primary" onClick={handleUpdatePicture}>Save Changes</Button>
+                        </Modal.Footer>
+                    </Modal>
                 </Card.Body>
             </Card>
         </div>
