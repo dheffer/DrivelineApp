@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 
 export const handler = async (event, context) => {
 
-    const JWTSecret = process.env.JWT_SECRET;
+    const JWT_SECRET = process.env.JWT_SECRET;
     const oauthClient = new google.auth.OAuth2(
         process.env.CLIENT_ID,
         process.env.CLIENT_SECRET,
@@ -33,9 +33,10 @@ export const handler = async (event, context) => {
         .then(res => {
             let user = updateOrCreateUserFromOAuth(res);
             console.log("RES  " + JSON.stringify(res));
-            const token = jwt.sign( {"name":user.name, "email":user.email}, JWTSecret, {expiresIn: '2d'} );
+            const token = jwt.sign( {"name":user.name, "email":user.email}, JWT_SECRET, {expiresIn: '2d'} );
             console.log("TOKEN  " + token);
-            console.log(jwt.verify(token, process.env.JWTSecret));
+            console.log("VERIFY " + jwt.verify(token, JWT_SECRET));
+            console.log(jwt.decode(token, JWT_SECRET))
             return {
                 statusCode: 302,
                 headers: {
@@ -79,6 +80,7 @@ const updateOrCreateUserFromOAuth = async (user) => {
             }
             else {
                 const result = await users.insertOne( {email, name});
+                console.log("RESULT  " + JSON.stringify(result.value));
                 return {
                     statusCode: 200,
                     body: JSON.stringify(result.value)

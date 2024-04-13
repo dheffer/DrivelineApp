@@ -11,6 +11,7 @@ function Garage(props) {
     const navigate = useNavigate();
     const [refreshData, setRefreshData] = useState(false);
 
+    /*
     useEffect(() => {
         const fetchUser = async () => {
             try {
@@ -37,6 +38,8 @@ function Garage(props) {
         };
         fetchUser();
     }, []);
+
+     */
 
     useEffect(() => {
 
