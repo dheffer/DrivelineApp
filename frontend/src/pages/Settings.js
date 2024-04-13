@@ -2,17 +2,25 @@ import React, { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
 import {Nav} from "react-bootstrap";
+import { useNavigate } from 'react-router-dom';
 
 export const Settings = (props) => {
     const [darkMode, setDarkMode] = useState(false);
     const [notifications, setNotifications] = useState(false);
     const [unitOfMeasurement, setUnitOfMeasurement] = useState('metric');
 
+    const navigate = useNavigate();
     const [show, setShow] = useState(false);
     const handleShow = () => setShow(!show);
 
     const handleSubmit = (e) => {
         e.preventDefault();
+    }
+
+    const handleLogout = () => {
+        localStorage.clear();
+        navigate('/');
+        window.location.reload();
     }
 
     return (
@@ -45,7 +53,7 @@ export const Settings = (props) => {
                         </select>
                     </div>
                     <div className={"mt-3"}>
-                        <Button variant="primary" onClick={() => localStorage.clear()}>Logout</Button>
+                        <Button variant="primary" onClick={handleLogout}>Logout</Button>
                     </div>
                 </Offcanvas.Body>
             </Offcanvas>

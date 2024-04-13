@@ -5,8 +5,7 @@ import React, {useEffect, useState} from "react";
 
 function VehicleInfo() {
     const location = useLocation();
-    const {configId} = location.state;
-    const email = process.env.EMAIL;
+    const { configId } = location.state;
 
     const [loading, setLoading] = useState(true);
     const [refreshData, setRefreshData] = useState(false);
@@ -20,7 +19,10 @@ function VehicleInfo() {
 
 
     const [user, setUser] = useState("Loading...");
+    const [email, setEmail] = useState("");
     const navigate = useNavigate();
+
+    console.log("email: "+email);
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -34,6 +36,7 @@ function VehicleInfo() {
                     });
                     if (response.ok) {
                         const data = await response.json();
+                        setEmail(data.email);
                         const firstName = data.name.split(' ')[0];
                         setUser(`${firstName}'s`);
                     } else {
@@ -50,49 +53,67 @@ function VehicleInfo() {
     }, []);
 
     useEffect(() => {
-        fetch('/api/get-vehicle-info?configId=' + configId)
+        const myHeaders = new Headers();
+        myHeaders.append("Authorization", "Bearer " + localStorage.getItem('token'));
+        myHeaders.append("Content-Type", "application/json");
+
+        const reqOptions = {
+            method: 'GET',
+            headers: myHeaders,
+            redirect: 'follow'
+        }
+        fetch('/api/get-vehicle-info?configId=' + configId, reqOptions)
             .then((res) => {
                 if (!res.ok) {
                     throw new Error('Network response was not ok');
                 }
                 return res.json();
             })
-            .then((vehicle) => {
+            .then( (vehicle) => {
                 setInfo(vehicle);
-                return fetch("/api/get-user-vehicle-odometers");
-            })
-            .then((odometerResponse) => {
+                return fetch("/api/get-user-vehicle-odometers", reqOptions);
+                })
+            .then( (odometerResponse) => {
                 if (!odometerResponse.ok) {
                     throw new Error('Network response was not ok');
                 }
                 return odometerResponse.json();
             })
-            .then((odometerData) => {
-                const currentOdometer = odometerData.find(reading => reading.config_id === configId).odometer;
+            .then( (odometerData) => {
+                const currentOdometer = odometerData.find( reading => reading.config_id === configId).odometer;
                 setOdometer(currentOdometer);
-                return fetch(`/api/get-maintenance?config_id=${configId}&odometer=${currentOdometer}`);
+                return fetch(`/api/get-maintenance?config_id=${configId}&odometer=${currentOdometer}`, reqOptions);
             })
-            .then((maintenanceResponse) => {
+            .then( (maintenanceResponse) => {
                 if (!maintenanceResponse.ok) {
                     throw new Error('Network response was not ok');
                 }
                 return maintenanceResponse.json();
             })
-            .then((maintenanceData) => {
-                console.log("MAINTENANCE DATA: " + JSON.stringify(maintenanceData));
+            .then( (maintenanceData) => {
+                console.log("MAINTENANCE DATA: "+JSON.stringify(maintenanceData));
                 setMaintenance(maintenanceData);
                 setLoading(false);
                 setUpcomingMaintenance(maintenanceData.service_schedule_mileage)
             })
-            .catch((error) => {
+            .catch( (error) => {
                 console.error('There has been a problem with your fetch operation:', error);
             });
         fetchReadings();
     }, [configId, refreshData]);
 
     const fetchReadings = async () => {
+        const myHeaders = new Headers();
+        myHeaders.append("Authorization", "Bearer " + localStorage.getItem('token'));
+        myHeaders.append("Content-Type", "application/json");
+
+        const reqOptions = {
+            method: 'GET',
+            headers: myHeaders,
+            redirect: 'follow'
+        }
         try{
-            const response = await fetch("/api/get-user-vehicle-odometers");
+            const response = await fetch("/api/get-user-vehicle-odometers", reqOptions);
             if(response.ok){
                 const data = await response.json();
                 console.log("READINGS "+ JSON.stringify(data));
@@ -112,11 +133,15 @@ function VehicleInfo() {
         console.log(configId+ "= config");
         console.log(newOdometerValue+ "= odometer");
 
+        const myHeaders = new Headers();
+        myHeaders.append("Authorization", "Bearer " + localStorage.getItem('token'));
+        myHeaders.append("Content-Type", "application/json");
+
+        console.log("ODOMETER EMAIL: "+email);
+
         const reqOptions = {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: myHeaders,
             body: JSON.stringify({
                 config_id : configId,
                 email: email,
@@ -143,6 +168,7 @@ function VehicleInfo() {
                 console.error('There has been a problem with your fetch operation:', error);
             });
     }
+
 
     return (
         <Container className="mt-5">
@@ -178,7 +204,7 @@ function VehicleInfo() {
                                     <p><strong>Model:</strong> {info.model}</p>
                                     <p><strong>Engine:</strong> {info.engine}</p>
                                     <p><strong>Transmission:</strong> {info.transmission}</p>
-                                    <p><strong>Odometer:</strong> {odometer ? `${odometer} miles` : "Loading..."}</p>
+                                    <p><strong>Odometer:</strong> {odometer ? `${odometer} miles` : "0 miles"}</p>
                                 </>
                             ) : "Loading vehicle specifications..."}
                         </Card.Body>
@@ -206,36 +232,34 @@ function VehicleInfo() {
                     </Card>
                 </Col>
                 <Col md={7}>
-                    {upcomingMaintenance && (
-                        <Card>
-                            <Card.Header style={{backgroundColor: '#644A77', color: '#FFFFFF', fontSize: '1.25rem'}}>Upcoming
-                                Maintenance Procedures | Due at: {upcomingMaintenance} miles</Card.Header>
-                            <Card.Body className="text-left" style={{fontSize: '1.1rem'}}>
-                                {maintenance && maintenance.tasks.length > 0 ? (
-                                    <Table striped bordered hover size="sm">
-                                        <thead>
-                                        <tr>
-                                            <th>Action</th>
-                                            <th>Part</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        {maintenance.tasks.map((task, index) => (
-                                            <tr key={index}>
-                                                <td>{task.action}</td>
-                                                <td>{task.part}</td>
-                                            </tr>
-                                        ))}
-                                        </tbody>
-                                    </Table>
-                                ) : "Loading upcoming maintenance..."}
-                            </Card.Body>
-                        </Card>
-                    )}
+                    <Card>
+                        <Card.Header style={{backgroundColor: '#644A77', color: '#FFFFFF', fontSize: '1.25rem'}}>Upcoming Maintenance Procedures | Due at: {upcomingMaintenance ? upcomingMaintenance + ' miles' : 'Loading...'}</Card.Header>
+                        <Card.Body className="text-left" style={{fontSize: '1.1rem'}}>
+                            <Table striped bordered hover size="sm">
+                                <thead>
+                                <tr>
+                                    <th>Action</th>
+                                    <th>Part</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {maintenance ? maintenance.tasks.map((task, index) => (
+                                    <tr key={index}>
+                                        <td>{task.action ? task.action : 'Loading...'}</td>
+                                        <td>{task.part}</td>
+                                    </tr>
+                                )) : <tr>
+                                    <td>Loading...</td>
+                                    <td>Loading...</td>
+                                </tr>}
+                                </tbody>
+                            </Table>
+                        </Card.Body>
+                    </Card>
                 </Col>
             </Row>
         </Container>
     );
 }
 
-    export default VehicleInfo;
+export default VehicleInfo;
