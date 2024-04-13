@@ -5,8 +5,8 @@ import '../../App.css';
 import {useNavigate} from "react-router-dom";
 function AddVehicle() {
 
-    const EMAIL = process.env.EMAIL;
     const [refreshData, setRefreshData] = useState(false);
+    const [email, setEmail] = useState("");
 
     const [vehicleAdded, setVehicleAdded] = useState(false);
     const [configId, setConfigId] = useState(null);
@@ -41,6 +41,7 @@ function AddVehicle() {
                     if (response.ok) {
                         const data = await response.json();
                         const firstName = data.name.split(' ')[0];
+                        setEmail(data.email);
                         setUser(`${firstName}'s`);
                     } else {
                         console.error("User not found");
@@ -159,7 +160,7 @@ function AddVehicle() {
                     'Authorization': 'Bearer ' + localStorage.getItem('token')
                 },
                 body: JSON.stringify({
-                    email: EMAIL,
+                    email: email,
                     config_id: configId
                 })
             });
