@@ -11,6 +11,7 @@ export const handler = async (event, context) => {
             }
         }
     );
+    // TODO: add authorization
     const config_id = event['config_id'];
     const odometer = event['odometer'];
 
@@ -19,20 +20,26 @@ export const handler = async (event, context) => {
             const database = client.db("vehicleDB");
             const collection = database.collection("maintenance");
             const docObject = await collection.findOne({config_id: config_id});
+            let recommended = null;
 
-            if(docObject && docObject.schedules){
+            if (docObject && docObject.schedules) {
                 for (const schedule of docObject.schedules) {
                     const mileage = parseInt(schedule.service_schedule_mileage.replace(',', ''));
 
                     if (mileage > odometer) {
-                        return schedule;
+                        recommended = schedule;
+                        break;
                     }
                 }
+            } else {
+                return {
+                    statusCode: 404,
+                    body: JSON.stringify({message: "Maintenance schedule not found"})
+                }
             }
-        }).then(maintenance => {
             return {
                 statusCode: 200,
-                body: JSON.stringify(maintenance)
+                body: JSON.stringify(recommended)
             };
         }).catch(err => {
             return {
