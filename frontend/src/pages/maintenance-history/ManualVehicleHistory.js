@@ -21,6 +21,8 @@ function ManualVehicleHistory(props) {
         e.preventDefault();
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
+        myHeaders.append("Authorization", "Bearer " + localStorage.getItem('token'));
+
         const raw = JSON.stringify({
             "type": typeText.current.value,
             "date": dateText.current.value,
@@ -39,6 +41,7 @@ function ManualVehicleHistory(props) {
             .then((result) => {
                 console.log(result);
                 setRefreshData(!refreshData);
+                window.location.reload();
             })
             .catch((error) => console.error(error));
         handleClose();

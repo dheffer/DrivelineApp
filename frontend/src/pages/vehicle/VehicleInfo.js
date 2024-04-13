@@ -5,8 +5,9 @@ import React, {useEffect, useState} from "react";
 
 function VehicleInfo() {
     const location = useLocation();
-    const {configId} = location.state;
+    const { configId } = location.state;
     const email = process.env.EMAIL;
+
 
     const [loading, setLoading] = useState(true);
     const [refreshData, setRefreshData] = useState(false);
@@ -50,49 +51,67 @@ function VehicleInfo() {
     }, []);
 
     useEffect(() => {
-        fetch('/api/get-vehicle-info?configId=' + configId)
+        const myHeaders = new Headers();
+        myHeaders.append("Authorization", "Bearer " + localStorage.getItem('token'));
+        myHeaders.append("Content-Type", "application/json");
+
+        const reqOptions = {
+            method: 'GET',
+            headers: myHeaders,
+            redirect: 'follow'
+        }
+        fetch('/api/get-vehicle-info?configId=' + configId, reqOptions)
             .then((res) => {
                 if (!res.ok) {
                     throw new Error('Network response was not ok');
                 }
                 return res.json();
             })
-            .then((vehicle) => {
+            .then( (vehicle) => {
                 setInfo(vehicle);
-                return fetch("/api/get-user-vehicle-odometers");
-            })
-            .then((odometerResponse) => {
+                return fetch("/api/get-user-vehicle-odometers", reqOptions);
+                })
+            .then( (odometerResponse) => {
                 if (!odometerResponse.ok) {
                     throw new Error('Network response was not ok');
                 }
                 return odometerResponse.json();
             })
-            .then((odometerData) => {
-                const currentOdometer = odometerData.find(reading => reading.config_id === configId).odometer;
+            .then( (odometerData) => {
+                const currentOdometer = odometerData.find( reading => reading.config_id === configId).odometer;
                 setOdometer(currentOdometer);
-                return fetch(`/api/get-maintenance?config_id=${configId}&odometer=${currentOdometer}`);
+                return fetch(`/api/get-maintenance?config_id=${configId}&odometer=${currentOdometer}`, reqOptions);
             })
-            .then((maintenanceResponse) => {
+            .then( (maintenanceResponse) => {
                 if (!maintenanceResponse.ok) {
                     throw new Error('Network response was not ok');
                 }
                 return maintenanceResponse.json();
             })
-            .then((maintenanceData) => {
-                console.log("MAINTENANCE DATA: " + JSON.stringify(maintenanceData));
+            .then( (maintenanceData) => {
+                console.log("MAINTENANCE DATA: "+JSON.stringify(maintenanceData));
                 setMaintenance(maintenanceData);
                 setLoading(false);
                 setUpcomingMaintenance(maintenanceData.service_schedule_mileage)
             })
-            .catch((error) => {
+            .catch( (error) => {
                 console.error('There has been a problem with your fetch operation:', error);
             });
         fetchReadings();
     }, [configId, refreshData]);
 
     const fetchReadings = async () => {
+        const myHeaders = new Headers();
+        myHeaders.append("Authorization", "Bearer " + localStorage.getItem('token'));
+        myHeaders.append("Content-Type", "application/json");
+
+        const reqOptions = {
+            method: 'GET',
+            headers: myHeaders,
+            redirect: 'follow'
+        }
         try{
-            const response = await fetch("/api/get-user-vehicle-odometers");
+            const response = await fetch("/api/get-user-vehicle-odometers", reqOptions);
             if(response.ok){
                 const data = await response.json();
                 console.log("READINGS "+ JSON.stringify(data));
@@ -112,11 +131,13 @@ function VehicleInfo() {
         console.log(configId+ "= config");
         console.log(newOdometerValue+ "= odometer");
 
+        const myHeaders = new Headers();
+        myHeaders.append("Authorization", "Bearer " + localStorage.getItem('token'));
+        myHeaders.append("Content-Type", "application/json");
+
         const reqOptions = {
             method: 'POST',
-            headers: {
-                'Content-Type': 'application/json'
-            },
+            headers: myHeaders,
             body: JSON.stringify({
                 config_id : configId,
                 email: email,
@@ -143,6 +164,7 @@ function VehicleInfo() {
                 console.error('There has been a problem with your fetch operation:', error);
             });
     }
+
 
     return (
         <Container className="mt-5">
@@ -178,7 +200,7 @@ function VehicleInfo() {
                                     <p><strong>Model:</strong> {info.model}</p>
                                     <p><strong>Engine:</strong> {info.engine}</p>
                                     <p><strong>Transmission:</strong> {info.transmission}</p>
-                                    <p><strong>Odometer:</strong> {odometer ? `${odometer} miles` : "Loading..."}</p>
+                                    <p><strong>Odometer:</strong> {odometer ? `${odometer} miles` : "0 miles"}</p>
                                 </>
                             ) : "Loading vehicle specifications..."}
                         </Card.Body>
@@ -228,14 +250,20 @@ function VehicleInfo() {
                                         ))}
                                         </tbody>
                                     </Table>
-                                ) : "Loading upcoming maintenance..."}
+                                ) : (
+                                    <p className={"alert alert-info"}> No Maintenance Scheduled For This Vehicle</p>
+                                )}
                             </Card.Body>
                         </Card>
-                    )}
+                    )} : {
+                    <div className={'text-center'}>
+                        <p className={"alert alert-info"}> No Maintenance Scheduled For This Vehicle</p>
+                    </div>
+                    }
                 </Col>
             </Row>
         </Container>
     );
 }
 
-    export default VehicleInfo;
+export default VehicleInfo;

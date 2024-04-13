@@ -39,7 +39,10 @@ function Garage(props) {
     }, []);
 
     useEffect(() => {
+
         const myHeaders = new Headers();
+        myHeaders.append("Authorization", "Bearer " + localStorage.getItem('token'));
+
         const reqOptions = {
             method: 'GET',
             headers: myHeaders,
@@ -55,36 +58,12 @@ function Garage(props) {
             .then(vehicles => {
                 props.setInfo(vehicles);
                 setLoading(false);
+                setRefreshData(false)
             })
             .catch(error => {
                 console.error('There has been a problem with your fetch operation:', error);
             });
     }, [refreshData]);
-
-    const updateOdometer = async (configID, email) => {
-        try{
-            const response = await fetch("/api/update-odometer", {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json'
-                },
-                body: JSON.stringify({
-                    vehicle_config_ids : configID,
-                    email: email,
-                    //odometer: odometer
-                })
-            });
-            if(response.ok){
-                setRefreshData(!refreshData);
-            }
-            else{
-                console.error("Failed to update Odometer");
-            }
-        }
-        catch (error){
-            console.error("Catch Failed to update Odometer");
-        }
-    }
 
     let vehicle_count = 0;
 
