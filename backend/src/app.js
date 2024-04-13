@@ -283,8 +283,6 @@ app.delete('/api/delete-maintenance-history', async (req, res) => {
  */
 app.get('/api/get-user-vehicles', async (req, res) => {
     const garage = DATABASE.collection("user_garage");
-
-
     const vehicles = await garage.aggregate([
         {
             $match: {
@@ -590,7 +588,7 @@ app.get('/api/get-user-vehicle-odometers', async (req, res) => {
     }));
 
 
-        res.status(200).json(response);
+    res.status(200).json(response);
 });
 
 
