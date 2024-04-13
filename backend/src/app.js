@@ -7,9 +7,6 @@ import { getGoogleOauthURL } from './OauthClient.js';
 import { oauthClient } from './OauthClient.js';
 import 'dotenv/config';
 import client from "./mongo.js";
-import mongo from "./mongo.js"
-import e from 'express';
-import {parse} from "dotenv";
 
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
@@ -91,7 +88,7 @@ app.get('/api/user', async (req, res) => {
 
         const token = authorization.split(" ")[1];
         console.log(token+ ": TOKEN");
-        jwt.verify(token, JWTSecret, async (err, decoded) => {
+        jwt.verify(token, process.env.JWTSecret, async (err, decoded) => {
             if(err) {
                 res.status(401).json({message: "Invalid Token"});
             }
