@@ -40,15 +40,13 @@ function NavBar() {
     return (
         <Navbar expand="lg" className="bg-body-tertiary navbar-bottom-margin" sticky="top">
             <Container>
-                <Navbar.Brand href="/garage" style={{ display: 'flex', alignItems: 'flex-start', marginDown: '35px' }}>
-                    <span className="drive" style={{ display: 'flex', alignItems: 'flex-start', marginTop: '15px' }}>Drive</span><span className="line" style={{ display: 'flex', alignItems: 'flex-start', marginTop: '15px' }}>line</span>
+                <Navbar.Brand href="/garage" className="d-flex justify-content-start">
+                    <span className="drive" style={{ display: 'flex', alignItems: 'flex-start'}}>Drive</span><span className="line" style={{ display: 'flex', alignItems: 'flex-start'}}>line</span>
                 </Navbar.Brand>
                 <Navbar.Toggle />
-                <Navbar.Collapse>
-                    <Nav className="me-auto">
-                        <Nav.Link href="/garage">Garage</Nav.Link>
-                    </Nav>
-                </Navbar.Collapse>
+                <Nav className="me-auto">
+                    <Nav.Link href="/garage" style={{marginTop: "7px"}}>Garage</Nav.Link>
+                </Nav>
                 <Nav className="ms-auto">
                     <Nav.Link>
                         <Settings greeting={`${user || 'LOADING...'}`} />
