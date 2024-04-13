@@ -9,12 +9,43 @@ function Vehicle(props) {
     const [odometerReading, setOdometerReading] = useState([]);
     const [refreshData, setRefreshData] = useState(false);
     const [pictureUrl, setPictureUrl] = useState("");
-    const email = process.env.EMAIL;
+    const [email, setEmail] = useState("");
     const [showModal, setShowModal] = useState(false);
+    console.log("EMAIL: " + email);
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            try{
+                const token = localStorage.getItem('token');
+                if(token) {
+                    const response = await fetch('/api/user', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    if(response.ok){
+                        const data = await response.json();
+                        setEmail(data.email);
+                        setUser(data.name);
+                        console.log("EMAIL DATA: " + data.email);
+                    }
+                    else {
+                        console.error("User not found");
+                    }
+                }
+            }
+            catch (error) {
+                console.log(error);
+            }
+        };
+        fetchUser();
+    }, []);
+
 
     useEffect(() => {
         fetchReadings();
     }, [refreshData]);
+    const [user, setUser] = useState("Placeholder User");
 
     const fetchReadings = async () => {
         try{
@@ -43,44 +74,6 @@ function Vehicle(props) {
 
 
     const v = props.vehicle;
-
-    const handleUpdateOdometer = () => {
-        console.log("Updating odometer");
-        console.log(v.configurations.config_id+ "= config");
-        console.log(odometerValue+ "= odometer");
-
-        const myHeaders = new Headers();
-        myHeaders.append("Authorization", "Bearer " + localStorage.getItem('token'));
-        myHeaders.append("Content-Type", "application/json");
-
-        const reqOptions = {
-            method: 'POST',
-            headers: myHeaders,
-            body: JSON.stringify({
-                config_id : v.configurations.config_id,
-                email: email,
-                odometer: odometerValue,
-            }),
-            redirect: 'follow'
-        };
-        console.log("reqOptions " + reqOptions);
-
-        fetch('/api/update-odometer', reqOptions)
-            .then(res => {
-                if (!res.ok) {
-                    throw new Error('Network response was not ok');
-                }
-                return res.json();
-            })
-            .then(data => {
-                console.log("Odometer Updated! "+data);
-                fetchReadings();
-                setOdometerValue(0);
-            })
-            .catch(error => {
-                console.error('There has been a problem with your fetch operation:', error);
-            });
-    }
 
     const getOdometer = (config) => {
         const reading = odometerReading.find(vehicle => vehicle.config_id === config);

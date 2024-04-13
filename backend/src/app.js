@@ -11,11 +11,9 @@ import mongo from "./mongo.js"
 import e from 'express';
 import {parse} from "dotenv";
 
-const userEmail = "";
 const CLIENT_ID = process.env.GOOGLE_CLIENT_ID;
 const CLIENT_SECRET = process.env.GOOGLE_CLIENT_SECRET;
 const DATABASE = client.db("vehicleDB");
-const EMAIL = process.env.EMAIL;
 
 const app = express();
 
@@ -208,7 +206,7 @@ app.get('/api/get-vehicle-history', async (req, res) => {
                 {
                     $match: {
                         config_id: parseInt(configId),
-                        email: EMAIL
+                        email: decoded.email
                     }
                 },
                 {
@@ -258,7 +256,7 @@ app.post('/api/add-maintenance-history', async (req, res) => {
                 cost: parseInt(req.body.cost)
             };
             const add = await garage.updateOne(
-                { email: EMAIL, config_id: parseInt(configId) },
+                { email: decoded.email, config_id: parseInt(configId) },
                 { $push: { completed_maintenance: maintenance } }
             );
             return res.json(add.modifiedCount);
@@ -303,7 +301,7 @@ app.post('/api/update-maintenance-history', async (req, res) => {
             } = req.body;
             const update = await garage.updateOne(
                 {
-                    email: EMAIL,
+                    email: decoded.email,
                     config_id: parseInt(req.query.configId),
                     "completed_maintenance.type": old_type,
                     "completed_maintenance.date": old_date,
@@ -345,7 +343,7 @@ app.delete('/api/delete-maintenance-history', async (req, res) => {
             const { type, date, maintenance, cost } = req.body;
             const deletion = await garage.updateOne(
                 {
-                    email: EMAIL,
+                    email: decoded.email,
                     config_id: parseInt(req.query.configId)
                 },
                 {$pull:
@@ -390,7 +388,7 @@ app.get('/api/get-user-vehicles', async (req, res) => {
             const vehicles = await garage.aggregate([
                 {
                     $match: {
-                        email: EMAIL
+                        email: decoded.email
                     }
                 },
                 {
@@ -437,11 +435,11 @@ app.delete('/api/delete-user-vehicle', async (req, res) => {
 
             const { config_id } = req.body;
             const deletion = await garage.updateOne(
-                {email: EMAIL},
+                {email: decoded.email},
                 {$pull: { vehicle_config_ids: config_id } }
             );
             const deletionTwo = await vehicInfo.deleteOne(
-                {email: EMAIL, config_id: config_id}
+                {email: decoded.email, config_id: config_id}
             );
             return res.json(deletion.modifiedCount+deletionTwo.deletedCount);
         });
@@ -455,51 +453,59 @@ app.delete('/api/delete-user-vehicle', async (req, res) => {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
-app.get('/api/get-maintenance', async (req , res) => {
+app.get('/api/get-maintenance', async (req, res) => {
     const message = DATABASE.collection("maintenance");
     const config_id = req.query.config_id;
     const odometer = req.query.odometer;
     let maintenance = null;
 
     const { authorization } = req.headers;
-    console.log("USER AUTHORIZ: "+authorization)
-    if(!authorization) {
-        res.status(400).json({message: "Authorization Needed!"});
+    console.log("USER AUTHORIZ: " + authorization);
+    if (!authorization) {
+        return res.status(400).json({ message: "Authorization Needed!" });
     }
-    try{
-
+    try {
         const token = authorization.split(" ")[1];
-        console.log(token+ ": TOKEN");
+        console.log(token + ": TOKEN");
         jwt.verify(token, JWTSecret, async (err, decoded) => {
             if (err) {
-                res.status(401).json({message: "Invalid Token"});
+                console.log("TOKEN NOT WORK HERE");
+                return res.status(401).json({ message: "Invalid Token" });
             }
+            console.log("TOKEN PASS GOOD");
+            const docObject = await message.findOne({ config_id });
 
-            const docObject = await message.findOne({config_id});
+            console.log("DOC OBJECT " + JSON.stringify(docObject));
 
-            if (docObject && docObject.schedules) {
+            console.log("DOC OBJECT BEFORE" + JSON.stringify(docObject));
+
+            if (docObject) {
+                console.log("DOC OBJECT Sched: " + docObject.schedules);
+                console.log("DOC OBJECT " + JSON.stringify(docObject));
                 for (const schedule of docObject.schedules) {
+                    console.log("MADE IT IN");
                     const mileage = parseInt(schedule.service_schedule_mileage.replace(',', ''));
-
                     if (mileage > odometer) {
+                        console.log("MILEAGE: " + mileage);
                         maintenance = schedule;
+                        console.log("MAINTENANCE: " + maintenance);
                         break;
                     }
                 }
-            }
-
-            if (maintenance) {
-                res.send(maintenance);
+                if (maintenance) {
+                    res.send(maintenance);
+                } else {
+                    res.status(404).json({ message: "No maintenance found for this vehicle" });
+                }
             } else {
-                res.status(404).json({message: "No maintenance found for this vehicle"});
+                res.status(404).json({ message: "No maintenance scheduled for this vehicle" });
             }
-        }
-    );
-    }
-    catch(err) {
-        res.status(500).json({message: "Error Validating User"});
+        });
+    } catch (err) {
+        res.status(500).json({ message: "Error Validating User" });
     }
 });
+
 
 app.get('/api/get-config-id', async (req, res) => {
     const year = req.query.year;
@@ -724,8 +730,6 @@ app.get('/api/get-transmissions', async (req, res) => {
 });
 
 app.post('/api/add-vehicle', async (req, res) => {
-    const userEmail = process.env.EMAIL;
-    const email = req.body.email;
     const config_id = req.body.config_id;
 
     const { authorization } = req.headers;
@@ -748,22 +752,22 @@ app.post('/api/add-vehicle', async (req, res) => {
                 const userVehicle = database.collection("user_vehicle_info");
 
                 try{
-                    const exist = await garage.findOne({email: userEmail});
+                    const exist = await garage.findOne({email: decoded.email});
                     if(exist) {
                         await garage.updateOne(
-                            { email: userEmail },
+                            { email: decoded.email },
                             { $addToSet: { vehicle_config_ids: config_id } }
                         );
                         await userVehicle.insertOne(
-                            { email: userEmail, config_id: config_id, odometer: 0, upcoming_maintenance: [], completed_maintenance: [] })
+                            { email: decoded.email, config_id: config_id, odometer: 0, upcoming_maintenance: [], completed_maintenance: [] })
                         return res.status(200).json({message: "Vehicle added to garage"});
                     }
                     else {
                         await garage.insertOne(
-                            { email: userEmail, vehicle_config_ids: [config_id] }
+                            { email: decoded.email, vehicle_config_ids: [config_id] }
                         )
                         await userVehicle.insertOne(
-                            { email: userEmail, config_id: config_id, odometer: 0, upcoming_maintenance: [], completed_maintenance: [] })
+                            { email: decoded.email, config_id: config_id, odometer: 0, upcoming_maintenance: [], completed_maintenance: [] })
                         return res.status(200).json({message: "User Vehicle added to info"});
                     }
                 }
@@ -778,7 +782,6 @@ app.post('/api/add-vehicle', async (req, res) => {
 });
 
 app.post('/api/update-odometer', async (req, res) => {
-    const userEmail = process.env.EMAIL;
     const odometer = req.body.odometer;
     const config_id = req.body.config_id;
     const picture_url = req.body.picture_url;
@@ -801,7 +804,7 @@ app.post('/api/update-odometer', async (req, res) => {
                 const userVehicle = database.collection("user_vehicle_info");
 
                 try{
-                    const updateFields = { email: userEmail, config_id: config_id};
+                    const updateFields = { email: decoded.email, config_id: config_id};
                     const updateData = {};
 
                     if(odometer !== undefined) {
@@ -842,52 +845,31 @@ app.get('/api/get-user-vehicle-odometers', async (req, res) => {
                 if(err) {
                     return res.status(400).json({message: 'Unable to verify token'});
                 }
-            const database = client.db("vehicleDB");
-            const garage = database.collection("user_garage");
-            const userVehicle = database.collection("user_vehicle_info");
-            const userGarage = await garage.findOne({email: EMAIL});
-            if(!userGarage){
-                return res.status(404).json({message: "User not found"});
-            }
+                    const database = client.db("vehicleDB");
+                    const garage = database.collection("user_garage");
+                    const userVehicle = database.collection("user_vehicle_info");
+                    const userGarage = await garage.findOne({email: decoded.email});
 
-            const vehicleConfigIds = userGarage.vehicle_config_ids;
-            if(!vehicleConfigIds){
-                return res.status(404).json({message: "User has no vehicles"});
-            }
+                    if(!userGarage){
+                        return res.status(404).json({message: "User not found"});
+                    }
 
-            const odometerReadings = await userVehicle.find(
-                {email: EMAIL, config_id: {$in: vehicleConfigIds} },
-                {_id: 0, undefined: 1, odometer: 1}
-            ).toArray();
+                    const vehicleConfigIds = userGarage.vehicle_config_ids;
+                    if(!vehicleConfigIds){
+                        return res.status(404).json({message: "User has no vehicles"});
+                    }
 
-            const pictureReadings = await userVehicle.find(
-                {email: EMAIL, config_id: {$in: vehicleConfigIds} },
-                {_id: 0, undefined: 1, picture_url: 1}
-            ).toArray();
+                    const vehicle = await userVehicle.find(
+                        {email: decoded.email, config_id: {$in: vehicleConfigIds}}
+                    ).toArray();
 
-            const odometerMap = {};
-            odometerReadings.forEach(reading => {
-                odometerMap[reading.config_id] = reading.odometer;
-            });
+                    res.status(200).json(vehicle);
 
-            const pictureMap = {};
-            pictureReadings.forEach(reading => {
-                pictureMap[reading.config_id] = reading.picture_url;
-            });
-
-            const response = vehicleConfigIds.map(configId => ({
-                config_id: configId,
-                odometer: odometerMap[configId],
-                picture_url: pictureMap[configId]
-            }));
-
-
-                res.status(200).json(response);
-            });
-        }
-        catch(err) {
-            return res.status(500).json({message: "Error Validating User"});
-        }
+                    });
+                }
+                catch(err) {
+                    return res.status(500).json({message: "Error Validating User"});
+                }
 });
 
 

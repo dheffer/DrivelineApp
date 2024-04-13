@@ -6,8 +6,6 @@ import React, {useEffect, useState} from "react";
 function VehicleInfo() {
     const location = useLocation();
     const { configId } = location.state;
-    const email = process.env.EMAIL;
-
 
     const [loading, setLoading] = useState(true);
     const [refreshData, setRefreshData] = useState(false);
@@ -21,7 +19,10 @@ function VehicleInfo() {
 
 
     const [user, setUser] = useState("Loading...");
+    const [email, setEmail] = useState("");
     const navigate = useNavigate();
+
+    console.log("email: "+email);
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -35,6 +36,7 @@ function VehicleInfo() {
                     });
                     if (response.ok) {
                         const data = await response.json();
+                        setEmail(data.email);
                         const firstName = data.name.split(' ')[0];
                         setUser(`${firstName}'s`);
                     } else {
@@ -135,6 +137,8 @@ function VehicleInfo() {
         myHeaders.append("Authorization", "Bearer " + localStorage.getItem('token'));
         myHeaders.append("Content-Type", "application/json");
 
+        console.log("ODOMETER EMAIL: "+email);
+
         const reqOptions = {
             method: 'POST',
             headers: myHeaders,
@@ -228,38 +232,30 @@ function VehicleInfo() {
                     </Card>
                 </Col>
                 <Col md={7}>
-                    {upcomingMaintenance && (
-                        <Card>
-                            <Card.Header style={{backgroundColor: '#644A77', color: '#FFFFFF', fontSize: '1.25rem'}}>Upcoming
-                                Maintenance Procedures | Due at: {upcomingMaintenance} miles</Card.Header>
-                            <Card.Body className="text-left" style={{fontSize: '1.1rem'}}>
-                                {maintenance && maintenance.tasks.length > 0 ? (
-                                    <Table striped bordered hover size="sm">
-                                        <thead>
-                                        <tr>
-                                            <th>Action</th>
-                                            <th>Part</th>
-                                        </tr>
-                                        </thead>
-                                        <tbody>
-                                        {maintenance.tasks.map((task, index) => (
-                                            <tr key={index}>
-                                                <td>{task.action}</td>
-                                                <td>{task.part}</td>
-                                            </tr>
-                                        ))}
-                                        </tbody>
-                                    </Table>
-                                ) : (
-                                    <p className={"alert alert-info"}> No Maintenance Scheduled For This Vehicle</p>
-                                )}
-                            </Card.Body>
-                        </Card>
-                    )} : {
-                    <div className={'text-center'}>
-                        <p className={"alert alert-info"}> No Maintenance Scheduled For This Vehicle</p>
-                    </div>
-                    }
+                    <Card>
+                        <Card.Header style={{backgroundColor: '#644A77', color: '#FFFFFF', fontSize: '1.25rem'}}>Upcoming Maintenance Procedures | Due at: {upcomingMaintenance ? upcomingMaintenance + ' miles' : 'Loading...'}</Card.Header>
+                        <Card.Body className="text-left" style={{fontSize: '1.1rem'}}>
+                            <Table striped bordered hover size="sm">
+                                <thead>
+                                <tr>
+                                    <th>Action</th>
+                                    <th>Part</th>
+                                </tr>
+                                </thead>
+                                <tbody>
+                                {maintenance ? maintenance.tasks.map((task, index) => (
+                                    <tr key={index}>
+                                        <td>{task.action ? task.action : 'Loading...'}</td>
+                                        <td>{task.part}</td>
+                                    </tr>
+                                )) : <tr>
+                                    <td>Loading...</td>
+                                    <td>Loading...</td>
+                                </tr>}
+                                </tbody>
+                            </Table>
+                        </Card.Body>
+                    </Card>
                 </Col>
             </Row>
         </Container>
