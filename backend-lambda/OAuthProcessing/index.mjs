@@ -12,12 +12,16 @@ export const handler = async (event, context) => {
         process.env.OAUTH_CALLBACK_URL
     );
     const { code } = event['queryStringParameters'];
+    console.log("CODE  " + code);
     const { tokens } = await oauthClient.getToken(code);
+    console.log("TOKENS  " + JSON.stringify(tokens));
     const url = getAccessAndBearerTokenUrl(tokens.access_token);
+    console.log("URL  " + url);
 
     const myHeaders = new Headers();
     const bearerToken = "Bearer "+tokens.id_token;
     myHeaders.append("Authorization", bearerToken);
+    console.log("BEARER TOKEN  " + bearerToken);
 
     const reqOptions = {
         method: 'GET',
@@ -28,9 +32,12 @@ export const handler = async (event, context) => {
         .then(response => response.json())
         .then(res => {
             let user = updateOrCreateUserFromOAuth(res);
+            console.log("RES  " + JSON.stringify(res));
             const token = jwt.sign( {"name":user.name, "email":user.email}, JWTSecret, {expiresIn: '2d'} );
+            console.log("TOKEN  " + token);
+            console.log(jwt.verify(token, process.env.JWTSecret));
             return {
-                statusCode: 200,
+                statusCode: 302,
                 headers: {
                     "Location": `${process.env.APP_URL}/login?token=${token}`
                 }
