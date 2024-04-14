@@ -1,4 +1,4 @@
-import { MongoClient, ServerApiVersion } from "mongodb";
+import {MongoClient, ServerApiVersion} from "mongodb";
 import 'dotenv/config';
 import jwt from 'jsonwebtoken';
 
@@ -13,9 +13,11 @@ export const handler = async (event, context) => {
             }
         }
     );
+    console.log(event);
     const authorization = event.headers['Authorization'];
     const config_id = event['queryStringParameters'].config_id;
     const data = JSON.parse(event.body);
+    console.log(data);
     const values = {
         old_type: data.old_type,
         old_date: data.old_date,
@@ -41,7 +43,8 @@ export const handler = async (event, context) => {
 
             const database = client.db("vehicleDB");
             const garage = database.collection("user_vehicle_info");
-            const update = await garage.updateOne(
+            console.log("EMAIL " + decoded.email + " CONFIG_ID " + config_id + " MAINTENANCE " + values);
+            return await garage.updateOne(
                 {
                     email: decoded.email,
                     config_id: parseInt(config_id),
@@ -58,19 +61,12 @@ export const handler = async (event, context) => {
                         "completed_maintenance.$.cost": parseInt(values.new_cost)
                     }
                 });
-            if (update.modifiedCount === 1) {
-                return {
-                    statusCode: 200,
-                    body: JSON.stringify({message: `Maintenance history updated for vehicle with config ${config_id}`})
-                };
-            }
-            else {
-                return {
-                    statusCode: 400,
-                    body: JSON.stringify({message: `Maintenance history not updated for vehicle with config ${config_id}`})
-                };
-            }
-
+        }).then(res => {
+            console.log(res);
+            return {
+                statusCode: 200,
+                body: JSON.stringify({message: res})
+            };
         }).catch(err => {
             return {
                 statusCode: 500,

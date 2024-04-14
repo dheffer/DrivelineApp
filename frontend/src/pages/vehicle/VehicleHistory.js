@@ -146,9 +146,8 @@ function UpdateMaintenanceHistory(props) {
             redirect: 'follow'
         };
 
-        fetch("/api/update-maintenance-history?configId="+props.configId, reqOptions)
-            .then((res) =>
-                res.json())
+        fetch("/api/update-maintenance-history?config_id="+props.configId, reqOptions)
+            .then((res) => res.text())
             .then((result) => {
                 console.log(result);
                 setRefreshData(!refreshData);
