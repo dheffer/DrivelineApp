@@ -593,7 +593,6 @@ app.get('/api/get-models', async (req, res) => {
     }
     else{
         const { authorization } = req.headers;
-        //console.log("USER AUTHORIZ: "+authorization)
         if(!authorization) {
             res.status(400).json({message: "Authorization Needed!"});
         }
