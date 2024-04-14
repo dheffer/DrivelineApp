@@ -1,5 +1,6 @@
 import { MongoClient, ServerApiVersion } from "mongodb";
 import 'dotenv/config';
+import jwt from 'jsonwebtoken'
 
 export const handler = async (event, context) => {
     const uri = process.env.MONGO_URI;
@@ -11,8 +12,9 @@ export const handler = async (event, context) => {
             }
         }
     );
-    // TODO: add authorization
-    const config_id = event['config_id'];
+    const authorization = event.headers['Authorization'];
+    const config_id = event['queryStringParameters'].config_id;
+
     const odometer = event['odometer'];
 
     return client.connect()

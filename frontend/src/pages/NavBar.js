@@ -8,7 +8,7 @@ import { GearFill } from 'react-bootstrap-icons';
 import '../App.css';
 
 function NavBar() {
-    const [user, setUser] = useState();
+    const [user, setUser] = useState('');
 
     useEffect(() => {
         const fetchUser = async () => {
@@ -22,9 +22,7 @@ function NavBar() {
                     });
                     if(response.ok){
                         const data = await response.json();
-                        await console.log("USERNAME DATA: " + data);
                         setUser(data.name);
-                    
                     }
                     else {
                         console.error("User not found");
@@ -48,7 +46,7 @@ function NavBar() {
                 </Nav>
                 <Nav className="ms-auto">
                     <Nav.Link>
-                        <Settings greeting={`${user || 'Sign in'}`} />
+                        <Settings greeting={user ? user : 'Sign in'} />
                         <GearFill className="ml-2" />
                     </Nav.Link>
                 </Nav>

@@ -142,7 +142,7 @@ function AddVehicle() {
             const data = await response.json();
             if (data.config_id) {
                 setConfigId(data.config_id);
-                await addVehicleToUser(data.config_id);
+                await addVehicleToUser();
             } else {
                 console.log("No config ID found for the selected vehicle.");
             }
@@ -151,7 +151,7 @@ function AddVehicle() {
         }
     };
 
-    const addVehicleToUser = async (configId) => {
+    const addVehicleToUser = async () => {
         try {
             const response = await fetch('/api/add-vehicle', {
                 method: 'POST',
@@ -160,7 +160,6 @@ function AddVehicle() {
                     'Authorization': 'Bearer ' + localStorage.getItem('token')
                 },
                 body: JSON.stringify({
-                    email: email,
                     config_id: configId
                 })
             });

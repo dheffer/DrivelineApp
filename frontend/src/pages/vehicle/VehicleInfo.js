@@ -62,35 +62,36 @@ function VehicleInfo() {
             headers: myHeaders,
             redirect: 'follow'
         }
-        fetch('/api/get-vehicle-info?configId=' + configId, reqOptions)
-            .then((res) => {
+        fetch('/api/get-vehicle-info?config_id=' + configId, reqOptions)
+            .then(async (res) => {
                 if (!res.ok) {
                     throw new Error('Network response was not ok');
                 }
+                console.log(res);
                 return res.json();
             })
-            .then( (vehicle) => {
+            .then(async (vehicle) => {
                 setInfo(vehicle);
                 return fetch("/api/get-user-vehicle-odometers", reqOptions);
-                })
-            .then( (odometerResponse) => {
+            })
+            .then(async (odometerResponse) => {
                 if (!odometerResponse.ok) {
                     throw new Error('Network response was not ok');
                 }
                 return odometerResponse.json();
             })
-            .then( (odometerData) => {
+            .then(async (odometerData) => {
                 const currentOdometer = odometerData.find( reading => reading.config_id === configId).odometer;
                 setOdometer(currentOdometer);
                 return fetch(`/api/get-maintenance?config_id=${configId}&odometer=${currentOdometer}`, reqOptions);
             })
-            .then( (maintenanceResponse) => {
+            .then(async (maintenanceResponse) => {
                 if (!maintenanceResponse.ok) {
                     throw new Error('Network response was not ok');
                 }
                 return maintenanceResponse.json();
             })
-            .then( (maintenanceData) => {
+            .then(async (maintenanceData) => {
                 console.log("MAINTENANCE DATA: "+JSON.stringify(maintenanceData));
                 setMaintenance(maintenanceData);
                 setLoading(false);
@@ -199,11 +200,11 @@ function VehicleInfo() {
                         <Card.Body className="text-left" style={{fontSize: '1.1rem'}}>
                             {info ? (
                                 <>
-                                    <p><strong>Year:</strong> {info.year}</p>
-                                    <p><strong>Make:</strong> {info.make}</p>
-                                    <p><strong>Model:</strong> {info.model}</p>
-                                    <p><strong>Engine:</strong> {info.engine}</p>
-                                    <p><strong>Transmission:</strong> {info.transmission}</p>
+                                    <p><strong>Year:</strong> {info.message.year}</p>
+                                    <p><strong>Make:</strong> {info.message.make}</p>
+                                    <p><strong>Model:</strong> {info.message.model}</p>
+                                    <p><strong>Engine:</strong> {info.message.engine}</p>
+                                    <p><strong>Transmission:</strong> {info.message.transmission}</p>
                                     <p><strong>Odometer:</strong> {odometer ? `${odometer} miles` : "0 miles"}</p>
                                 </>
                             ) : "Loading vehicle specifications..."}
