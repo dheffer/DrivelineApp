@@ -244,15 +244,17 @@ function VehicleInfo() {
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {maintenance ? maintenance.tasks.map((task, index) => (
+                                {
+                                    maintenance !== null ? maintenance.map((task, index) => (
                                     <tr key={index}>
                                         <td>{task.action ? task.action : 'Loading...'}</td>
                                         <td>{task.part}</td>
                                     </tr>
-                                )) : <tr>
-                                    <td>Loading...</td>
-                                    <td>Loading...</td>
-                                </tr>}
+                                    )) : <tr>
+                                            <td>Loading...</td>
+                                            <td>Loading...</td>
+                                            </tr>
+                                }
                                 </tbody>
                             </Table>
                         </Card.Body>

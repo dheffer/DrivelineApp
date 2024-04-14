@@ -13,21 +13,10 @@ export const handler = async (event, context) => {
             }
         }
     );
-    console.log(event);
+    console.log("EVENT " + event);
     const authorization = event.headers['Authorization'];
     const config_id = event['queryStringParameters'].config_id;
     const data = JSON.parse(event.body);
-    console.log(data);
-    const values = {
-        old_type: data.old_type,
-        old_date: data.old_date,
-        old_maintenance: data.old_maintenance,
-        old_cost: data.old_cost,
-        new_type: data.new_type,
-        new_date: data.new_date,
-        new_maintenance: data.new_maintenance,
-        new_cost: data.new_cost
-    };
 
     return client.connect()
         .then(async () => {
@@ -48,17 +37,17 @@ export const handler = async (event, context) => {
                 {
                     email: decoded.email,
                     config_id: parseInt(config_id),
-                    "completed_maintenance.type": values.old_type,
-                    "completed_maintenance.date": values.old_date,
-                    "completed_maintenance.maintenance": values.old_maintenance,
-                    "completed_maintenance.cost": parseInt(values.old_cost)
+                    "completed_maintenance.type": data.old_type,
+                    "completed_maintenance.date": data.old_date,
+                    "completed_maintenance.maintenance": data.old_maintenance,
+                    "completed_maintenance.cost": data.old_cost
                 },
                 {
                     $set: {
-                        "completed_maintenance.$.type": values.new_type,
-                        "completed_maintenance.$.date": values.new_date,
-                        "completed_maintenance.$.maintenance": values.new_maintenance,
-                        "completed_maintenance.$.cost": parseInt(values.new_cost)
+                        "completed_maintenance.$.type": data.new_type,
+                        "completed_maintenance.$.date": data.new_date,
+                        "completed_maintenance.$.maintenance": data.new_maintenance,
+                        "completed_maintenance.$.cost": data.new_cost
                     }
                 });
         }).then(res => {
