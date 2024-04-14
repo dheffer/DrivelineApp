@@ -5,7 +5,6 @@ import {useEffect, useState} from "react";
 
 function RemoveVehicle(props) {
     const [loading, setLoading] = useState(true);
-    const [refreshData, setRefreshData] = useState(false);
 
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
@@ -14,6 +13,7 @@ function RemoveVehicle(props) {
     const handleDelete = (e) => {
         e.preventDefault();
         const myHeaders = new Headers();
+        myHeaders.append("Authorization", "Bearer " + localStorage.getItem('token'));
         myHeaders.append("Content-Type", "application/json");
 
         const raw = JSON.stringify({
@@ -30,7 +30,7 @@ function RemoveVehicle(props) {
         fetch("/api/delete-user-vehicle", reqOptions)
             .then((response) => response.text())
             .then((result) => {
-                setRefreshData(!refreshData);
+                window.location.reload();
             })
             .catch((error) => console.error(error));
 

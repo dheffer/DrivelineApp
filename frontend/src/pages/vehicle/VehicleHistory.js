@@ -1,4 +1,5 @@
-import { useLocation, useNavigate } from "react-router-dom";
+import {Routes, Route, useLocation} from "react-router-dom";
+import VehicleNavbar from "./VehicleNavbar";
 import UploadNavbar from "../maintenance-history/UploadNavbar";
 import { useEffect, useRef, useState } from "react";
 import { Button, Modal, Alert, Form, InputGroup, Container, Row, Col, Table } from "react-bootstrap";
@@ -45,6 +46,8 @@ function VehicleHistory(props) {
 
     useEffect(() => {
         const myHeaders = new Headers();
+        myHeaders.append("Content-Type", "application/json");
+        myHeaders.append("Authorization", "Bearer " + localStorage.getItem('token'));
         const reqOptions = {
             method: 'GET',
             headers: myHeaders,
@@ -73,6 +76,7 @@ function VehicleHistory(props) {
             .then((maintenanceData) => {
                 setMaintenance(maintenanceData[0]);
                 setLoading(false);
+                setRefreshData(!refreshData)
             })
             .catch((error) => {
                 console.error('There has been a problem with your fetch operation:', error);
@@ -164,6 +168,7 @@ function UpdateMaintenanceHistory(props) {
         e.preventDefault();
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
+        myHeaders.append("Authorization", "Bearer " + localStorage.getItem('token'));
         const raw = JSON.stringify({
             "old_type": props.maintenanceInfo.type,
             "old_date": props.maintenanceInfo.date,
@@ -185,7 +190,8 @@ function UpdateMaintenanceHistory(props) {
             .then((res) => res.json())
             .then((result) => {
                 console.log(result);
-                props.setRefreshData(!props.refreshData);
+                setRefreshData(!refreshData);
+                window.location.reload();
             })
             .catch((error) => console.error(error));
         handleClose();
@@ -267,6 +273,7 @@ function DeleteMaintenanceHistory(props) {
         e.preventDefault();
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
+        myHeaders.append("Authorization", "Bearer " + localStorage.getItem('token'));
 
         const raw = JSON.stringify({
             "type": props.maintenanceInfo.type,
@@ -285,8 +292,8 @@ function DeleteMaintenanceHistory(props) {
         fetch(`/api/delete-maintenance-history?configId=${props.configId}`, reqOptions)
             .then((response) => response.text())
             .then((result) => {
-                console.log(result);
-                props.setRefreshData(!props.refreshData);
+                setRefreshData(!refreshData);
+                window.location.reload();
             })
             .catch((error) => console.error(error));
 

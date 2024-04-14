@@ -6,12 +6,12 @@ import '../App.css';
 
 export const Login = () => {
     const [googleOauthURL, setGoogleOauthURL] = useState('');
-    const [searchParams] = useSearchParams();
+    const [searchParams, setSearchParams] = useSearchParams();
     const [error, setError] = useState('');
 
     let navigate = useNavigate();
 
-    useEffect(() => {
+    useEffect( () => {
         fetchGoogleOauthURL();
     }, []);
 
@@ -26,16 +26,16 @@ export const Login = () => {
             });
     };
 
-    useEffect(() => {
+    useEffect( () => {
         const token = searchParams.get('token');
-        if (token) {
+        if(token) {
             localStorage.setItem('token', token);
             navigate('/garage');
         }
-    }, [searchParams, navigate]);
+    }, [searchParams, navigate])
 
     const handleLogin = () => {
-        if (googleOauthURL) {
+        if(googleOauthURL) {
             window.location.href = googleOauthURL;
         } else {
             setError('Google OAuth URL not found');
@@ -55,4 +55,4 @@ export const Login = () => {
     );
 };
 
-export default Login;
+    export default Login;

@@ -1,0 +1,38 @@
+name: Deploy to AWS Lambda
+on:
+  release:
+    types: [published]
+
+defaults:
+  run:
+    working-directory: ./backend-lambda
+jobs:
+  deploy_source:
+    name: Build and deploy
+    strategy:
+      matrix:
+        node-version: [21.x]
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@master
+      - name: Use node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v2
+        with:
+          node-version: ${{ matrix.node-version }}
+
+      - name: npm install
+        run: |
+          cd deleteMaintenanceHistory
+          npm install
+      - name: zip
+        uses: montudor/action-zip@v0.1.0
+        with:
+          args: zip -qq -r ./bundle.zip ./
+      - name: default deploy
+        uses: appleboy/lambda-action@master
+        with:
+          aws_access_key_id: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          aws_secret_access_key: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          aws_region: eu-west-1
+          function_name: my-function
+          zip_file: bundle.zip

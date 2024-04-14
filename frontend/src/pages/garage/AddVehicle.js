@@ -5,6 +5,10 @@ import '../../App.css';
 import {useNavigate} from "react-router-dom";
 
 function AddVehicle() {
+
+    const [refreshData, setRefreshData] = useState(false);
+    const [email, setEmail] = useState("");
+
     const [vehicleAdded, setVehicleAdded] = useState(false);
     const [configId, setConfigId] = useState(null);
     const [dropdownValues, setDropdownValues] = useState({
@@ -38,6 +42,7 @@ function AddVehicle() {
                     if (response.ok) {
                         const data = await response.json();
                         const firstName = data.name.split(' ')[0];
+                        setEmail(data.email);
                         setUser(`${firstName}'s`);
                     } else {
                         console.error("User not found");
@@ -50,7 +55,7 @@ function AddVehicle() {
             }
         };
         fetchUser();
-    }, []);
+    }, [refreshData]);
 
     useEffect(() => {
         getDropdownValues('years');
@@ -78,6 +83,15 @@ function AddVehicle() {
     };
 
     const getDropdownValues = async (category, year = '', make = '', model = '', engine = '') => {
+        const myHeaders = new Headers();
+        myHeaders.append("Authorization", "Bearer " + localStorage.getItem('token'));
+        myHeaders.append("Content-Type", "application/json");
+
+        const reqOptions = {
+            method: 'GET',
+            headers: myHeaders,
+            redirect: 'follow'
+        }
         let url = `/api/get-${category}?`;
         const params = new URLSearchParams();
 
@@ -89,7 +103,7 @@ function AddVehicle() {
         url += params.toString();
 
         try {
-            const response = await fetch(url);
+            const response = await fetch(url, reqOptions);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -110,9 +124,19 @@ function AddVehicle() {
     };
 
     const handleSelectAndAddVehicle = async () => {
+
+        const myHeaders = new Headers();
+        myHeaders.append("Authorization", "Bearer " + localStorage.getItem('token'));
+        myHeaders.append("Content-Type", "application/json");
+
+        const reqOptions = {
+            method: 'GET',
+            headers: myHeaders,
+            redirect: 'follow'
+        }
         const queryParameters = new URLSearchParams(selectedVehicle).toString();
         try {
-            const response = await fetch(`/api/get-config-id?${queryParameters}`);
+            const response = await fetch(`/api/get-config-id?${queryParameters}`, reqOptions);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -133,10 +157,11 @@ function AddVehicle() {
             const response = await fetch('/api/add-vehicle', {
                 method: 'POST',
                 headers: {
-                    'Content-Type': 'application/json'
+                    'Content-Type': 'application/json',
+                    'Authorization': 'Bearer ' + localStorage.getItem('token')
                 },
                 body: JSON.stringify({
-                    email: "user@example.com", // Replace with dynamic user email
+                    email: email,
                     config_id: configId
                 })
             });
@@ -153,10 +178,11 @@ function AddVehicle() {
         <Container className="mt-5">
             <Row className="justify-content-md-center">
                 <h2>
-                    <span onClick={() => navigate('/garage')} style={{ cursor: 'pointer', color: '#644A77', fontWeight: 'bold' }}>
+                    <span onClick={() => navigate('/garage')}
+                          style={{cursor: 'pointer', color: '#644A77', fontWeight: 'bold'}}>
                         {user} Garage
                     </span>
-                    <span style={{ color: '#644A77', fontWeight: 'normal' }}> > Add New Vehicle</span>
+                    <span style={{color: '#644A77', fontWeight: 'normal'}}> > Add New Vehicle</span>
                 </h2>
                 <Col md={6}>
                     <Form>
@@ -224,7 +250,7 @@ function AddVehicle() {
                                 style={{backgroundColor: '#644A77', borderColor: '#644A77'}}
                                 onClick={handleSelectAndAddVehicle}
                                 disabled={!selectedVehicle.transmission || vehicleAdded}>
-                                Select and Add Vehicle
+                                Add Vehicle
                             </Button>
                         </div>
                         {vehicleAdded && <div className="alert alert-success mt-4" role="alert">

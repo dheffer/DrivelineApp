@@ -11,8 +11,8 @@ Driveline is a web application designed to streamline and automate the process o
 
 ## Key Features:
 - [x] **OAuth Login Page:** Utilizes OAuth for secure login, enabling users to create profiles seamlessly.
-- [ ] **Vehicle Management:** Users can upload, edit, and remove vehicles from their Garage with ease.
-- [ ] **Service History & Upcoming Services:** Users can view detailed service history, upcoming maintenance tasks, and general vehicle information when selecting a vehicle in their garage.
+- [x] **Vehicle Management:** Users can upload, edit, and remove vehicles from their Garage with ease.
+- [x] **Service History & Upcoming Services:** Users can view detailed service history, upcoming maintenance tasks, and general vehicle information when selecting a vehicle in their garage.
 - [ ] **Settings Configuration:** The settings page allows users to customize their profile and app settings, including preferences like light & dark mode
 
 ## Technologies Used:
