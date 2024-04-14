@@ -39,7 +39,7 @@ function RemoveVehicle(props) {
 
     return (
         <>
-            <Button onClick={handleShow}>Remove</Button>
+            <Button variant="outline-danger" onClick={handleShow}>Remove</Button>
             <Modal show={show} onHide={handleClose}>
                 <Modal.Dialog>
                     <Modal.Header closeButton>
@@ -50,7 +50,7 @@ function RemoveVehicle(props) {
                     </Modal.Body>
                     <Modal.Footer className={'mx-auto'}>
                         <Button variant="secondary" onClick={handleClose}>No, take me back.</Button>
-                        <Button variant="primary" onClick={handleDelete}>Yes, I am sure.</Button>
+                        <Button variant={"danger"} onClick={handleDelete}>Remove Vehicle.</Button>
                     </Modal.Footer>
                 </Modal.Dialog>
             </Modal>
@@ -58,4 +58,4 @@ function RemoveVehicle(props) {
     )
 }
 
-export default RemoveVehicle;
+    export default RemoveVehicle;

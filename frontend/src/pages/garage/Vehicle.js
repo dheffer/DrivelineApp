@@ -31,7 +31,7 @@ function Vehicle(props) {
     }
 
     const v = props.vehicle;
-    
+
     const handleUpdateOdometer = () => {
         console.log("Updating odometer");
         console.log(v.configurations.config_id+ "= config");
@@ -72,7 +72,7 @@ function Vehicle(props) {
         const reading = odometerReading.find(vehicle => vehicle.config_id === config);
         return reading ? reading.odometer : -9999;
     }
-    
+
     const getPicture = (config) => {
         const reading = odometerReading.find(vehicle => vehicle.config_id === config);
         return reading ? reading.picture_url : "https://cdn.dealerk.it/cars/placeholder/placeholder-800.png";
@@ -120,9 +120,9 @@ function Vehicle(props) {
                     <Card.Title className={'d-flex justify-content-center'}>{v.configurations.year} {v.configurations.make} {v.configurations.model}</Card.Title>
                     <Card.Text className="d-flex justify-content-around">
                         <Link to={`/garage/vehicle-info/${v.configurations.config_id}`} state={{configId: v.configurations.config_id}}>
-                            <Button className={"btn btn-primary"}>View Info</Button>
+                            <Button style={{ backgroundColor: '#8c7498', borderColor: '#8c7498' }}>View Info</Button>
                         </Link>
-                        <RemoveVehicle configId={v.configurations.config_id}/>
+                        <RemoveVehicle configId={v.configurations.config_id} />
                     </Card.Text>
                     <Card.Footer className="d-flex justify-content-around">
                         <div className="d-flex flex-column align-items-center">
@@ -143,7 +143,7 @@ function Vehicle(props) {
                                 onChange={e => setPictureUrl(e.target.value)}
                             />
                         </Form.Group>
-                        <Button variant="primary" size="sm" onClick={handleUpdatePicture}>Update Picture</Button>
+                        <Button variant="primary" size="sm" style={{ backgroundColor: '#8c7498', borderColor: '#8c7498' }} onClick={handleUpdatePicture}>Update Picture</Button>
                     </Card.Footer>
                 </Card.Body>
             </Card>

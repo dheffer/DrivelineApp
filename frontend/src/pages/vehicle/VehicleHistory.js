@@ -1,12 +1,11 @@
-import {Routes, Route, useLocation} from "react-router-dom";
-import VehicleNavbar from "./VehicleNavbar";
+import { useLocation, useNavigate } from "react-router-dom";
 import UploadNavbar from "../maintenance-history/UploadNavbar";
-import {useEffect, useRef, useState} from "react";
-import Button from "react-bootstrap/Button";
-import Modal from "react-bootstrap/Modal";
-import {Alert, Col, Form, InputGroup, Row} from "react-bootstrap";
+import { useEffect, useRef, useState } from "react";
+import { Button, Modal, Alert, Form, InputGroup, Container, Row, Col, Table } from "react-bootstrap";
+import ManualVehicleHistory from "../maintenance-history/ManualVehicleHistory";
 
 function VehicleHistory(props) {
+    const navigate = useNavigate();
     const location = useLocation();
     const { configId } = location.state;
 
@@ -14,6 +13,35 @@ function VehicleHistory(props) {
     const [refreshData, setRefreshData] = useState(false);
 
     const [maintenance, setMaintenance] = useState(null);
+    const [vehicleInfo, setVehicleInfo] = useState(null);
+    const [user, setUser] = useState("Loading...");
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                if (token) {
+                    const response = await fetch('/api/user', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        const firstName = data.name.split(' ')[0];
+                        setUser(`${firstName}'s`);
+                    } else {
+                        console.error("User not found");
+                        setUser("User's");
+                    }
+                }
+            } catch (error) {
+                console.error(error);
+                setUser("User's");
+            }
+        };
+        fetchUser();
+    }, []);
 
     useEffect(() => {
         const myHeaders = new Headers();
@@ -22,97 +50,108 @@ function VehicleHistory(props) {
             headers: myHeaders,
             redirect: 'follow'
         };
-        fetch('/api/get-vehicle-history?configId='+configId, reqOptions)
-            .then( (res) => {
+        fetch(`/api/get-vehicle-info?configId=${configId}`, reqOptions)
+            .then((res) => {
                 if (!res.ok) {
                     throw new Error('Network response was not ok');
                 }
                 return res.json();
             })
-            .then( (maintenance) => {
-                setMaintenance(maintenance[0]);
-                setLoading(false);
+            .then((info) => {
+                setVehicleInfo(info);
             })
-            .catch( (error) => {
+            .catch((error) => {
                 console.error('There has been a problem with your fetch operation:', error);
             });
-    }, []);
+        fetch(`/api/get-vehicle-history?configId=${configId}`, reqOptions)
+            .then((res) => {
+                if (!res.ok) {
+                    throw new Error('Network response was not ok');
+                }
+                return res.json();
+            })
+            .then((maintenanceData) => {
+                setMaintenance(maintenanceData[0]);
+                setLoading(false);
+            })
+            .catch((error) => {
+                console.error('There has been a problem with your fetch operation:', error);
+            });
+    }, [refreshData]);
 
     return (
-        <div className="container">
-            <VehicleNavbar selected={"history"} configId={configId}/>
-            <Routes>
-                <Route path="/garage/vehicle-info/:vehicle/*"/>
-                <Route path="/garage/vehicle-history/:vehicle/*"/>
-            </Routes>
+        <Container>
+            <Row className="justify-content-md-center">
+                <h2>
+        <span onClick={() => navigate('/garage')} style={{ cursor: 'pointer', color: '#644A77', fontWeight: 'bold' }}>
+            {user} Garage
+        </span>
+                    <span style={{ color: '#644A77', fontWeight: 'normal' }}> {' > '} </span>
+                    {vehicleInfo ? (
+                        <span onClick={() => navigate(`/garage/vehicle-info/${configId}`, {state: {configId}})}
+                              style={{ cursor: 'pointer', color: '#644A77', fontWeight: 'bold' }}>
+                {vehicleInfo.year} {vehicleInfo.make} {vehicleInfo.model}
+            </span>
+                    ) : (
+                        <span style={{ color: '#644A77', fontWeight: 'normal' }}> Loading Vehicle Info...</span>
+                    )}
+                    <span style={{ color: '#644A77', fontWeight: 'normal' }}> {' > '} Maintenance History</span>
+                </h2>
+            </Row>
 
-            <div className="row">
-                <div className="col-md-1 order-md-1"/>
-                <div className="col-md-10 order-md-2">
-                    <div className="row">
-                        <div className="col-md-1"/>
-                        <div className="col-md-10 mt-4">
-                            <Row>
-                                <Col>
-                                    <h1>Maintenance History</h1>
-                                </Col>
-                                <Col>
-                                    <UploadNavbar configId={configId}/>
-                                </Col>
-                                <Col/>
-                            </Row>
-
-                        </div>
-                        <div className="col-md-1"/>
-                    </div>
-                    <div className="row">
-                        <div className="col-md-1"/>
-                        <div className="col-md-10">
-                            <table className="table">
-                                <thead>
-                                <tr>
-                                    <th/>
-                                    <th scope="col">Type</th>
-                                    <th scope="col">Date</th>
-                                    <th scope="col">Service</th>
-                                    <th scope="col">Cost</th>
-                                    <th/>
+            <Row className="mb-3">
+                <Col md={12}>
+                    <ManualVehicleHistory configId={configId} />
+                </Col>
+            </Row>
+            <Row>
+                <Col>
+                    <Table striped bordered hover>
+                        <thead>
+                        <tr>
+                            <th scope="col">Action</th>
+                            <th scope="col">Part</th>
+                            <th scope="col">Cost</th>
+                            <th scope="col">Date</th>
+                            <th scope="col">Edit/Remove</th>
+                        </tr>
+                        </thead>
+                        <tbody>
+                        {maintenance != null ?
+                            maintenance.completed_maintenance.map((service, index) => (
+                                <tr key={index}>
+                                    <td>{service.type}</td>
+                                    <td>{service.maintenance}</td>
+                                    <td>${parseFloat(service.cost).toFixed(2)}</td>
+                                    <td>{service.date}</td>
+                                    <td>
+                                            <span className="me-2">
+                                                <UpdateMaintenanceHistory
+                                                    maintenanceInfo={service}
+                                                    configId={configId}
+                                                    setRefreshData={setRefreshData}
+                                                    buttonVariant="secondary"
+                                                />
+                                            </span>
+                                        <DeleteMaintenanceHistory
+                                            maintenanceInfo={service}
+                                            configId={configId}
+                                            setRefreshData={setRefreshData}
+                                            buttonVariant="danger"
+                                        />
+                                    </td>
                                 </tr>
-                                </thead>
-                                <tbody>
-                                {
-                                    maintenance != null ?
-                                        maintenance.completed_maintenance.map((service, index) => {
-                                            return (
-                                                <tr key={index}>
-                                                    <td><UpdateMaintenanceHistory maintenanceInfo={service} configId={configId}/></td>
-                                                    <td>{service.type}</td>
-                                                    <td>{service.date}</td>
-                                                    <td>{service.maintenance}</td>
-                                                    <td>{service.cost}</td>
-                                                    <td><DeleteMaintenanceHistory maintenanceInfo={service} configId={configId}/></td>
-                                                </tr>
-                                            )
-                                        }) : <tr>
-                                            <td colSpan="4">No maintenance history!</td></tr>
-                                }
-                                </tbody>
-                            </table>
-                        </div>
-                        <div className="col-md-1"/>
-                    </div>
-                </div>
-                <div className="col-md-1 order-md-3"/>
-            </div>
-        </div>
+                            )) : <tr><td colSpan="5">No maintenance history!</td></tr>
+                        }
+                        </tbody>
+                    </Table>
+                </Col>
+            </Row>
+        </Container>
     );
 }
 
 function UpdateMaintenanceHistory(props) {
-
-    const [loading, setLoading] = useState(true);
-    const [refreshData, setRefreshData] = useState(false);
-
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
@@ -142,12 +181,11 @@ function UpdateMaintenanceHistory(props) {
             redirect: 'follow'
         };
 
-        fetch("/api/update-maintenance-history?configId="+props.configId, reqOptions)
-            .then((res) =>
-                res.json())
+        fetch(`/api/update-maintenance-history?configId=${props.configId}`, reqOptions)
+            .then((res) => res.json())
             .then((result) => {
                 console.log(result);
-                setRefreshData(!refreshData);
+                props.setRefreshData(!props.refreshData);
             })
             .catch((error) => console.error(error));
         handleClose();
@@ -155,7 +193,7 @@ function UpdateMaintenanceHistory(props) {
 
     return (
         <>
-            <Button onClick={handleShow}>Edit</Button>
+            <Button onClick={handleShow} variant={props.buttonVariant}>Edit</Button>
             <Modal show={show} onHide={handleClose}>
                 <Modal.Dialog>
                     <Modal.Header closeButton>
@@ -170,10 +208,15 @@ function UpdateMaintenanceHistory(props) {
                                             <InputGroup.Text>Type</InputGroup.Text>
                                             <Form.Select type="as" defaultValue={props.maintenanceInfo.type}
                                                          ref={typeText} required>
-                                                <option value="Maintenance">Maintenance</option>
-                                                <option value="Repair">Repair</option>
-                                                <option value="Inspection">Inspection</option>
-                                                <option value="Replacement">Replacement</option>
+                                                <option value="Replaced">Replaced</option>
+                                                <option value="Repaired">Repaired</option>
+                                                <option value="Adjusted">Adjusted</option>
+                                                <option value="Inspected">Inspected</option>
+                                                <option value="Rotated">Rotated</option>
+                                                <option value="Aligned">Aligned</option>
+                                                <option value="Flushed">Flushed</option>
+                                                <option value="Calibrated">Calibrated</option>
+                                                <option value="Reset">Reset</option>
                                                 <option value="Other">Other</option>
                                             </Form.Select>
                                         </InputGroup>
@@ -202,7 +245,6 @@ function UpdateMaintenanceHistory(props) {
                                         </InputGroup>
                                     </Col>
                                 </Row>
-
                             </Form.Group>
                         </Form>
                     </Modal.Body>
@@ -217,13 +259,9 @@ function UpdateMaintenanceHistory(props) {
 }
 
 function DeleteMaintenanceHistory(props) {
-    const [loading, setLoading] = useState(true);
-    const [refreshData, setRefreshData] = useState(false);
-
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
-
 
     const handleDelete = (e) => {
         e.preventDefault();
@@ -244,10 +282,11 @@ function DeleteMaintenanceHistory(props) {
             redirect: "follow"
         };
 
-        fetch("/api/delete-maintenance-history?configId="+props.configId, reqOptions)
+        fetch(`/api/delete-maintenance-history?configId=${props.configId}`, reqOptions)
             .then((response) => response.text())
             .then((result) => {
-                setRefreshData(!refreshData);
+                console.log(result);
+                props.setRefreshData(!props.refreshData);
             })
             .catch((error) => console.error(error));
 
@@ -256,7 +295,7 @@ function DeleteMaintenanceHistory(props) {
 
     return (
         <>
-            <Button onClick={handleShow} variant="danger">Remove</Button>
+            <Button onClick={handleShow} variant={props.buttonVariant}>Remove</Button>
             <Modal show={show} onHide={handleClose}>
                 <Modal.Dialog>
                     <Modal.Header closeButton>
@@ -272,7 +311,7 @@ function DeleteMaintenanceHistory(props) {
                 </Modal.Dialog>
             </Modal>
         </>
-    )
+    );
 }
 
-export default VehicleHistory
+export default VehicleHistory;

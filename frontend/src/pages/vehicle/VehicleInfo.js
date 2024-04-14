@@ -148,11 +148,13 @@ function VehicleInfo() {
         <Container className="mt-5">
             <Row className="mb-3">
                 <Col>
-                    <h2 onClick={() => navigate('/garage')}
-                        style={{cursor: 'pointer', color: '#644A77', fontWeight: 'bold'}}>
+                    <h2>
+                    <span onClick={() => navigate('/garage')}
+                          style={{cursor: 'pointer', color: '#644A77', fontWeight: 'bold'}}>
                         {user} Garage
-                        <span style={{fontWeight: 'normal', color: '#644A77'}}> >
-                        {info ? ` ${info.year} ${info.make} ${info.model}` : ' Loading Vehicle Info...'}
+                    </span>
+                        <span style={{fontWeight: 'normal', color: '#644A77'}}>
+                        {' >'}{info ? ` ${info.year} ${info.make} ${info.model}` : ' Loading Vehicle Info...'}
                     </span>
                     </h2>
                 </Col>
@@ -160,7 +162,8 @@ function VehicleInfo() {
             <Row className="mb-3">
                 <Col className="text-start">
                     <Button variant="primary"
-                            onClick={() => navigate(`/garage/vehicle-history/${configId}`, {state: {configId}})}>
+                            onClick={() => navigate(`/garage/vehicle-history/${configId}`, {state: {configId}})}
+                            style={{ backgroundColor: '#8c7498', borderColor: '#8c7498' }}>
                         View Maintenance History
                     </Button>
                 </Col>
@@ -168,8 +171,7 @@ function VehicleInfo() {
             <Row>
                 <Col md={5}>
                     <Card>
-                        <Card.Header style={{backgroundColor: '#644A77', color: '#FFFFFF', fontSize: '1.25rem'}}>Vehicle
-                            Specifications</Card.Header>
+                        <Card.Header style={{backgroundColor: '#644A77', color: '#FFFFFF', fontSize: '1.25rem'}}>Vehicle Specifications</Card.Header>
                         <Card.Body className="text-left" style={{fontSize: '1.1rem'}}>
                             {info ? (
                                 <>
@@ -199,7 +201,10 @@ function VehicleInfo() {
                                     </Col>
                                 </Form.Group>
                                 <div className="d-flex justify-content-center">
-                                    <Button variant="primary" onClick={handleUpdateOdometer}>Update Odometer</Button>
+                                    <Button variant="primary" onClick={handleUpdateOdometer}
+                                            style={{ backgroundColor: '#8c7498', borderColor: '#8c7498' }}>
+                                        Update Odometer
+                                    </Button>
                                 </div>
                             </Form>
                         </Card.Body>
@@ -208,8 +213,9 @@ function VehicleInfo() {
                 <Col md={7}>
                     {upcomingMaintenance && (
                         <Card>
-                            <Card.Header style={{backgroundColor: '#644A77', color: '#FFFFFF', fontSize: '1.25rem'}}>Upcoming
-                                Maintenance Procedures | Due at: {upcomingMaintenance} miles</Card.Header>
+                            <Card.Header style={{backgroundColor: '#644A77', color: '#FFFFFF', fontSize: '1.25rem'}}>
+                                Upcoming Maintenance Procedures | Due at: {upcomingMaintenance} miles
+                            </Card.Header>
                             <Card.Body className="text-left" style={{fontSize: '1.1rem'}}>
                                 {maintenance && maintenance.tasks.length > 0 ? (
                                     <Table striped bordered hover size="sm">

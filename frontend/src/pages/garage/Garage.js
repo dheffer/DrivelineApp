@@ -62,26 +62,24 @@ function Garage(props) {
     }, [refreshData]);
 
     const updateOdometer = async (configID, email) => {
-        try{
+        try {
             const response = await fetch("/api/update-odometer", {
                 method: 'POST',
                 headers: {
                     'Content-Type': 'application/json'
                 },
                 body: JSON.stringify({
-                    vehicle_config_ids : configID,
+                    vehicle_config_ids: configID,
                     email: email,
                     //odometer: odometer
                 })
             });
-            if(response.ok){
+            if (response.ok) {
                 setRefreshData(!refreshData);
-            }
-            else{
+            } else {
                 console.error("Failed to update Odometer");
             }
-        }
-        catch (error){
+        } catch (error) {
             console.error("Catch Failed to update Odometer");
         }
     }
@@ -90,12 +88,17 @@ function Garage(props) {
 
     return (
         <Container className="mt-5">
-            <Row className="mb-4 justify-content-between align-items-center">
+            <Row className="mb-3">
                 <Col>
-                    <h2 className="d-inline-block mr-4" onClick={()=> navigate('/garage')} style={{ cursor: 'pointer', color: '#644A77', fontWeight: 'bold' }}>
+                    <h2 onClick={() => navigate('/garage')}
+                        style={{cursor: 'pointer', color: '#644A77', fontWeight: 'bold'}}>
                         {user} Garage
                     </h2>
-                    <Link to="/garage/add" className="btn btn-primary" style={{verticalAlign: 'baseline', marginLeft: '10px'}}>
+                </Col>
+            </Row>
+            <Row className="mb-3">
+                <Col className="text-start">
+                    <Link to="/garage/add" className="btn btn-primary" style={{ backgroundColor: '#8c7498', borderColor: '#8c7498' }}>
                         Add New Vehicle
                     </Link>
                 </Col>
@@ -103,7 +106,7 @@ function Garage(props) {
             <Row>
                 {props.info ? props.info.map((vehicle, index) => (
                     <Col key={index} xs={12} md={4} className="mb-4">
-                        <Vehicle vehicle={vehicle} id={index} />
+                        <Vehicle vehicle={vehicle} id={index}/>
                     </Col>
                 )) : !loading && <Col>No vehicles found.</Col>}
             </Row>
@@ -111,4 +114,4 @@ function Garage(props) {
     );
 }
 
-export default Garage;
+    export default Garage;

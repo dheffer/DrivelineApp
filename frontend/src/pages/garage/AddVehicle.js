@@ -161,7 +161,7 @@ function AddVehicle() {
                 <Col md={6}>
                     <Form>
                         <Form.Group controlId="yearSelect">
-                            <Form.Label style={{ fontWeight: 'bold', color: '#644A77' }}>Year</Form.Label>
+                            <Form.Label style={{fontWeight: 'bold', color: '#644A77'}}>Year</Form.Label>
                             <Form.Select name="year" value={selectedVehicle.year} onChange={handleChange}>
                                 <option value="">Select Year</option>
                                 {dropdownValues.years.map((year, index) => (
@@ -172,7 +172,7 @@ function AddVehicle() {
 
                         {selectedVehicle.year && (
                             <Form.Group controlId="makeSelect">
-                                <Form.Label style={{ fontWeight: 'bold', color: '#644A77' }}>Make</Form.Label>
+                                <Form.Label style={{fontWeight: 'bold', color: '#644A77'}}>Make</Form.Label>
                                 <Form.Select name="make" value={selectedVehicle.make} onChange={handleChange}>
                                     <option value="">Select Make</option>
                                     {dropdownValues.makes.map((make, index) => (
@@ -184,7 +184,7 @@ function AddVehicle() {
 
                         {selectedVehicle.make && (
                             <Form.Group controlId="modelSelect">
-                                <Form.Label style={{ fontWeight: 'bold', color: '#644A77' }}>Model</Form.Label>
+                                <Form.Label style={{fontWeight: 'bold', color: '#644A77'}}>Model</Form.Label>
                                 <Form.Select name="model" value={selectedVehicle.model} onChange={handleChange}>
                                     <option value="">Select Model</option>
                                     {dropdownValues.models.map((model, index) => (
@@ -196,7 +196,7 @@ function AddVehicle() {
 
                         {selectedVehicle.model && (
                             <Form.Group controlId="engineSelect">
-                                <Form.Label style={{ fontWeight: 'bold', color: '#644A77' }}>Engine</Form.Label>
+                                <Form.Label style={{fontWeight: 'bold', color: '#644A77'}}>Engine</Form.Label>
                                 <Form.Select name="engine" value={selectedVehicle.engine} onChange={handleChange}>
                                     <option value="">Select Engine</option>
                                     {dropdownValues.engines.map((engine, index) => (
@@ -208,8 +208,9 @@ function AddVehicle() {
 
                         {selectedVehicle.engine && (
                             <Form.Group controlId="transmissionSelect">
-                                <Form.Label style={{ fontWeight: 'bold', color: '#644A77' }}>Transmission</Form.Label>
-                                <Form.Select name="transmission" value={selectedVehicle.transmission} onChange={handleChange}>
+                                <Form.Label style={{fontWeight: 'bold', color: '#644A77'}}>Transmission</Form.Label>
+                                <Form.Select name="transmission" value={selectedVehicle.transmission}
+                                             onChange={handleChange}>
                                     <option value="">Select Transmission</option>
                                     {dropdownValues.transmissions.map((transmission, index) => (
                                         <option key={index} value={transmission}>{transmission}</option>
@@ -219,7 +220,12 @@ function AddVehicle() {
                         )}
 
                         <div className="text-center mt-4">
-                            <Button className="btn btn-primary" onClick={handleSelectAndAddVehicle} disabled={!selectedVehicle.transmission || vehicleAdded}>Select and Add Vehicle</Button>
+                            <Button
+                                style={{backgroundColor: '#644A77', borderColor: '#644A77'}}
+                                onClick={handleSelectAndAddVehicle}
+                                disabled={!selectedVehicle.transmission || vehicleAdded}>
+                                Select and Add Vehicle
+                            </Button>
                         </div>
                         {vehicleAdded && <div className="alert alert-success mt-4" role="alert">
                             Vehicle has been added successfully!
