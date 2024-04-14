@@ -1,5 +1,6 @@
 import {MongoClient, ServerApiVersion} from "mongodb";
 import 'dotenv/config'
+import jwt from 'jsonwebtoken';
 
 export const handler = async (event) => {
 
@@ -12,16 +13,27 @@ export const handler = async (event) => {
             }
         }
     );
-    const email = event['email'];
+    const authorization = event.headers['Authorization'];
 
     return client.connect()
         .then(async () => {
+            const token = authorization.split(" ")[1];
+            console.log("Token:", token);
+            const decoded = jwt.verify(token, process.env.JWTSecret);
+            if (!decoded) {
+                return {
+                    statusCode: 401,
+                    body: JSON.stringify({ message: "No token provided" })
+                };
+            }
+            console.log("Decoded:", decoded);
+
             const database = client.db("vehicleDB");
             const garage = database.collection("user_garage");
             return await garage.aggregate([
                 {
                     $match: {
-                        email: email
+                        email: decoded.email
                     }
                 },
                 {

@@ -75,7 +75,7 @@ function Garage(props) {
             <Row className="mb-4 justify-content-between align-items-center">
                 <Col>
                     <h2 className="d-inline-block mr-4" onClick={()=> navigate('/garage')} style={{ cursor: 'pointer', color: '#644A77', fontWeight: 'bold' }}>
-                        {user} Garage
+                        User Garage
                     </h2>
                     <Link to="/garage/add" className="btn btn-primary" style={{verticalAlign: 'baseline', marginLeft: '10px'}}>
                         Add New Vehicle
@@ -83,11 +83,11 @@ function Garage(props) {
                 </Col>
             </Row>
             <Row>
-                {props.info ? props.info.map((vehicle, index) => (
+                {props.info && props.info.length > 0 ?
+                    props.info.map((vehicle, index) => (
                     <Col key={index} xs={12} md={4} className="mb-4">
                         <Vehicle vehicle={vehicle} id={index} />
-                    </Col>
-                )) : !loading && <Col>No vehicles found.</Col>}
+                    </Col>)) : <Col>No vehicles found.</Col> }
             </Row>
         </Container>
     );
