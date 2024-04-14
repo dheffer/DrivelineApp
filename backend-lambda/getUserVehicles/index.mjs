@@ -13,6 +13,7 @@ export const handler = async (event) => {
             }
         }
     );
+    console.log(event);
     const authorization = event.headers['Authorization'];
 
     return client.connect()

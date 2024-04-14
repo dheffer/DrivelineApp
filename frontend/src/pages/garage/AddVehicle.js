@@ -142,6 +142,8 @@ function AddVehicle() {
             const data = await response.json();
             if (data.config_id) {
                 setConfigId(data.config_id);
+                console.log("CONFIG " + data.config_id)
+                console.log("SELECTED VEHICLE " + selectedVehicle)
                 await addVehicleToUser();
             } else {
                 console.log("No config ID found for the selected vehicle.");
@@ -152,17 +154,17 @@ function AddVehicle() {
     };
 
     const addVehicleToUser = async () => {
+        const myHeaders = new Headers();
+        myHeaders.append("Authorization", "Bearer " + localStorage.getItem('token'));
+        myHeaders.append("Content-Type", "application/json");
+        const reqOptions = {
+            method: 'POST',
+            header: myHeaders,
+            body: { config_id: configId },
+            redirect: 'follow'
+        };
         try {
-            const response = await fetch('/api/add-vehicle', {
-                method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + localStorage.getItem('token')
-                },
-                body: JSON.stringify({
-                    config_id: configId
-                })
-            });
+            const response = await fetch(`/api/add-vehicle?config_id=${configId}`, reqOptions);
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
