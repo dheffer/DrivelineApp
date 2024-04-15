@@ -1,8 +1,9 @@
 import React, { useState } from 'react';
 import Button from 'react-bootstrap/Button';
 import Offcanvas from 'react-bootstrap/Offcanvas';
-import {Nav} from "react-bootstrap";
+import {Col, Nav, Row} from "react-bootstrap";
 import { useNavigate } from 'react-router-dom';
+import {GearFill} from "react-bootstrap-icons";
 
 export const Settings = (props) => {
     const [darkMode, setDarkMode] = useState(false);
@@ -26,7 +27,17 @@ export const Settings = (props) => {
     return (
         <div>
             {/*<Button variant="primary" onClick={handleShow}>Settings</Button>*/}
-            <Nav.Link onClick={handleShow} className={".align-items-center"} >{props.greeting}</Nav.Link>
+
+            <Nav.Link onClick={handleShow} className="align-items-center">
+                <Row>
+                    <Col lg="auto">
+                        {props.greeting}
+                    </Col>
+                    <Col>
+                        <GearFill className=".pe-2" />
+                    </Col>
+                </Row>
+            </Nav.Link>
             <Offcanvas show={show} onHide={handleShow} placement="end">
                 <Offcanvas.Header closeButton>
                     <Offcanvas.Title>Settings</Offcanvas.Title>
