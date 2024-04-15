@@ -34,7 +34,6 @@ function VehicleHistory(props) {
             .then( (maintenance) => {
                 setMaintenance(maintenance[0]);
                 setLoading(false);
-                setRefreshData(!refreshData)
             })
             .catch( (error) => {
                 console.error('There has been a problem with your fetch operation:', error);
