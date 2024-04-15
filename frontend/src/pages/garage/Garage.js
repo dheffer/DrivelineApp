@@ -11,6 +11,34 @@ function Garage(props) {
     const navigate = useNavigate();
     const [refreshData, setRefreshData] = useState(false);
 
+
+    useEffect(() => {
+        const fetchUser = async () => {
+            try {
+                const token = localStorage.getItem('token');
+                if (token) {
+                    const response = await fetch('/api/user', {
+                        headers: {
+                            'Authorization': `Bearer ${token}`
+                        }
+                    });
+                    if (response.ok) {
+                        const data = await response.json();
+                        const firstName = data.name.split(' ')[0];
+                        setUser(`${firstName}'s`);
+                    } else {
+                        console.error("User not found");
+                        setUser("User's");
+                    }
+                }
+            } catch (error) {
+                console.error(error);
+                setUser("User's");
+            }
+        };
+        fetchUser();
+    }, []);
+
     useEffect(() => {
 
         const myHeaders = new Headers();
@@ -38,42 +66,12 @@ function Garage(props) {
             });
     }, [refreshData]);
 
-    useEffect(() => {
-        fetchUser();
-    }, []);
-
-    const fetchUser = async () => {
-        try {
-            const token = localStorage.getItem('token');
-            if (token) {
-                const response = await fetch('/api/user', {
-                    headers: {
-                        'Authorization': `Bearer ${token}`
-                    }
-                });
-                if (response.ok) {
-                    const data = await response.json();
-                    console.log(data);
-                    const firstName = data.name.split(' ')[0];
-                    console.log(firstName)
-                    setUser(`${firstName}'s`);
-                } else {
-                    console.error("User not found");
-                    setUser("User's");
-                }
-            }
-        } catch (error) {
-            console.error(error);
-            setUser("User's");
-        }
-    };
-
     return (
         <Container className="mt-5">
             <Row className="mb-4 justify-content-between align-items-center">
                 <Col>
                     <h2 className="d-inline-block mr-4" onClick={()=> navigate('/garage')} style={{ cursor: 'pointer', color: '#644A77', fontWeight: 'bold' }}>
-                        ${user} Garage
+                        {user} Garage
                     </h2>
                     <Link to="/garage/add" className="btn btn-primary" style={{verticalAlign: 'baseline', marginLeft: '10px'}}>
                         Add New Vehicle

@@ -35,7 +35,8 @@ export const handler = async (event, context) => {
 
     // Extracting the 'Authorization' header and 'config_id' from the incoming event
     const authorization = event.headers['Authorization'];
-    const config_id = event['queryStringParameters'].config_id;
+    const data = JSON.parse(event.body);
+    const config_id = data.config_id;
 
     // Connecting to the MongoDB database
     return client.connect()
