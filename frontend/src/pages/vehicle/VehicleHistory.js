@@ -53,8 +53,8 @@ function VehicleHistory(props) {
             headers: myHeaders,
             redirect: 'follow'
         };
-        fetch('/api/get-vehicle-history?config_id='+configId, reqOptions)
-            .then( (res) => {
+        fetch(`/api/get-vehicle-info?configId=${configId}`, reqOptions)
+            .then((res) => {
                 if (!res.ok) {
                     throw new Error('Network response was not ok');
                 }
@@ -81,7 +81,7 @@ function VehicleHistory(props) {
             .catch((error) => {
                 console.error('There has been a problem with your fetch operation:', error);
             });
-    }, []);
+    }, [refreshData]);
 
     return (
         <Container className="mt-5">
@@ -204,8 +204,8 @@ function UpdateMaintenanceHistory(props) {
             redirect: 'follow'
         };
 
-        fetch("/api/update-maintenance-history?config_id="+props.configId, reqOptions)
-            .then((res) => res.text())
+        fetch(`/api/update-maintenance-history?configId=${props.configId}`, reqOptions)
+            .then((res) => res.json())
             .then((result) => {
                 console.log(result);
                 setRefreshData(!refreshData);
@@ -305,7 +305,7 @@ function DeleteMaintenanceHistory(props) {
             redirect: "follow"
         };
 
-        fetch("/api/delete-maintenance-history?config_id="+props.configId, reqOptions)
+        fetch(`/api/delete-maintenance-history?configId=${props.configId}`, reqOptions)
             .then((response) => response.text())
             .then((result) => {
                 console.log(result);
