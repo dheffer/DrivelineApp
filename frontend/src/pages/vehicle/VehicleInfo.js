@@ -92,15 +92,13 @@ function VehicleInfo() {
                 return maintenanceResponse.json();
             })
             .then(async (maintenanceData) => {
-                console.log("MAINTENANCE DATA STRING: "+JSON.stringify(maintenanceData));
-                console.log("MAINTENANCE DATA: "+(maintenanceData));
-                console.log("MAINTENANCE ACTION: "+maintenanceData.message.tasks[0].action);
-                console.log("MAINTENANCE ACTION: "+maintenanceData.message.tasks.action);
-                console.log("MAINTENANCE ACTION: "+maintenanceData.message.tasks);
-                console.log("MAINTENANCE ACTION: "+maintenanceData.message.service_schedule_mileage);
-                setMaintenance(maintenanceData);
+                setMaintenance(maintenanceData.message.tasks);
                 setLoading(false);
-                setUpcomingMaintenance(maintenanceData.service_schedule_mileage)
+                setUpcomingMaintenance(maintenanceData.message.service_schedule_mileage)
+                console.log("Maintenance: " + maintenance)
+                console.log("Maintenance STRING: " + JSON.stringify(maintenance))
+                console.log("Maintenance msg: " + JSON.stringify(maintenance.message))
+
             })
             .catch( (error) => {
                 console.error('There has been a problem with your fetch operation:', error);
@@ -184,7 +182,7 @@ function VehicleInfo() {
                         style={{cursor: 'pointer', color: '#644A77', fontWeight: 'bold'}}>
                         {user} Garage
                         <span style={{fontWeight: 'normal', color: '#644A77'}}> >
-                        {info ? ` ${info.year} ${info.make} ${info.model}` : ' Loading Vehicle Info...'}
+                            {info ? ` ${info.year} ${info.make} ${info.model}` : ' Loading Vehicle Info...'}
                     </span>
                     </h2>
                 </Col>
@@ -253,8 +251,8 @@ function VehicleInfo() {
                                     maintenance.length > 0 ? (
                                             maintenance.map((task, index) => (
                                                 <tr key={index}>
-                                                    <td>{task.message.action ? task.message.action : 'Loading...'}</td>
-                                                    <td>{task.message.part}</td>
+                                                    <td>{task.action ? task.action : 'Loading...'}</td>
+                                                    <td>{task.part}</td>
                                                 </tr>
                                             ))
                                         ) :
