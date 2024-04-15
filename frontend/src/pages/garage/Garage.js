@@ -23,7 +23,7 @@ function Garage(props) {
                         }
                     });
                     if (response.ok) {
-                        const { data } = await response.json();
+                        const data = await response.json();
                         const firstName = data.name.split(' ')[0];
                         setUser(`${firstName}'s`);
                     } else {
@@ -83,11 +83,11 @@ function Garage(props) {
                 </Col>
             </Row>
             <Row>
-                {props.info ? props.info.map((vehicle, index) => (
+                {props.info && props.info.length > 0 ?
+                    props.info.map((vehicle, index) => (
                     <Col key={index} xs={12} md={4} className="mb-4">
                         <Vehicle vehicle={vehicle} id={index} />
-                    </Col>
-                )) : !loading && <Col>No vehicles found.</Col>}
+                    </Col>)) : <Col>No vehicles found.</Col> }
             </Row>
         </Container>
     );
