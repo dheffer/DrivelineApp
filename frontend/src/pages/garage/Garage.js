@@ -11,6 +11,7 @@ function Garage(props) {
     const navigate = useNavigate();
     const [refreshData, setRefreshData] = useState(false);
 
+
     useEffect(() => {
         const fetchUser = async () => {
             try {
@@ -22,7 +23,7 @@ function Garage(props) {
                         }
                     });
                     if (response.ok) {
-                        const data = await response.json();
+                        const { data } = await response.json();
                         const firstName = data.name.split(' ')[0];
                         setUser(`${firstName}'s`);
                     } else {
@@ -63,8 +64,6 @@ function Garage(props) {
                 console.error('There has been a problem with your fetch operation:', error);
             });
     }, [refreshData]);
-
-    let vehicle_count = 0;
 
     return (
         <Container className="mt-5">

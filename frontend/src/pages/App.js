@@ -7,7 +7,6 @@ import VehicleHistory from "./vehicle/VehicleHistory";
 import UploadVehicleHistory from "./maintenance-history/UploadVehicleHistory";
 import ManualVehicleHistory from "./maintenance-history/ManualVehicleHistory";
 import AddVehicle from "./garage/AddVehicle";
-import RemoveVehicle from "./garage/RemoveVehicle";
 import {Settings} from "./Settings";
 import {useState} from "react";
 import Footer from "./Footer";

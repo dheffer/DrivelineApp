@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 
 export const handler = async (event, context) => {
 
-    const JWTSecret = process.env.JWT_SECRET;
+    const JWTSecret = process.env.JWTSecret;
     const oauthClient = new google.auth.OAuth2(
         process.env.CLIENT_ID,
         process.env.CLIENT_SECRET,
@@ -27,10 +27,11 @@ export const handler = async (event, context) => {
     return await fetch(url, reqOptions)
         .then(response => response.json())
         .then(res => {
-            let user = updateOrCreateUserFromOAuth(res);
-            const token = jwt.sign( {"name":user.name, "email":user.email}, JWTSecret, {expiresIn: '2d'} );
+            let user = updateOrCreateUserFromOAuth(res)
+            console.log("User: ", res.name + " " + res.email)
+            const token = jwt.sign( {"name": res.name, "email": res.email}, JWTSecret, {expiresIn: '2d'} );
             return {
-                statusCode: 200,
+                statusCode: 302,
                 headers: {
                     "Location": `${process.env.APP_URL}/login?token=${token}`
                 }
@@ -55,28 +56,23 @@ const updateOrCreateUserFromOAuth = async (user) => {
     );
     const { name, email } = user;
 
+    console.log("User in function: ", name + " " + email)
+
     return client.connect()
         .then(async () => {
             const database = client.db("vehicleDB");
             const users = database.collection("users");
-            const existingUser = await users.findOne({email})
-            if( existingUser ) {
-                const result = await users.findOneAndUpdate({email},
+            const existing = await users.findOne({email})
+            if (existing) {
+                return await users.findOneAndUpdate({email},
                     { $set: {name, email}},
                     { returnDocument: "after"}
                 );
-                return {
-                    statusCode: 200,
-                    body: JSON.stringify(result.value)
-                };
+            } else {
+                return await users.insertOne({name, email});
             }
-            else {
-                const result = await users.insertOne( {email, name});
-                return {
-                    statusCode: 200,
-                    body: JSON.stringify(result.value)
-                };
-            }
+        }).then(res => {
+            return res;
         }).catch(err => {
             return {
                 statusCode: 500,
@@ -88,5 +84,5 @@ const updateOrCreateUserFromOAuth = async (user) => {
 
 
 const getAccessAndBearerTokenUrl = (access_token) => {
-  return `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${access_token}`;
+    return `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${access_token}`;
 };

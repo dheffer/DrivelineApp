@@ -14,7 +14,7 @@ export const handler = async (event, context) => {
     );
 
     return client.connect()
-        .then(() => {
+        .then(async () => {
             const database = client.db("vehicleDB");
             const configurations = database.collection("configurations");
 

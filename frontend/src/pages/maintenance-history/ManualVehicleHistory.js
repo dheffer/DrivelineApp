@@ -36,7 +36,7 @@ function ManualVehicleHistory(props) {
             redirect: 'follow'
         };
 
-        fetch("/api/add-maintenance-history?configId="+props.configId, reqOptions)
+        fetch("/api/add-maintenance-history?config_id="+props.configId, reqOptions)
             .then((res) => res.json())
             .then((result) => {
                 console.log(result);

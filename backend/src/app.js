@@ -33,13 +33,7 @@ const getAccessAndBearerTokenUrl = (access_token) => {
 
 app.get( '/api/auth/google/callback', async (req, res) => {
     const { code } = req.query;
-
-    console.log(code);
-
     const { tokens } = await oauthClient.getToken(code);
-
-    console.log(tokens);
-
     const url = getAccessAndBearerTokenUrl(tokens.access_token);
 
     const myHeaders = new Headers();
@@ -63,12 +57,12 @@ app.get( '/api/auth/google/callback', async (req, res) => {
                 res.redirect(`http://localhost:3000/login?token=${token}`);
             });
         })
-        .catch((error) => 
-         {
+        .catch((error) =>
+        {
             console.error(error);
             res.status(500).json(error);
         });
-    });
+});
 
 app.get('/api/auth/google/url', async (req, res) => {
     res.status(200).json({url: googleOAuthURL});
@@ -80,26 +74,25 @@ app.get(/^(?!\/api).+/, (req, res) => {
 
 app.get('/api/user', async (req, res) => {
     const { authorization } = req.headers;
-    console.log("USER AUTHORIZ: "+authorization)
     if(!authorization) {
         res.status(400).json({message: "Authorization Needed!"});
     }
     try{
 
         const token = authorization.split(" ")[1];
-        console.log(token+ ": TOKEN");
+
         jwt.verify(token, process.env.JWTSecret, async (err, decoded) => {
             if(err) {
                 res.status(401).json({message: "Invalid Token"});
             }
-
-            console.log("Decoded:   "+decoded);
+            console.log("API/USER")
+            console.log(token);
+            console.log("Decoded:   "+decoded.name+"\t"+decoded.email+ "\n");
 
             const DATABASE = client.db("vehicleDB");
             const users = DATABASE.collection("users");
 
             const user = await users.findOne({email: decoded.email});
-            console.log("AUTHORIZ USER: "+user);
 
             if(!user) {
                 res.status(404).json({message: "User not found"});
@@ -119,9 +112,6 @@ const updateOrCreateUserFromOauth = async (oauthUserInfo) => {
         email,
     } = oauthUserInfo;
 
-    console.log(name);
-    console.log(email);
-    
     const users = DATABASE.collection("users");
 
     const existingUser = await users.findOne({email})
@@ -143,25 +133,21 @@ const updateOrCreateUserFromOauth = async (oauthUserInfo) => {
 ////////////////////////////////////////////////////////////////////////////////////////////////////////////////////////
 
 /***
-    * This route is used to get the vehicle information from the DATABASE
+ * This route is used to get the vehicle information from the DATABASE
  * @param configId - The config_id of the vehicle
  */
 app.get('/api/get-vehicle-info', async (req, res) => {
     const { authorization } = req.headers;
-    console.log("USER AUTHORIZ: "+authorization)
     if(!authorization) {
         res.status(400).json({message: "Authorization Needed!"});
     }
     try{
 
         const token = authorization.split(" ")[1];
-        console.log(token+ ": TOKEN");
         jwt.verify(token, JWTSecret, async (err, decoded) => {
             if(err) {
                 res.status(401).json({message: "Invalid Token"});
             }
-
-            console.log("Decoded:   "+decoded);
 
             const vehicle = DATABASE.collection("configurations");
             const configId = req.query.configId;
@@ -176,21 +162,19 @@ app.get('/api/get-vehicle-info', async (req, res) => {
 });
 
 /***
-    * This route is used to get the vehicle history from the DATABASE
+ * This route is used to get the vehicle history from the DATABASE
  * @param configId - The config_id of the vehicle
  * @param email - The email of the user
  */
 
 app.get('/api/get-vehicle-history', async (req, res) => {
     const { authorization } = req.headers;
-    console.log("USER AUTHORIZ: "+authorization)
     if(!authorization) {
         res.status(400).json({message: "Authorization Needed!"});
     }
     try{
 
         const token = authorization.split(" ")[1];
-        console.log(token+ ": TOKEN");
         jwt.verify(token, JWTSecret, async (err, decoded) => {
             if(err) {
                 res.status(401).json({message: "Invalid Token"});
@@ -222,7 +206,7 @@ app.get('/api/get-vehicle-history', async (req, res) => {
 });
 
 /***
-    * This route is used to add maintenance history to the DATABASE
+ * This route is used to add maintenance history to the DATABASE
  * @param configId - The config_id of the vehicle
  * @param type - The type of maintenance
  * @param date - The date of the maintenance
@@ -232,14 +216,12 @@ app.get('/api/get-vehicle-history', async (req, res) => {
  */
 app.post('/api/add-maintenance-history', async (req, res) => {
     const { authorization } = req.headers;
-    console.log("USER AUTHORIZ: "+authorization)
     if(!authorization) {
         res.status(400).json({message: "Authorization Needed!"});
     }
     try{
 
         const token = authorization.split(" ")[1];
-        console.log(token+ ": TOKEN");
         jwt.verify(token, JWTSecret, async (err, decoded) => {
             if(err) {
                 res.status(401).json({message: "Invalid Token"});
@@ -265,7 +247,7 @@ app.post('/api/add-maintenance-history', async (req, res) => {
 });
 
 /***
-    * This route is used to update maintenance history in the DATABASE
+ * This route is used to update maintenance history in the DATABASE
  * @param configId - The config_id of the vehicle
  * @param old_type - The old type of maintenance
  * @param old_date - The old date of the maintenance
@@ -279,14 +261,12 @@ app.post('/api/add-maintenance-history', async (req, res) => {
  */
 app.post('/api/update-maintenance-history', async (req, res) => {
     const { authorization } = req.headers;
-    console.log("USER AUTHORIZ: "+authorization)
     if(!authorization) {
         res.status(400).json({message: "Authorization Needed!"});
     }
     try{
 
         const token = authorization.split(" ")[1];
-        console.log(token+ ": TOKEN");
         jwt.verify(token, JWTSecret, async (err, decoded) => {
             if(err) {
                 res.status(401).json({message: "Invalid Token"});
@@ -323,14 +303,12 @@ app.post('/api/update-maintenance-history', async (req, res) => {
 
 app.delete('/api/delete-maintenance-history', async (req, res) => {
     const { authorization } = req.headers;
-    console.log("USER AUTHORIZ: "+authorization)
     if(!authorization) {
         res.status(400).json({message: "Authorization Needed!"});
     }
     try{
 
         const token = authorization.split(" ")[1];
-        console.log(token+ ": TOKEN");
         jwt.verify(token, JWTSecret, async (err, decoded) => {
             if(err) {
                 res.status(401).json({message: "Invalid Token"});
@@ -367,21 +345,20 @@ app.delete('/api/delete-maintenance-history', async (req, res) => {
  */
 app.get('/api/get-user-vehicles', async (req, res) => {
     const { authorization } = req.headers;
-    console.log("USER AUTHORIZ: "+authorization)
     if(!authorization) {
         res.status(400).json({message: "Authorization Needed!"});
     }
     try{
-
         const token = authorization.split(" ")[1];
-        console.log(token+ ": TOKEN");
+
+        console.log("GET-USER-VEHICLES \n"+token);
+        console.log('DECODED ' + jwt.decode(token, JWTSecret) + "\n");
+
         jwt.verify(token, JWTSecret, async (err, decoded) => {
             if(err) {
                 res.status(401).json({message: "Invalid Token"});
             }
             const garage = DATABASE.collection("user_garage");
-
-
             const vehicles = await garage.aggregate([
                 {
                     $match: {
@@ -415,14 +392,12 @@ app.get('/api/get-user-vehicles', async (req, res) => {
 });
 app.delete('/api/delete-user-vehicle', async (req, res) => {
     const { authorization } = req.headers;
-    console.log("USER AUTHORIZ: "+authorization)
     if(!authorization) {
         res.status(400).json({message: "Authorization Needed!"});
     }
     try{
 
         const token = authorization.split(" ")[1];
-        console.log(token+ ": TOKEN");
         jwt.verify(token, JWTSecret, async (err, decoded) => {
             if(err) {
                 res.status(401).json({message: "Invalid Token"});
@@ -457,35 +432,34 @@ app.get('/api/get-maintenance', async (req, res) => {
     let maintenance = null;
 
     const { authorization } = req.headers;
-    console.log("USER AUTHORIZ: " + authorization);
     if (!authorization) {
         return res.status(400).json({ message: "Authorization Needed!" });
     }
     try {
         const token = authorization.split(" ")[1];
-        console.log(token + ": TOKEN");
+        //console.log(token + ": TOKEN");
         jwt.verify(token, JWTSecret, async (err, decoded) => {
             if (err) {
-                console.log("TOKEN NOT WORK HERE");
+                //console.log("TOKEN NOT WORK HERE");
                 return res.status(401).json({ message: "Invalid Token" });
             }
-            console.log("TOKEN PASS GOOD");
+            //console.log("TOKEN PASS GOOD");
             const docObject = await message.findOne({ config_id });
 
-            console.log("DOC OBJECT " + JSON.stringify(docObject));
+            //console.log("DOC OBJECT " + JSON.stringify(docObject));
 
-            console.log("DOC OBJECT BEFORE" + JSON.stringify(docObject));
+            //console.log("DOC OBJECT BEFORE" + JSON.stringify(docObject));
 
             if (docObject) {
-                console.log("DOC OBJECT Sched: " + docObject.schedules);
-                console.log("DOC OBJECT " + JSON.stringify(docObject));
+                //  console.log("DOC OBJECT Sched: " + docObject.schedules);
+                //console.log("DOC OBJECT " + JSON.stringify(docObject));
                 for (const schedule of docObject.schedules) {
-                    console.log("MADE IT IN");
+                    //console.log("MADE IT IN");
                     const mileage = parseInt(schedule.service_schedule_mileage.replace(',', ''));
                     if (mileage > odometer) {
-                        console.log("MILEAGE: " + mileage);
+                        //console.log("MILEAGE: " + mileage);
                         maintenance = schedule;
-                        console.log("MAINTENANCE: " + maintenance);
+                        //console.log("MAINTENANCE: " + maintenance);
                         break;
                     }
                 }
@@ -516,14 +490,14 @@ app.get('/api/get-config-id', async (req, res) => {
     }
     else{
         const { authorization } = req.headers;
-        console.log("USER AUTHORIZ: "+authorization)
+        //console.log("USER AUTHORIZ: "+authorization)
         if(!authorization) {
             res.status(400).json({message: "Authorization Needed!"});
         }
         try{
 
             const token = authorization.split(" ")[1];
-            console.log(token+ ": TOKEN");
+            //console.log(token+ ": TOKEN");
             jwt.verify(token, JWTSecret, async (err, decoded) => {
                 if(err) {
                     res.status(401).json({message: "Invalid Token"});
@@ -545,26 +519,26 @@ app.get('/api/get-config-id', async (req, res) => {
 
 app.get('/api/get-years', async (req, res) => {
     const { authorization } = req.headers;
-    console.log("USER AUTHORIZ: "+authorization)
+    //console.log("USER AUTHORIZ: "+authorization)
     if(!authorization) {
         res.status(400).json({message: "Authorization Needed!"});
     }
     try{
 
         const token = authorization.split(" ")[1];
-        console.log(token+ ": TOKEN");
+        //console.log(token+ ": TOKEN");
         jwt.verify(token, JWTSecret, async (err, decoded) => {
             if(err) {
                 res.status(401).json({message: "Invalid Token"});
             }
-                const database = client.db("vehicleDB");
-                const configurations = database.collection("configurations");
-                const years = await configurations.aggregate([
-                    { $group: { _id: "$year", years: { $addToSet: "$year" } }},
-                    { $sort: { _id: 1 }}
-                ]).toArray();
-                res.send(years);
-            });
+            const database = client.db("vehicleDB");
+            const configurations = database.collection("configurations");
+            const years = await configurations.aggregate([
+                { $group: { _id: "$year", years: { $addToSet: "$year" } }},
+                { $sort: { _id: 1 }}
+            ]).toArray();
+            res.send(years);
+        });
     }
     catch(err) {
         res.status(500).json({message: "Error Validating User"});
@@ -573,20 +547,20 @@ app.get('/api/get-years', async (req, res) => {
 
 app.get('/api/get-makes', async (req, res) => {
     const carYear = req.query.year;
-  
+
     if(!carYear) {
         return res.status(400).json({message: "Missing required fields"});
     }
     else{
         const { authorization } = req.headers;
-        console.log("USER AUTHORIZ: "+authorization)
+        //console.log("USER AUTHORIZ: "+authorization)
         if(!authorization) {
             res.status(400).json({message: "Authorization Needed!"});
         }
         try{
 
             const token = authorization.split(" ")[1];
-            console.log(token+ ": TOKEN");
+            //console.log(token+ ": TOKEN");
             jwt.verify(token, JWTSecret, async (err, decoded) => {
                 if(err) {
                     res.status(401).json({message: "Invalid Token"});
@@ -607,8 +581,8 @@ app.get('/api/get-makes', async (req, res) => {
         catch(err) {
             res.status(500).json({message: "Error Validating User"});
 
-    }
-}});
+        }
+    }});
 
 app.get('/api/get-models', async (req, res) => {
     const year = req.query.year;
@@ -619,14 +593,13 @@ app.get('/api/get-models', async (req, res) => {
     }
     else{
         const { authorization } = req.headers;
-        console.log("USER AUTHORIZ: "+authorization)
         if(!authorization) {
             res.status(400).json({message: "Authorization Needed!"});
         }
         try{
 
             const token = authorization.split(" ")[1];
-            console.log(token+ ": TOKEN");
+            //console.log(token+ ": TOKEN");
             jwt.verify(token, JWTSecret, async (err, decoded) => {
                 if(err) {
                     res.status(401).json({message: "Invalid Token"});
@@ -641,10 +614,10 @@ app.get('/api/get-models', async (req, res) => {
 
                 const uniqueModels = models.map(model => model._id);
                 res.send(uniqueModels);
-    })}
-    catch(err) {
-        res.status(500).json({message: "Error Validating User"});
-    }}
+            })}
+        catch(err) {
+            res.status(500).json({message: "Error Validating User"});
+        }}
 
 })
 
@@ -658,14 +631,14 @@ app.get('/api/get-engines', async (req, res) => {
     }
     else{
         const { authorization } = req.headers;
-        console.log("USER AUTHORIZ: "+authorization)
+        //console.log("USER AUTHORIZ: "+authorization)
         if(!authorization) {
             res.status(400).json({message: "Authorization Needed!"});
         }
         try{
 
             const token = authorization.split(" ")[1];
-            console.log(token+ ": TOKEN");
+            //console.log(token+ ": TOKEN");
             jwt.verify(token, JWTSecret, async (err, decoded) => {
                 if(err) {
                     res.status(401).json({message: "Invalid Token"});
@@ -680,9 +653,9 @@ app.get('/api/get-engines', async (req, res) => {
 
                 const uniqueEngines = engines.map(engine => engine._id);
                 res.send(uniqueEngines);
-    })}
-    catch(err) {
-        res.status(500).json({message: "Error Validating User"});
+            })}
+        catch(err) {
+            res.status(500).json({message: "Error Validating User"});
         }
     }
 })
@@ -697,14 +670,14 @@ app.get('/api/get-transmissions', async (req, res) => {
         return res.status(400).json({message: "Missing required fields"});
     }    else{
         const { authorization } = req.headers;
-        console.log("USER AUTHORIZ: "+authorization)
+        //console.log("USER AUTHORIZ: "+authorization)
         if(!authorization) {
             res.status(400).json({message: "Authorization Needed!"});
         }
         try{
 
             const token = authorization.split(" ")[1];
-            console.log(token+ ": TOKEN");
+            //console.log(token+ ": TOKEN");
             jwt.verify(token, JWTSecret, async (err, decoded) => {
                 if(err) {
                     res.status(401).json({message: "Invalid Token"});
@@ -719,9 +692,9 @@ app.get('/api/get-transmissions', async (req, res) => {
 
                 const uniqueTransmissions = transmissions.map(transmission => transmission._id);
                 res.send(uniqueTransmissions);
-    })}
-    catch(err) {
-        res.status(500).json({message: "Error Validating User"});
+            })}
+        catch(err) {
+            res.status(500).json({message: "Error Validating User"});
         }
     }
 });
@@ -730,52 +703,52 @@ app.post('/api/add-vehicle', async (req, res) => {
     const config_id = req.body.config_id;
 
     const { authorization } = req.headers;
-        console.log(authorization);
+    //console.log(authorization);
 
-        if( !authorization ) {
-            res.status(400).json({message: "Authorization needed"})
-        }
-        try {
-            const token = authorization.split(' ')[1];
-            console.log(token);
-            //ok so have a token and we want to verify it
-            jwt.verify( token, JWTSecret, async(err, decoded) => {
-                if(err) {
-                    return res.status(400).json({message: 'Unable to verify token'});
-                }
+    if( !authorization ) {
+        res.status(400).json({message: "Authorization needed"})
+    }
+    try {
+        const token = authorization.split(' ')[1];
+        //console.log(token);
+        //ok so have a token and we want to verify it
+        jwt.verify( token, JWTSecret, async(err, decoded) => {
+            if(err) {
+                return res.status(400).json({message: 'Unable to verify token'});
+            }
 
-                const database = client.db("vehicleDB");
-                const garage = database.collection("user_garage");
-                const userVehicle = database.collection("user_vehicle_info");
+            const database = client.db("vehicleDB");
+            const garage = database.collection("user_garage");
+            const userVehicle = database.collection("user_vehicle_info");
 
-                try{
-                    const exist = await garage.findOne({email: decoded.email});
-                    if(exist) {
-                        await garage.updateOne(
-                            { email: decoded.email },
-                            { $addToSet: { vehicle_config_ids: config_id } }
-                        );
-                        await userVehicle.insertOne(
-                            { email: decoded.email, config_id: config_id, odometer: 0, upcoming_maintenance: [], completed_maintenance: [] })
-                        return res.status(200).json({message: "Vehicle added to garage"});
-                    }
-                    else {
-                        await garage.insertOne(
-                            { email: decoded.email, vehicle_config_ids: [config_id] }
-                        )
-                        await userVehicle.insertOne(
-                            { email: decoded.email, config_id: config_id, odometer: 0, upcoming_maintenance: [], completed_maintenance: [] })
-                        return res.status(200).json({message: "User Vehicle added to info"});
-                    }
+            try{
+                const exist = await garage.findOne({email: decoded.email});
+                if(exist) {
+                    await garage.updateOne(
+                        { email: decoded.email },
+                        { $addToSet: { vehicle_config_ids: config_id } }
+                    );
+                    await userVehicle.insertOne(
+                        { email: decoded.email, config_id: config_id, odometer: 0, upcoming_maintenance: [], completed_maintenance: [] })
+                    return res.status(200).json({message: "Vehicle added to garage"});
                 }
-                catch(err) {
-                    return res.status(500).json(err);
+                else {
+                    await garage.insertOne(
+                        { email: decoded.email, vehicle_config_ids: [config_id] }
+                    )
+                    await userVehicle.insertOne(
+                        { email: decoded.email, config_id: config_id, odometer: 0, upcoming_maintenance: [], completed_maintenance: [] })
+                    return res.status(200).json({message: "User Vehicle added to info"});
                 }
-            });
-        }
-        catch(err) {
-            return res.status(500).json({message: "Error Validating User"});
-        }
+            }
+            catch(err) {
+                return res.status(500).json(err);
+            }
+        });
+    }
+    catch(err) {
+        return res.status(500).json({message: "Error Validating User"});
+    }
 });
 
 app.post('/api/update-odometer', async (req, res) => {
@@ -784,89 +757,89 @@ app.post('/api/update-odometer', async (req, res) => {
     const picture_url = req.body.picture_url;
 
     const { authorization } = req.headers;
-        console.log(authorization);
+    //console.log(authorization);
 
-        if( !authorization ) {
-            res.status(400).json({message: "Authorization needed"})
-        }
-        try {
-            const token = authorization.split(' ')[1];
-            console.log(token);
-            //ok so have a token and we want to verify it
-            jwt.verify( token, JWTSecret, async(err, decoded) => {
-                if(err) {
-                    return res.status(400).json({message: 'Unable to verify token'});
+    if( !authorization ) {
+        res.status(400).json({message: "Authorization needed"})
+    }
+    try {
+        const token = authorization.split(' ')[1];
+        //console.log(token);
+        //ok so have a token and we want to verify it
+        jwt.verify( token, JWTSecret, async(err, decoded) => {
+            if(err) {
+                return res.status(400).json({message: 'Unable to verify token'});
+            }
+            const database = client.db("vehicleDB");
+            const userVehicle = database.collection("user_vehicle_info");
+
+            try{
+                const updateFields = { email: decoded.email, config_id: config_id};
+                const updateData = {};
+
+                if(odometer !== undefined) {
+                    updateData.odometer = parseInt(odometer);
                 }
-                const database = client.db("vehicleDB");
-                const userVehicle = database.collection("user_vehicle_info");
-
-                try{
-                    const updateFields = { email: decoded.email, config_id: config_id};
-                    const updateData = {};
-
-                    if(odometer !== undefined) {
-                        updateData.odometer = parseInt(odometer);
-                    }
-                    if(picture_url !== undefined) {
-                        updateData.picture_url = picture_url;
-                    }
-
-                    await userVehicle.updateOne(
-                        updateFields,
-                        { $set: updateData }
-                    );
-                    return res.status(200).json({message: "Odometer updated"});
+                if(picture_url !== undefined) {
+                    updateData.picture_url = picture_url;
                 }
-                catch(err) {
-                    return res.status(500).json(err);
-                }
-            });
-        }
-        catch(err) {
-            return res.status(500).json({message: "Error Validating User"});
-        }
+
+                await userVehicle.updateOne(
+                    updateFields,
+                    { $set: updateData }
+                );
+                return res.status(200).json({message: "Odometer updated"});
+            }
+            catch(err) {
+                return res.status(500).json(err);
+            }
+        });
+    }
+    catch(err) {
+        return res.status(500).json({message: "Error Validating User"});
+    }
 });
 
 app.get('/api/get-user-vehicle-odometers', async (req, res) => {
     const { authorization } = req.headers;
-        console.log(authorization);
+    //console.log(authorization);
 
-        if( !authorization ) {
-            res.status(400).json({message: "Authorization needed"})
-        }
-        try {
-            const token = authorization.split(' ')[1];
-            console.log(token);
-            //ok so have a token and we want to verify it
-            jwt.verify( token, JWTSecret, async(err, decoded) => {
-                if(err) {
-                    return res.status(400).json({message: 'Unable to verify token'});
-                }
-                    const database = client.db("vehicleDB");
-                    const garage = database.collection("user_garage");
-                    const userVehicle = database.collection("user_vehicle_info");
-                    const userGarage = await garage.findOne({email: decoded.email});
+    if( !authorization ) {
+        res.status(400).json({message: "Authorization needed"})
+    }
+    try {
+        const token = authorization.split(' ')[1];
+        //console.log(token);
+        //ok so have a token and we want to verify it
+        jwt.verify( token, JWTSecret, async(err, decoded) => {
+            if(err) {
+                return res.status(400).json({message: 'Unable to verify token'});
+            }
+            const database = client.db("vehicleDB");
+            const garage = database.collection("user_garage");
+            const userVehicle = database.collection("user_vehicle_info");
+            const userGarage = await garage.findOne({email: decoded.email});
 
-                    if(!userGarage){
-                        return res.status(404).json({message: "User not found"});
-                    }
+            if(!userGarage){
+                return res.status(404).json({message: "User not found"});
+            }
 
-                    const vehicleConfigIds = userGarage.vehicle_config_ids;
-                    if(!vehicleConfigIds){
-                        return res.status(404).json({message: "User has no vehicles"});
-                    }
+            const vehicleConfigIds = userGarage.vehicle_config_ids;
+            if(!vehicleConfigIds){
+                return res.status(404).json({message: "User has no vehicles"});
+            }
 
-                    const vehicle = await userVehicle.find(
-                        {email: decoded.email, config_id: {$in: vehicleConfigIds}}
-                    ).toArray();
+            const vehicle = await userVehicle.find(
+                {email: decoded.email, config_id: {$in: vehicleConfigIds}}
+            ).toArray();
 
-                    res.status(200).json(vehicle);
+            res.status(200).json(vehicle);
 
-                    });
-                }
-                catch(err) {
-                    return res.status(500).json({message: "Error Validating User"});
-                }
+        });
+    }
+    catch(err) {
+        return res.status(500).json({message: "Error Validating User"});
+    }
 });
 
 
