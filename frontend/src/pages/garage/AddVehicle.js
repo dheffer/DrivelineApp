@@ -152,13 +152,13 @@ function AddVehicle() {
     };
 
     const addVehicleToUser = async (configId) => {
+        const myHeaders = new Headers();
+        myHeaders.append("Authorization", "Bearer " + localStorage.getItem('token'));
+        myHeaders.append("Content-Type", "application/json");
         try {
             const response = await fetch('/api/add-vehicle', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + localStorage.getItem('token')
-                },
+                headers: myHeaders,
                 body: JSON.stringify({
                     email: email,
                     config_id: configId

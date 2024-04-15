@@ -2,21 +2,24 @@ import { MongoClient, ServerApiVersion } from "mongodb";
 import 'dotenv/config';
 
 export const handler = async (event, context) => {
+    console.log(event);
     const uri = process.env.MONGO_URI;
-    const client = new MongoClient(uri,  {
-            serverApi: {
-                version: ServerApiVersion.v1,
-                strict: true,
-                deprecationErrors: true,
-            }
+    const client = new MongoClient(uri, {
+        serverApi: {
+            version: ServerApiVersion.v1,
+            strict: true,
+            deprecationErrors: true,
         }
-    );
-    // TODO: add authorization
-    const config_id = event['config_id'];
-    const odometer = event['odometer'];
+    });
+    const authorization  = event.headers['Authorization'];
+
+    const config_id = event['queryStringParameters'].config_id;
+    const odometer = event['queryStringParameters'].odometer;
 
     return client.connect()
         .then(async () => {
+            const token = authorization.split(" ")[1];
+            console.log("Token:", token);
             const database = client.db("vehicleDB");
             const collection = database.collection("maintenance");
             const docObject = await collection.findOne({config_id: config_id});
@@ -44,7 +47,7 @@ export const handler = async (event, context) => {
         }).catch(err => {
             return {
                 statusCode: 500,
-                body: JSON.stringify({ message: `Internal Server Error: ${err.message}` })
+                body: JSON.stringify({ message: "Internal Server Error" })
             };
         }).finally(() => client.close());
 };

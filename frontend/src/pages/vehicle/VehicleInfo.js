@@ -11,7 +11,7 @@ function VehicleInfo() {
     const [refreshData, setRefreshData] = useState(false);
 
     const [info, setInfo] = useState(null);
-    const [maintenance, setMaintenance] = useState(null);
+    const [maintenance, setMaintenance] = useState([]);
 
     const [upcomingMaintenance, setUpcomingMaintenance] = useState(null);
     const [odometer, setOdometer] = useState(0);
@@ -62,39 +62,43 @@ function VehicleInfo() {
             headers: myHeaders,
             redirect: 'follow'
         }
-        fetch('/api/get-vehicle-info?configId=' + configId, reqOptions)
-            .then((res) => {
+        fetch('/api/get-vehicle-info?config_id=' + configId, reqOptions)
+            .then(async (res) => {
                 if (!res.ok) {
                     throw new Error('Network response was not ok');
                 }
+                console.log(res);
                 return res.json();
             })
-            .then( (vehicle) => {
+            .then(async (vehicle) => {
                 setInfo(vehicle);
                 return fetch("/api/get-user-vehicle-odometers", reqOptions);
-                })
-            .then( (odometerResponse) => {
+            })
+            .then(async (odometerResponse) => {
                 if (!odometerResponse.ok) {
                     throw new Error('Network response was not ok');
                 }
                 return odometerResponse.json();
             })
-            .then( (odometerData) => {
+            .then(async (odometerData) => {
                 const currentOdometer = odometerData.find( reading => reading.config_id === configId).odometer;
                 setOdometer(currentOdometer);
                 return fetch(`/api/get-maintenance?config_id=${configId}&odometer=${currentOdometer}`, reqOptions);
             })
-            .then( (maintenanceResponse) => {
+            .then(async (maintenanceResponse) => {
                 if (!maintenanceResponse.ok) {
                     throw new Error('Network response was not ok');
                 }
                 return maintenanceResponse.json();
             })
-            .then( (maintenanceData) => {
-                console.log("MAINTENANCE DATA: "+JSON.stringify(maintenanceData));
-                setMaintenance(maintenanceData);
+            .then(async (maintenanceData) => {
+                setMaintenance(maintenanceData.message.tasks);
                 setLoading(false);
-                setUpcomingMaintenance(maintenanceData.service_schedule_mileage)
+                setUpcomingMaintenance(maintenanceData.message.service_schedule_mileage)
+                console.log("Maintenance: " + maintenance)
+                console.log("Maintenance STRING: " + JSON.stringify(maintenance))
+                console.log("Maintenance msg: " + JSON.stringify(maintenance.message))
+
             })
             .catch( (error) => {
                 console.error('There has been a problem with your fetch operation:', error);
@@ -178,7 +182,7 @@ function VehicleInfo() {
                         style={{cursor: 'pointer', color: '#644A77', fontWeight: 'bold'}}>
                         {user} Garage
                         <span style={{fontWeight: 'normal', color: '#644A77'}}> >
-                        {info ? ` ${info.year} ${info.make} ${info.model}` : ' Loading Vehicle Info...'}
+                            {info ? ` ${info.year} ${info.make} ${info.model}` : ' Loading Vehicle Info...'}
                     </span>
                     </h2>
                 </Col>
@@ -199,11 +203,11 @@ function VehicleInfo() {
                         <Card.Body className="text-left" style={{fontSize: '1.1rem'}}>
                             {info ? (
                                 <>
-                                    <p><strong>Year:</strong> {info.year}</p>
-                                    <p><strong>Make:</strong> {info.make}</p>
-                                    <p><strong>Model:</strong> {info.model}</p>
-                                    <p><strong>Engine:</strong> {info.engine}</p>
-                                    <p><strong>Transmission:</strong> {info.transmission}</p>
+                                    <p><strong>Year:</strong> {info.message.year}</p>
+                                    <p><strong>Make:</strong> {info.message.make}</p>
+                                    <p><strong>Model:</strong> {info.message.model}</p>
+                                    <p><strong>Engine:</strong> {info.message.engine}</p>
+                                    <p><strong>Transmission:</strong> {info.message.transmission}</p>
                                     <p><strong>Odometer:</strong> {odometer ? `${odometer} miles` : "0 miles"}</p>
                                 </>
                             ) : "Loading vehicle specifications..."}
@@ -243,15 +247,22 @@ function VehicleInfo() {
                                 </tr>
                                 </thead>
                                 <tbody>
-                                {maintenance ? maintenance.tasks.map((task, index) => (
-                                    <tr key={index}>
-                                        <td>{task.action ? task.action : 'Loading...'}</td>
-                                        <td>{task.part}</td>
-                                    </tr>
-                                )) : <tr>
-                                    <td>Loading...</td>
-                                    <td>Loading...</td>
-                                </tr>}
+                                {
+                                    maintenance.length > 0 ? (
+                                            maintenance.map((task, index) => (
+                                                <tr key={index}>
+                                                    <td>{task.action ? task.action : 'Loading...'}</td>
+                                                    <td>{task.part}</td>
+                                                </tr>
+                                            ))
+                                        ) :
+                                        <>
+                                            <tr>
+                                                <td>Loading...</td>
+                                                <td>Loading...</td>
+                                            </tr>
+                                        </>
+                                }
                                 </tbody>
                             </Table>
                         </Card.Body>
