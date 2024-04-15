@@ -1,5 +1,6 @@
 import {MongoClient, ServerApiVersion} from "mongodb";
 import 'dotenv/config';
+import jwt from 'jsonwebtoken';
 
 export const handler = async (event, context) => {
     const uri = process.env.MONGO_URI;
@@ -11,13 +12,26 @@ export const handler = async (event, context) => {
             }
         }
     );
-    const config_id = event['config_id'];
+    const authorization = event.headers['Authorization'];
+    const config_id = event['queryStringParameters'].config_id;
+    console.log(event);
+    console.log("config_id " + config_id);
 
     return client.connect()
         .then(async () => {
-            const database = client.db("vehicleDB");
-            const vehicle = database.collection("configurations")
-            return await vehicle.findOne({config_id: parseInt(config_id)});
+            const token = authorization.split(" ")[1];
+            const verified = jwt.verify(token, process.env.JWTSecret);
+            if (!verified) {
+                return {
+                    statusCode: 401,
+                    body: JSON.stringify({ message: "Token invalid" })
+                };
+            }
+            else {
+                const database = client.db("vehicleDB");
+                const vehicle = database.collection("configurations")
+                return await vehicle.findOne({config_id: parseInt(config_id)});
+            }
         }).then(config => {
             return {
                 statusCode: 200,

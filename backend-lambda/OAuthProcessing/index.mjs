@@ -12,15 +12,11 @@ export const handler = async (event, context) => {
         process.env.OAUTH_CALLBACK_URL
     );
     const { code } = event['queryStringParameters'];
-
     const { tokens } = await oauthClient.getToken(code);
-
     const url = getAccessAndBearerTokenUrl(tokens.access_token);
 
     const myHeaders = new Headers();
-
     const bearerToken = "Bearer "+tokens.id_token;
-
     myHeaders.append("Authorization", bearerToken);
 
     const reqOptions = {
@@ -32,8 +28,16 @@ export const handler = async (event, context) => {
         .then(response => response.json())
         .then(res => {
             let user = updateOrCreateUserFromOAuth(res);
-            console.log("User: ", user.name + " " + user.email)
-            const token = jwt.sign( {"name":user.name, "email":user.email}, JWTSecret, {expiresIn: '2d'} );
+            console.log("RES  " + JSON.stringify(res));
+            const payload = {
+                name: res.name,
+                email: res.email
+            }
+            console.log("PAYLOAD  " + JSON.stringify(payload));
+            const token = jwt.sign( payload, JWTSecret, {expiresIn: '2d'} );
+            console.log("TOKEN  " + token);
+            console.log("VERIFY " + jwt.verify(token, JWTSecret));
+            console.log("DECODE " + jwt.decode(token, JWTSecret).name + " " + jwt.decode(token, JWTSecret).email);
             return {
                 statusCode: 302,
                 headers: {
@@ -59,8 +63,7 @@ const updateOrCreateUserFromOAuth = async (user) => {
         }
     );
     const { name, email } = user;
-
-    console.log("User in function: ", name + " " + email)
+    console.log("UPDATE OR CREATE FROM OAUTH -- NAME & EMAIL " + name + " " + email)
 
     return client.connect()
         .then(async () => {

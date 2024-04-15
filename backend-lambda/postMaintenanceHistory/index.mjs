@@ -1,5 +1,6 @@
 import { MongoClient, ServerApiVersion } from "mongodb";
 import 'dotenv/config';
+import jwt from 'jsonwebtoken';
 
 export const handler = async (event, context) => {
 
@@ -12,27 +13,41 @@ export const handler = async (event, context) => {
             }
         }
     );
-    const config_id = event['config_id'];
-    const email = event['email'];
+    console.log(event);
+    const authorization = event.headers['Authorization'];
+    const config_id = event['queryStringParameters'].config_id;
+    const data = JSON.parse(event.body);
     const maintenance = {
-        type: event.body.type,
-        date: event.body.date,
-        maintenance: event.body.maintenance,
-        cost: parseInt(event.body.cost)
+        type: data.type,
+        date: data.date,
+        maintenance: data.maintenance,
+        cost: parseInt(data.cost)
     }
 
     return client.connect()
         .then(async () => {
+            const token = authorization.split(" ")[1];
+            const verified = jwt.verify(token, process.env.JWTSecret);
+            if (!verified) {
+                return {
+                    statusCode: 401,
+                    body: JSON.stringify({message: "Token invalid"})
+                };
+            }
+            const decoded = jwt.decode(token, process.env.JWTSecret);
+
             const database = client.db("vehicleDB");
             const garage = database.collection("user_vehicle_info");
-
-            const add = await garage.updateOne(
-                { email: email, config_id: parseInt(config_id) },
-                { $push: { completed_maintenance: maintenance } }
+            console.log("EMAIL " + decoded.email + " CONFIG_ID " + config_id + " MAINTENANCE " + maintenance);
+            return await garage.updateOne(
+                {email: decoded.email, config_id: parseInt(config_id)},
+                {$push: {completed_maintenance: maintenance}}
             );
+        }).then(res => {
+            console.log(res);
             return {
                 statusCode: 200,
-                body: JSON.stringify({message: `Maintenance history added to vehicle with config ${config_id}`})
+                body: JSON.stringify({message: res})
             };
         }).catch(err => {
             return {

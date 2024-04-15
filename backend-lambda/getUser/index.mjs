@@ -1,56 +1,42 @@
-import { MongoClient, ServerApiVersion } from 'mongodb';
-import 'dotenv/config';
-import jwt from 'jsonwebtoken';
+    import {MongoClient, ServerApiVersion} from 'mongodb';
+    import 'dotenv/config';
+    import jwt from 'jsonwebtoken';
 
-export const handler = async (event, context) => {
-    const uri = process.env.MONGO_URI;
-    const client = new MongoClient(uri, {
+    export const handler = async (event, context) => {
+        const uri = process.env.MONGO_URI;
+        const client = new MongoClient(uri, {
             serverApi: {
                 version: ServerApiVersion.v1,
                 strict: true,
                 deprecationErrors: true,
             }
-        }
-    );
-    const authorization = event.headers['authorization'];
-    console.log(authorization);
+        });
+        const authorization  = event.headers['Authorization'];
+        console.log(event);
 
-    try {
-        await client.connect();
-
-        if (authorization) {
-            const token = authorization.split(' ')[1];
-            console.log(`token --- ${token}`);
-            try {
+        return client.connect()
+            .then(async () => {
+                const token = authorization.split(" ")[1];
+                console.log("Token:", token);
                 const decoded = jwt.verify(token, process.env.JWTSecret);
-                const database = client.db('vehicleDB');
-                const users = database.collection('users');
-                const user = await users.findOne({ email: decoded.email });
-                console.log(user);
-                if (user) {
+                if (!decoded) {
                     return {
-                        statusCode: 200,
-                        body: JSON.stringify(user)
-                    };
-                } else {
-                    return {
-                        statusCode: 404,
-                        body: JSON.stringify({ message: 'User not found' })
+                        statusCode: 401,
+                        body: JSON.stringify({ message: "Token invalid" })
                     };
                 }
-            } catch (err) {
+                const database = client.db("vehicleDB");
+                const users = database.collection("users");
+                return await users.findOne({email: decoded.email});
+            }).then(user => {
                 return {
-                    statusCode: 401,
-                    body: JSON.stringify({ message: 'Unauthorized' })
+                    statusCode: 200,
+                    body: JSON.stringify(user)
                 };
-            }
-        }
-    } catch (err) {
-        return {
-            statusCode: 500,
-            body: JSON.stringify({ message: `Internal Server Error: ${err.message}` })
-        };
-    } finally {
-        await client.close();
-    }
-};
+            }).catch(err => {
+                return {
+                    statusCode: 500,
+                    body: JSON.stringify({ message: "Internal Server Error" })
+                };
+            }).finally(() => client.close());
+    };
