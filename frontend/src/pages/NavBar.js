@@ -46,7 +46,7 @@ function NavBar() {
                 </Nav>
                 <Nav className="ms-auto">
                     <Nav.Link>
-                        <Settings greeting={user ? user : 'Sign in'} />
+                        <Settings greeting={user ? user : ' '} />
 
                     </Nav.Link>
                 </Nav>
