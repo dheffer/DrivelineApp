@@ -23,7 +23,7 @@ function Garage(props) {
                         }
                     });
                     if (response.ok) {
-                        const { data } = await response.json();
+                        const data = await response.json();
                         const firstName = data.name.split(' ')[0];
                         setUser(`${firstName}'s`);
                     } else {
@@ -71,7 +71,7 @@ function Garage(props) {
             <Row className="mb-4 justify-content-between align-items-center">
                 <Col>
                     <h2 className="d-inline-block mr-4" onClick={()=> navigate('/garage')} style={{ cursor: 'pointer', color: '#644A77', fontWeight: 'bold' }}>
-                        User Garage
+                        {user} Garage
                     </h2>
                     <Link to="/garage/add" className="btn btn-primary" style={{verticalAlign: 'baseline', marginLeft: '10px'}}>
                         Add New Vehicle

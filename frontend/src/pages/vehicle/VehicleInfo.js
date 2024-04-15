@@ -182,7 +182,7 @@ function VehicleInfo() {
                         style={{cursor: 'pointer', color: '#644A77', fontWeight: 'bold'}}>
                         {user} Garage
                         <span style={{fontWeight: 'normal', color: '#644A77'}}> >
-                            {info ? ` ${info.year} ${info.make} ${info.model}` : ' Loading Vehicle Info...'}
+                            {info ? ` ${info.message.year} ${info.message.make} ${info.message.model}` : ' Loading Vehicle Info...'}
                     </span>
                     </h2>
                 </Col>
