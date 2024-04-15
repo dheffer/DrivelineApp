@@ -11,6 +11,7 @@ function Garage(props) {
     const navigate = useNavigate();
     const [refreshData, setRefreshData] = useState(false);
 
+
     useEffect(() => {
         const fetchUser = async () => {
             try {
@@ -65,8 +66,6 @@ function Garage(props) {
             });
     }, [refreshData]);
 
-    let vehicle_count = 0;
-
     return (
         <Container className="mt-5">
             <Row className="mb-4 justify-content-between align-items-center">
@@ -80,11 +79,11 @@ function Garage(props) {
                 </Col>
             </Row>
             <Row>
-                {props.info ? props.info.map((vehicle, index) => (
+                {props.info && props.info.length > 0 ?
+                    props.info.map((vehicle, index) => (
                     <Col key={index} xs={12} md={4} className="mb-4">
                         <Vehicle vehicle={vehicle} id={index} />
-                    </Col>
-                )) : !loading && <Col>No vehicles found.</Col>}
+                    </Col>)) : <Col>No vehicles found.</Col> }
             </Row>
         </Container>
     );

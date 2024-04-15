@@ -44,8 +44,8 @@ function Vehicle(props) {
 
     useEffect(() => {
         fetchReadings();
-    }, [refreshData]);
-    const [user, setUser] = useState("Placeholder User");
+    }, []);
+    const [user, setUser] = useState('');
 
     const fetchReadings = async () => {
         try{
@@ -77,7 +77,7 @@ function Vehicle(props) {
 
     const getOdometer = (config) => {
         const reading = odometerReading.find(vehicle => vehicle.config_id === config);
-        return reading ? reading.odometer : -9999;
+        return reading ? reading.odometer : 'Loading...';
     }
 
     const getPicture = (config) => {

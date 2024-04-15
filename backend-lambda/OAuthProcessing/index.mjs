@@ -5,7 +5,7 @@ import jwt from 'jsonwebtoken';
 
 export const handler = async (event, context) => {
 
-    const JWTSecret = process.env.JWT_SECRET;
+    const JWTSecret = process.env.JWTSecret;
     const oauthClient = new google.auth.OAuth2(
         process.env.CLIENT_ID,
         process.env.CLIENT_SECRET,
@@ -28,9 +28,18 @@ export const handler = async (event, context) => {
         .then(response => response.json())
         .then(res => {
             let user = updateOrCreateUserFromOAuth(res);
-            const token = jwt.sign( {"name":user.name, "email":user.email}, JWTSecret, {expiresIn: '2d'} );
+            console.log("RES  " + JSON.stringify(res));
+            const payload = {
+                name: res.name,
+                email: res.email
+            }
+            console.log("PAYLOAD  " + JSON.stringify(payload));
+            const token = jwt.sign( payload, JWTSecret, {expiresIn: '2d'} );
+            console.log("TOKEN  " + token);
+            console.log("VERIFY " + jwt.verify(token, JWTSecret));
+            console.log("DECODE " + jwt.decode(token, JWTSecret).name + " " + jwt.decode(token, JWTSecret).email);
             return {
-                statusCode: 200,
+                statusCode: 302,
                 headers: {
                     "Location": `${process.env.APP_URL}/login?token=${token}`
                 }
@@ -54,6 +63,7 @@ const updateOrCreateUserFromOAuth = async (user) => {
         }
     );
     const { name, email } = user;
+    console.log("UPDATE OR CREATE FROM OAUTH -- NAME & EMAIL " + name + " " + email)
 
     return client.connect()
         .then(async () => {
@@ -61,17 +71,21 @@ const updateOrCreateUserFromOAuth = async (user) => {
             const users = database.collection("users");
             const existingUser = await users.findOne({email})
             if( existingUser ) {
+                console.log("User exists")
                 const result = await users.findOneAndUpdate({email},
                     { $set: {name, email}},
                     { returnDocument: "after"}
                 );
+                console.log("Result: ", result.value.name + " " + result.value.email)
                 return {
                     statusCode: 200,
                     body: JSON.stringify(result.value)
                 };
             }
             else {
+                console.log("User does not exist")
                 const result = await users.insertOne( {email, name});
+                console.log("Result: ", result.value.name + " " + result.value.email)
                 return {
                     statusCode: 200,
                     body: JSON.stringify(result.value)

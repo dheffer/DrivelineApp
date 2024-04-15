@@ -81,6 +81,8 @@ function AddVehicle() {
         }
     };
 
+    const [isLoading, setIsLoading] = useState(false);
+
     const getDropdownValues = async (category, year = '', make = '', model = '', engine = '') => {
         const myHeaders = new Headers();
         myHeaders.append("Authorization", "Bearer " + localStorage.getItem('token'));
@@ -103,6 +105,7 @@ function AddVehicle() {
 
         try {
             const response = await fetch(url, reqOptions);
+
             if (!response.ok) {
                 throw new Error(`HTTP error! status: ${response.status}`);
             }
@@ -119,6 +122,8 @@ function AddVehicle() {
             }));
         } catch (error) {
             console.error(`Failed to fetch ${category}:`, error);
+        } finally {
+            setIsLoading(false);
         }
     };
 
@@ -152,13 +157,13 @@ function AddVehicle() {
     };
 
     const addVehicleToUser = async (configId) => {
+        const myHeaders = new Headers();
+        myHeaders.append("Authorization", "Bearer " + localStorage.getItem('token'));
+        myHeaders.append("Content-Type", "application/json");
         try {
             const response = await fetch('/api/add-vehicle', {
                 method: 'POST',
-                headers: {
-                    'Content-Type': 'application/json',
-                    'Authorization': 'Bearer ' + localStorage.getItem('token')
-                },
+                headers: myHeaders,
                 body: JSON.stringify({
                     email: email,
                     config_id: configId
