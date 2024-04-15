@@ -12,16 +12,12 @@ export const handler = async (event, context) => {
         process.env.OAUTH_CALLBACK_URL
     );
     const { code } = event['queryStringParameters'];
-    console.log("CODE  " + code);
     const { tokens } = await oauthClient.getToken(code);
-    console.log("TOKENS  " + JSON.stringify(tokens));
     const url = getAccessAndBearerTokenUrl(tokens.access_token);
-    console.log("URL  " + url);
 
     const myHeaders = new Headers();
     const bearerToken = "Bearer "+tokens.id_token;
     myHeaders.append("Authorization", bearerToken);
-    console.log("BEARER TOKEN  " + bearerToken);
 
     const reqOptions = {
         method: 'GET',
@@ -31,17 +27,9 @@ export const handler = async (event, context) => {
     return await fetch(url, reqOptions)
         .then(response => response.json())
         .then(res => {
-            let user = updateOrCreateUserFromOAuth(res);
-            console.log("RES  " + JSON.stringify(res));
-            const payload = {
-                name: res.name,
-                email: res.email
-            }
-            console.log("PAYLOAD  " + JSON.stringify(payload));
-            const token = jwt.sign( payload, JWTSecret, {expiresIn: '2d'} );
-            console.log("TOKEN  " + token);
-            console.log("VERIFY " + jwt.verify(token, JWTSecret));
-            console.log("DECODE " + jwt.decode(token, JWTSecret).name + " " + jwt.decode(token, JWTSecret).email);
+            let user = updateOrCreateUserFromOAuth(res)
+            console.log("User: ", res.name + " " + res.email)
+            const token = jwt.sign( {"name": res.name, "email": res.email}, JWTSecret, {expiresIn: '2d'} );
             return {
                 statusCode: 302,
                 headers: {
@@ -67,31 +55,24 @@ const updateOrCreateUserFromOAuth = async (user) => {
         }
     );
     const { name, email } = user;
-    console.log("UPDATE OR CREATE FROM OAUTH -- NAME & EMAIL " + name + " " + email)
+
+    console.log("User in function: ", name + " " + email)
 
     return client.connect()
         .then(async () => {
             const database = client.db("vehicleDB");
             const users = database.collection("users");
-            const existingUser = await users.findOne({email})
-            if( existingUser ) {
-                const result = await users.findOneAndUpdate({email},
+            const existing = await users.findOne({email})
+            if (existing) {
+                return await users.findOneAndUpdate({email},
                     { $set: {name, email}},
                     { returnDocument: "after"}
                 );
-                return {
-                    statusCode: 200,
-                    body: JSON.stringify(result.value)
-                };
+            } else {
+                return await users.insertOne({name, email});
             }
-            else {
-                const result = await users.insertOne( {email, name});
-                console.log("RESULT  " + JSON.stringify(result));
-                return {
-                    statusCode: 200,
-                    body: JSON.stringify(result)
-                };
-            }
+        }).then(res => {
+            return res;
         }).catch(err => {
             return {
                 statusCode: 500,
@@ -103,5 +84,5 @@ const updateOrCreateUserFromOAuth = async (user) => {
 
 
 const getAccessAndBearerTokenUrl = (access_token) => {
-  return `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${access_token}`;
+    return `https://www.googleapis.com/oauth2/v1/userinfo?alt=json&access_token=${access_token}`;
 };

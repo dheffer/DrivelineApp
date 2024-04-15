@@ -1,4 +1,4 @@
-import { MongoClient, ServerApiVersion } from "mongodb";
+import {MongoClient, ServerApiVersion} from "mongodb";
 import 'dotenv/config';
 import jwt from 'jsonwebtoken'
 
@@ -14,34 +14,36 @@ export const handler = async (event, context) => {
     );
     const authorization = event.headers['Authorization'];
     const config_id = event['queryStringParameters'].config_id;
-
-    const odometer = event['odometer'];
+    const odometer = event['queryStringParameters'].odometer;
 
     return client.connect()
         .then(async () => {
+            const token = authorization.split(" ")[1];
+            const verified = jwt.verify(token, process.env.JWTSecret);
+            if (!verified) {
+                return {
+                    statusCode: 401,
+                    body: JSON.stringify({message: "Token invalid"})
+                };
+            }
+
             const database = client.db("vehicleDB");
             const collection = database.collection("maintenance");
-            const docObject = await collection.findOne({config_id: config_id});
-            let recommended = null;
-
-            if (docObject && docObject.schedules) {
-                for (const schedule of docObject.schedules) {
+            return await collection.findOne({config_id: config_id});
+        }).then(res => {
+            if (res && res.schedules) {
+                for (const schedule of res.schedules) {
                     const mileage = parseInt(schedule.service_schedule_mileage.replace(',', ''));
 
                     if (mileage > odometer) {
-                        recommended = schedule;
-                        break;
+                        return schedule;
                     }
                 }
-            } else {
-                return {
-                    statusCode: 404,
-                    body: JSON.stringify({message: "Maintenance schedule not found"})
-                }
             }
+        }).then(res => {
             return {
                 statusCode: 200,
-                body: JSON.stringify(recommended)
+                body: JSON.stringify({message: res})
             };
         }).catch(err => {
             return {

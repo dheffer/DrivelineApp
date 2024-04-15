@@ -44,8 +44,8 @@ function Vehicle(props) {
 
     useEffect(() => {
         fetchReadings();
-    }, [refreshData]);
-    const [user, setUser] = useState("Placeholder User");
+    }, []);
+    const [user, setUser] = useState('');
 
     const fetchReadings = async () => {
         try{

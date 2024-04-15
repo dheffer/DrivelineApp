@@ -11,7 +11,7 @@ function VehicleInfo() {
     const [refreshData, setRefreshData] = useState(false);
 
     const [info, setInfo] = useState(null);
-    const [maintenance, setMaintenance] = useState(null);
+    const [maintenance, setMaintenance] = useState([]);
 
     const [upcomingMaintenance, setUpcomingMaintenance] = useState(null);
     const [odometer, setOdometer] = useState(0);
@@ -92,7 +92,12 @@ function VehicleInfo() {
                 return maintenanceResponse.json();
             })
             .then(async (maintenanceData) => {
-                console.log("MAINTENANCE DATA: "+JSON.stringify(maintenanceData));
+                console.log("MAINTENANCE DATA STRING: "+JSON.stringify(maintenanceData));
+                console.log("MAINTENANCE DATA: "+(maintenanceData));
+                console.log("MAINTENANCE ACTION: "+maintenanceData.message.tasks[0].action);
+                console.log("MAINTENANCE ACTION: "+maintenanceData.message.tasks.action);
+                console.log("MAINTENANCE ACTION: "+maintenanceData.message.tasks);
+                console.log("MAINTENANCE ACTION: "+maintenanceData.message.service_schedule_mileage);
                 setMaintenance(maintenanceData);
                 setLoading(false);
                 setUpcomingMaintenance(maintenanceData.service_schedule_mileage)
@@ -245,15 +250,20 @@ function VehicleInfo() {
                                 </thead>
                                 <tbody>
                                 {
-                                    maintenance !== null ? maintenance.map((task, index) => (
-                                    <tr key={index}>
-                                        <td>{task.action ? task.action : 'Loading...'}</td>
-                                        <td>{task.part}</td>
-                                    </tr>
-                                    )) : <tr>
-                                            <td>Loading...</td>
-                                            <td>Loading...</td>
+                                    maintenance.length > 0 ? (
+                                            maintenance.map((task, index) => (
+                                                <tr key={index}>
+                                                    <td>{task.message.action ? task.message.action : 'Loading...'}</td>
+                                                    <td>{task.message.part}</td>
+                                                </tr>
+                                            ))
+                                        ) :
+                                        <>
+                                            <tr>
+                                                <td>Loading...</td>
+                                                <td>Loading...</td>
                                             </tr>
+                                        </>
                                 }
                                 </tbody>
                             </Table>
