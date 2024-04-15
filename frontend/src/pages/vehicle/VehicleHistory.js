@@ -53,8 +53,9 @@ function VehicleHistory(props) {
             headers: myHeaders,
             redirect: 'follow'
         };
-        fetch(`/api/get-vehicle-info?configId=${configId}`, reqOptions)
+        fetch(`/api/get-vehicle-info?config_id=${configId}`, reqOptions)
             .then((res) => {
+                console.log('RES ' + res);
                 if (!res.ok) {
                     throw new Error('Network response was not ok');
                 }
@@ -66,21 +67,21 @@ function VehicleHistory(props) {
             .catch((error) => {
                 console.error('There has been a problem with your fetch operation:', error);
             });
-        fetch(`/api/get-vehicle-history?configId=${configId}`, reqOptions)
+        fetch(`/api/get-vehicle-history?config_id=${configId}`, reqOptions)
             .then((res) => {
                 if (!res.ok) {
                     throw new Error('Network response was not ok');
                 }
                 return res.json();
             })
-            .then((maintenanceData) => {
-                setMaintenance(maintenanceData[0]);
+            .then((maintenance) => {
+                setMaintenance(maintenance[0]);
                 setLoading(false);
             })
             .catch((error) => {
                 console.error('There has been a problem with your fetch operation:', error);
             });
-    }, [refreshData]);
+    }, []);
 
     return (
         <Container className="mt-5">
@@ -95,7 +96,7 @@ function VehicleHistory(props) {
                         {vehicleInfo ? (
                             <span onClick={() => navigate(`/garage/vehicle-info/${configId}`, {state: {configId}})}
                                   style={{ cursor: 'pointer', color: '#644A77', fontWeight: 'bold' }}>
-                                {vehicleInfo.year} {vehicleInfo.make} {vehicleInfo.model}
+                                {vehicleInfo.message.year} {vehicleInfo.message.make} {vehicleInfo.message.model}
                             </span>
                         ) : (
                             <span style={{ color: '#644A77', fontWeight: 'normal' }}> Loading Vehicle Info...</span>
@@ -203,7 +204,7 @@ function UpdateMaintenanceHistory(props) {
             redirect: 'follow'
         };
 
-        fetch(`/api/update-maintenance-history?configId=${props.configId}`, reqOptions)
+        fetch(`/api/update-maintenance-history?config_id=${props.configId}`, reqOptions)
             .then((res) => res.json())
             .then((result) => {
                 console.log(result);
@@ -304,11 +305,10 @@ function DeleteMaintenanceHistory(props) {
             redirect: "follow"
         };
 
-        fetch(`/api/delete-maintenance-history?configId=${props.configId}`, reqOptions)
+        fetch(`/api/delete-maintenance-history?config_id=${props.configId}`, reqOptions)
             .then((response) => response.text())
             .then((result) => {
-                console.log(result);
-                props.setRefreshData(!props.refreshData);
+                window.location.reload();
             })
             .catch((error) => console.error(error));
 
