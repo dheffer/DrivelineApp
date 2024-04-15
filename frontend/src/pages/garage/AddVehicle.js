@@ -3,6 +3,7 @@ import React, { useEffect, useState } from "react";
 import { Button, Form, Container, Row, Col } from 'react-bootstrap';
 import '../../App.css';
 import {useNavigate} from "react-router-dom";
+
 function AddVehicle() {
 
     const [refreshData, setRefreshData] = useState(false);
@@ -61,7 +62,7 @@ function AddVehicle() {
     }, []);
 
     const handleChange = async (e) => {
-        const {name, value} = e.target;
+        const { name, value } = e.target;
         setSelectedVehicle(prevSelectedVehicle => ({
             ...prevSelectedVehicle,
             [name]: value
@@ -69,13 +70,13 @@ function AddVehicle() {
 
         if (name === 'year') {
             getDropdownValues('makes', value);
-            setDropdownValues(prev => ({...prev, models: [], engines: [], transmissions: []}));
+            setDropdownValues(prev => ({ ...prev, models: [], engines: [], transmissions: [] }));
         } else if (name === 'make') {
             getDropdownValues('models', selectedVehicle.year, value);
-            setDropdownValues(prev => ({...prev, engines: [], transmissions: []}));
+            setDropdownValues(prev => ({ ...prev, engines: [], transmissions: [] }));
         } else if (name === 'model') {
             getDropdownValues('engines', selectedVehicle.year, selectedVehicle.make, value);
-            setDropdownValues(prev => ({...prev, transmissions: []}));
+            setDropdownValues(prev => ({ ...prev, transmissions: [] }));
         } else if (name === 'engine') {
             getDropdownValues('transmissions', selectedVehicle.year, selectedVehicle.make, selectedVehicle.model, value);
         }
@@ -250,9 +251,12 @@ function AddVehicle() {
                         )}
 
                         <div className="text-center mt-4">
-                            <Button className="btn btn-primary" onClick={handleSelectAndAddVehicle}
-                                    disabled={!selectedVehicle.transmission || vehicleAdded}>Select and Add
-                                Vehicle</Button>
+                            <Button
+                                style={{backgroundColor: '#644A77', borderColor: '#644A77'}}
+                                onClick={handleSelectAndAddVehicle}
+                                disabled={!selectedVehicle.transmission || vehicleAdded}>
+                                Add Vehicle
+                            </Button>
                         </div>
                         {vehicleAdded && <div className="alert alert-success mt-4" role="alert">
                             Vehicle has been added successfully!

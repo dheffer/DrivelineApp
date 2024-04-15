@@ -175,15 +175,11 @@ body, .navbar-nav .nav-link, .navbar-text {
   height: 100%;
 }
 
-button, .btn {
-  background-color: #8c7498 !important;
-  border-color: #8c7498 !important;
-  color: white !important;
-}
+
 
 .custom-button-primary, .custom-button-success {
-  background-color: #2872a7 !important;
-  border-color: #2872a7 !important;
+  background-color: #8c7498 !important;
+  border-color: #8c7498 !important;
   color: white !important;
 }
 

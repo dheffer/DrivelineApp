@@ -22,8 +22,6 @@ function VehicleInfo() {
     const [email, setEmail] = useState("");
     const navigate = useNavigate();
 
-    console.log("email: "+email);
-
     useEffect(() => {
         const fetchUser = async () => {
             try {
@@ -173,7 +171,6 @@ function VehicleInfo() {
             });
     }
 
-
     return (
         <Container className="mt-5">
             <Row className="mb-3">
@@ -190,7 +187,8 @@ function VehicleInfo() {
             <Row className="mb-3">
                 <Col className="text-start">
                     <Button variant="primary"
-                            onClick={() => navigate(`/garage/vehicle-history/${configId}`, {state: {configId}})}>
+                            onClick={() => navigate(`/garage/vehicle-history/${configId}`, {state: {configId}})}
+                            style={{ backgroundColor: '#8c7498', borderColor: '#8c7498' }}>
                         View Maintenance History
                     </Button>
                 </Col>
@@ -229,7 +227,10 @@ function VehicleInfo() {
                                     </Col>
                                 </Form.Group>
                                 <div className="d-flex justify-content-center">
-                                    <Button variant="primary" onClick={handleUpdateOdometer}>Update Odometer</Button>
+                                    <Button variant="primary" onClick={handleUpdateOdometer}
+                                            style={{ backgroundColor: '#8c7498', borderColor: '#8c7498' }}>
+                                        Update Odometer
+                                    </Button>
                                 </div>
                             </Form>
                         </Card.Body>

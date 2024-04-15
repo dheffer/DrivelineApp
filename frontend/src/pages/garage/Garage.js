@@ -40,7 +40,6 @@ function Garage(props) {
     }, []);
 
     useEffect(() => {
-
         const myHeaders = new Headers();
         myHeaders.append("Authorization", "Bearer " + localStorage.getItem('token'));
 
@@ -68,12 +67,17 @@ function Garage(props) {
 
     return (
         <Container className="mt-5">
-            <Row className="mb-4 justify-content-between align-items-center">
+            <Row className="mb-3">
                 <Col>
-                    <h2 className="d-inline-block mr-4" onClick={()=> navigate('/garage')} style={{ cursor: 'pointer', color: '#644A77', fontWeight: 'bold' }}>
+                    <h2 onClick={() => navigate('/garage')}
+                        style={{cursor: 'pointer', color: '#644A77', fontWeight: 'bold'}}>
                         {user} Garage
                     </h2>
-                    <Link to="/garage/add" className="btn btn-primary" style={{verticalAlign: 'baseline', marginLeft: '10px'}}>
+                </Col>
+            </Row>
+            <Row className="mb-3">
+                <Col className="text-start">
+                    <Link to="/garage/add" className="btn btn-primary" style={{ backgroundColor: '#8c7498', borderColor: '#8c7498' }}>
                         Add New Vehicle
                     </Link>
                 </Col>

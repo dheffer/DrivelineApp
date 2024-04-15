@@ -9,6 +9,7 @@ import ManualVehicleHistory from "./maintenance-history/ManualVehicleHistory";
 import AddVehicle from "./garage/AddVehicle";
 import {Settings} from "./Settings";
 import {useState} from "react";
+import Footer from "./Footer";
 
 const ProtectedRoute = () => {
   const authenticated = localStorage.getItem('token') !== null;
@@ -21,24 +22,27 @@ function App() {
 
   return (
       <Router>
-        <div>
+        <div className="d-flex flex-column min-vh-100">
           <NavBar />
           <Routes>
-            <Route path= "/" element={<Login />} />
+            <Route path="/" element={<Login />} />
             <Route path="/login" element={<Login />} />
             <Route element={<ProtectedRoute />}>
               <Route path="/garage" element={<Garage info={garageInfo} setInfo={setGarageInfo} />} />
               <Route path="/garage/add" element={<AddVehicle />} />
-              <Route path="/garage/vehicle-info/:vehicle/*" element={<VehicleInfo configId={configId} setConfig={setConfigId}/>} />
-              <Route path="/garage/vehicle-history/:vehicle/*" element={<VehicleHistory configId={configId} setConfig={setConfigId}/>} />
+              <Route path="/garage/vehicle-info/:vehicle/*" element={<VehicleInfo configId={configId} setConfig={setConfigId} />} />
+              <Route path="/garage/vehicle-history/:vehicle/*" element={<VehicleHistory configId={configId} setConfig={setConfigId} />} />
               <Route path="/garage/vehicle-history/upload" element={<UploadVehicleHistory />} />
               <Route path="/garage/vehicle-history/manual" element={<ManualVehicleHistory />} />
               <Route path="/settings" element={<Settings />} />
             </Route>
           </Routes>
+          <div className="mt-auto">
+            <Footer />
+          </div>
         </div>
       </Router>
-  )
+  );
 }
 
 export default App;

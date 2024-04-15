@@ -47,7 +47,7 @@ function NavBar() {
                 <Nav className="ms-auto">
                     <Nav.Link>
                         <Settings greeting={user ? user : 'Sign in'} />
-                        <GearFill className="ml-2" />
+
                     </Nav.Link>
                 </Nav>
             </Container>

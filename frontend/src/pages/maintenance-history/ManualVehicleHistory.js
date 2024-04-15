@@ -49,11 +49,11 @@ function ManualVehicleHistory(props) {
 
     return (
         <>
-            <Button onClick={handleShow}>Manual</Button>
+            <Button onClick={handleShow} style={{ backgroundColor: '#8c7498', borderColor: '#8c7498' }}>Add Maintenance History</Button>
             <Modal show={show} onHide={handleClose}>
                 <Modal.Dialog>
                     <Modal.Header closeButton>
-                        <Modal.Title>Manual Maintenance History</Modal.Title>
+                        <Modal.Title>Add Maintenance Information</Modal.Title>
                     </Modal.Header>
                     <Modal.Body>
                         <Form>
@@ -63,10 +63,15 @@ function ManualVehicleHistory(props) {
                                         <InputGroup hasValidation>
                                             <InputGroup.Text>Type</InputGroup.Text>
                                             <Form.Select type="as" ref={typeText} required>
-                                                <option value="Maintenance">Maintenance</option>
-                                                <option value="Repair">Repair</option>
-                                                <option value="Inspection">Inspection</option>
-                                                <option value="Replacement">Replacement</option>
+                                                <option value="Replaced">Replaced</option>
+                                                <option value="Repaired">Repaired</option>
+                                                <option value="Adjusted">Adjusted</option>
+                                                <option value="Inspected">Inspected</option>
+                                                <option value="Rotated">Rotated</option>
+                                                <option value="Aligned">Aligned</option>
+                                                <option value="Flushed">Flushed</option>
+                                                <option value="Calibrated">Calibrated</option>
+                                                <option value="Reset">Reset</option>
                                                 <option value="Other">Other</option>
                                             </Form.Select>
                                         </InputGroup>
@@ -82,7 +87,7 @@ function ManualVehicleHistory(props) {
                                 <Row>
                                     <Col>
                                         <InputGroup hasValidation>
-                                            <InputGroup.Text>Service</InputGroup.Text>
+                                            <InputGroup.Text>Part</InputGroup.Text>
                                             <Form.Control type="text" placeholder={""}
                                                           ref={maintenanceText} required/>
                                         </InputGroup>
