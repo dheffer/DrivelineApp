@@ -48,8 +48,7 @@ export const Login = () => {
                 <img src="/logo.png" alt="Logo" id="driveline-diamond-logo" />
                 <h1>Welcome to <span className="drive">Drive</span><span className="line">line</span></h1>
                 <p id="intro-text">Your personalized tool to help keep your vehicle in top condition.</p>
-                <Button variant="primary" id="get-started-button" onClick={handleLogin} className="mt-4">Sign in with Google</Button>
-                {error && <div className="mt-3"><Alert variant="danger">{error}</Alert></div>}
+                <Button variant="primary" id="get-started-button" onClick={handleLogin} className="mt-4" style={{ backgroundColor: '#644A77', borderColor: '#644A77' }}>Sign in with Google</Button>                {error && <div className="mt-3"><Alert variant="danger">{error}</Alert></div>}
             </Container>
         </div>
     );

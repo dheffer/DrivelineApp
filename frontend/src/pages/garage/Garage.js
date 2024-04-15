@@ -86,7 +86,7 @@ function Garage(props) {
             <Row>
                 {props.info ? props.info.map((vehicle, index) => (
                     <Col key={index} xs={12} md={4} className="mb-4">
-                        <Vehicle vehicle={vehicle} id={index}/>
+                        <Vehicle vehicle={vehicle} id={index} />
                     </Col>
                 )) : !loading && <Col>No vehicles found.</Col>}
             </Row>

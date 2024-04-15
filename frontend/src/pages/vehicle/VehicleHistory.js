@@ -1,8 +1,8 @@
-import {Routes, Route, useLocation} from "react-router-dom";
+import {Routes, Route, useLocation, useNavigate} from "react-router-dom";
 import VehicleNavbar from "./VehicleNavbar";
 import UploadNavbar from "../maintenance-history/UploadNavbar";
 import { useEffect, useRef, useState } from "react";
-import { Button, Modal, Alert, Form, InputGroup, Container, Row, Col, Table } from "react-bootstrap";
+import { Button, Modal, Alert, Form, InputGroup, Container, Row, Col, Table, Card } from "react-bootstrap";
 import ManualVehicleHistory from "../maintenance-history/ManualVehicleHistory";
 
 function VehicleHistory(props) {
@@ -84,71 +84,88 @@ function VehicleHistory(props) {
     }, [refreshData]);
 
     return (
-        <Container>
-            <Row className="justify-content-md-center">
-                <h2>
-        <span onClick={() => navigate('/garage')} style={{ cursor: 'pointer', color: '#644A77', fontWeight: 'bold' }}>
-            {user} Garage
-        </span>
-                    <span style={{ color: '#644A77', fontWeight: 'normal' }}> {' > '} </span>
-                    {vehicleInfo ? (
-                        <span onClick={() => navigate(`/garage/vehicle-info/${configId}`, {state: {configId}})}
+        <Container className="mt-5">
+            <Row className="mb-3">
+                <Col>
+                    <h2>
+                        <span onClick={() => navigate('/garage')}
                               style={{ cursor: 'pointer', color: '#644A77', fontWeight: 'bold' }}>
-                {vehicleInfo.year} {vehicleInfo.make} {vehicleInfo.model}
-            </span>
-                    ) : (
-                        <span style={{ color: '#644A77', fontWeight: 'normal' }}> Loading Vehicle Info...</span>
-                    )}
-                    <span style={{ color: '#644A77', fontWeight: 'normal' }}> {' > '} Maintenance History</span>
-                </h2>
+                            {user} Garage
+                        </span>
+                        <span style={{ fontWeight: 'normal', color: '#644A77' }}> {' > '} </span>
+                        {vehicleInfo ? (
+                            <span onClick={() => navigate(`/garage/vehicle-info/${configId}`, {state: {configId}})}
+                                  style={{ cursor: 'pointer', color: '#644A77', fontWeight: 'bold' }}>
+                                {vehicleInfo.year} {vehicleInfo.make} {vehicleInfo.model}
+                            </span>
+                        ) : (
+                            <span style={{ color: '#644A77', fontWeight: 'normal' }}> Loading Vehicle Info...</span>
+                        )}
+                        <span style={{ fontWeight: 'normal', color: '#644A77' }}> {' > '} Maintenance History</span>
+                    </h2>
+                </Col>
             </Row>
-
             <Row className="mb-3">
                 <Col md={12}>
                     <ManualVehicleHistory configId={configId} />
                 </Col>
             </Row>
             <Row>
-                <Col>
-                    <Table striped bordered hover>
-                        <thead>
-                        <tr>
-                            <th scope="col">Action</th>
-                            <th scope="col">Part</th>
-                            <th scope="col">Cost</th>
-                            <th scope="col">Date</th>
-                            <th scope="col">Edit/Remove</th>
-                        </tr>
-                        </thead>
-                        <tbody>
-                        {maintenance != null ?
-                            maintenance.completed_maintenance.map((service, index) => (
-                                <tr key={index}>
-                                    <td>{service.type}</td>
-                                    <td>{service.maintenance}</td>
-                                    <td>${parseFloat(service.cost).toFixed(2)}</td>
-                                    <td>{service.date}</td>
-                                    <td>
-                                            <span className="me-2">
-                                                <UpdateMaintenanceHistory
-                                                    maintenanceInfo={service}
-                                                    configId={configId}
-                                                    setRefreshData={setRefreshData}
-                                                    buttonVariant="secondary"
-                                                />
-                                            </span>
-                                        <DeleteMaintenanceHistory
-                                            maintenanceInfo={service}
-                                            configId={configId}
-                                            setRefreshData={setRefreshData}
-                                            buttonVariant="danger"
-                                        />
-                                    </td>
+                <Col md={8}>
+                    <Card>
+                        <Card.Header style={{ backgroundColor: '#644A77', color: '#FFFFFF', fontSize: '1.25rem' }}>
+                            Detailed Maintenance Records
+                        </Card.Header>
+                        <Card.Body>
+                            <Table striped bordered hover size="sm">
+                                <thead>
+                                <tr>
+                                    <th style={{width: '20%'}}>Action</th>
+                                    <th style={{width: '20%'}}>Part</th>
+                                    <th style={{width: '20%'}}>Cost</th>
+                                    <th style={{width: '14%', borderRight: 'none'}}>Date</th>
+                                    <th style={{
+                                        width: '18%',
+                                        textAlign: 'right',
+                                        background: 'transparent',
+                                        borderLeft: 'none',
+                                        padding: 0
+                                    }}></th>
                                 </tr>
-                            )) : <tr><td colSpan="5">No maintenance history!</td></tr>
-                        }
-                        </tbody>
-                    </Table>
+                                </thead>
+                                <tbody>
+                                {maintenance && maintenance.completed_maintenance.map((service, index) => (
+                                    <tr key={index}>
+                                        <td>{service.type}</td>
+                                        <td>{service.maintenance}</td>
+                                        <td>${parseFloat(service.cost).toFixed(2)}</td>
+                                        <td style={{borderRight: 'none'}}>{service.date}</td>
+                                        <td style={{
+                                            textAlign: 'right',
+                                            background: 'transparent',
+                                            borderLeft: 'none',
+                                            padding: 0
+                                        }}>
+                                            <UpdateMaintenanceHistory
+                                                maintenanceInfo={service}
+                                                configId={configId}
+                                                buttonVariant="outline-secondary"
+                                            />
+                                            {/* Adding a span with horizontal padding */}
+                                            <span style={{width: '8px', display: 'inline-block'}}></span>
+                                            <DeleteMaintenanceHistory
+                                                maintenanceInfo={service}
+                                                configId={configId}
+                                                buttonVariant="outline-danger"
+                                            />
+                                        </td>
+                                    </tr>
+                                ))}
+                                </tbody>
+
+                            </Table>
+                        </Card.Body>
+                    </Card>
                 </Col>
             </Row>
         </Container>
@@ -159,6 +176,7 @@ function UpdateMaintenanceHistory(props) {
     const [show, setShow] = useState(false);
     const handleClose = () => setShow(false);
     const handleShow = () => setShow(true);
+    const [refreshData, setRefreshData] = useState(false);
 
     const typeText = useRef();
     const dateText = useRef();
@@ -274,14 +292,12 @@ function DeleteMaintenanceHistory(props) {
         const myHeaders = new Headers();
         myHeaders.append("Content-Type", "application/json");
         myHeaders.append("Authorization", "Bearer " + localStorage.getItem('token'));
-
         const raw = JSON.stringify({
             "type": props.maintenanceInfo.type,
             "date": props.maintenanceInfo.date,
             "maintenance": props.maintenanceInfo.maintenance,
             "cost": props.maintenanceInfo.cost
         });
-
         const reqOptions = {
             method: "DELETE",
             headers: myHeaders,
@@ -292,8 +308,8 @@ function DeleteMaintenanceHistory(props) {
         fetch(`/api/delete-maintenance-history?configId=${props.configId}`, reqOptions)
             .then((response) => response.text())
             .then((result) => {
-                setRefreshData(!refreshData);
-                window.location.reload();
+                console.log(result);
+                props.setRefreshData(!props.refreshData);
             })
             .catch((error) => console.error(error));
 
@@ -302,23 +318,23 @@ function DeleteMaintenanceHistory(props) {
 
     return (
         <>
-            <Button onClick={handleShow} variant={props.buttonVariant}>Remove</Button>
+            <Button onClick={handleShow} variant="outline-danger" >Remove</Button>
             <Modal show={show} onHide={handleClose}>
                 <Modal.Dialog>
                     <Modal.Header closeButton>
                         <Modal.Title>Are you sure you want to delete?</Modal.Title>
                     </Modal.Header>
                     <Modal.Body className={'text-justify-center'}>
-                        <Alert key={'danger'} variant={'danger'} className={'text-justify'}>Deletion is irreversible.</Alert>
+                        <Alert key={'danger'} variant={'danger'} className={'text-justify'}>Once an entry is deleted it cannot be restored.</Alert>
                     </Modal.Body>
                     <Modal.Footer className={'mx-auto'}>
-                        <Button variant="secondary" onClick={handleClose}>No, take me back.</Button>
-                        <Button variant="primary" onClick={handleDelete}>Yes, I am sure.</Button>
+                        <Button variant="secondary" onClick={handleClose}>No, take me back</Button>
+                        <Button variant="danger" onClick={handleDelete}>Delete Entry</Button>
                     </Modal.Footer>
                 </Modal.Dialog>
             </Modal>
         </>
-    );
+    )
 }
 
-export default VehicleHistory;
+export default VehicleHistory

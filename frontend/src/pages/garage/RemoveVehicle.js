@@ -39,18 +39,18 @@ function RemoveVehicle(props) {
 
     return (
         <>
-            <Button variant="outline-danger" onClick={handleShow}>Remove</Button>
+            <Button variant="secondary" onClick={handleShow}>Remove</Button>
             <Modal show={show} onHide={handleClose}>
                 <Modal.Dialog>
                     <Modal.Header closeButton>
                         <Modal.Title>Are you sure you want to delete?</Modal.Title>
                     </Modal.Header>
                     <Modal.Body className={'text-justify-center'}>
-                        <Alert key={'danger'} variant={'danger'} className={'text-justify'}>Deletion is irreversible.</Alert>
+                        <Alert key={'danger'} variant={'danger'} className={'text-justify'}>Removing this vehicle will also result in the loss of any maintenance history associated with it.</Alert>
                     </Modal.Body>
                     <Modal.Footer className={'mx-auto'}>
-                        <Button variant="secondary" onClick={handleClose}>No, take me back.</Button>
-                        <Button variant={"danger"} onClick={handleDelete}>Remove Vehicle.</Button>
+                        <Button variant="secondary" onClick={handleClose}>No, take me back</Button>
+                        <Button variant={"danger"} onClick={handleDelete}>Remove vehicle</Button>
                     </Modal.Footer>
                 </Modal.Dialog>
             </Modal>
