@@ -127,7 +127,7 @@ function VehicleHistory(props) {
                                     <th style={{
                                         width: '18%',
                                         textAlign: 'right',
-                                        background: 'transparent',
+                                        background: 'white',
                                         borderLeft: 'none',
                                         padding: 0
                                     }}></th>
