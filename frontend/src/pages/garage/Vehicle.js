@@ -141,7 +141,7 @@ function Vehicle(props) {
                     <Card.Title className={'d-flex justify-content-center'}>{v.configurations.year} {v.configurations.make} {v.configurations.model}</Card.Title>
                     <Card.Text className="d-flex justify-content-around">
                         <Link to={`/garage/vehicle-info/${v.configurations.config_id}`} state={{configId: v.configurations.config_id}}>
-                            <Button style={{ backgroundColor: '#6A91BF', borderColor: '#6A91BF' }}>View Info</Button>
+                            <Button style={{ backgroundColor: '#6A91BF', borderColor: '#6A91BF' }}>View/Edit Info</Button>
                         </Link>
                         <RemoveVehicle configId={v.configurations.config_id} />
                     </Card.Text>

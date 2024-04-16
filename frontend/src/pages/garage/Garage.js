@@ -66,7 +66,7 @@ function Garage(props) {
     }, [refreshData]);
 
     return (
-        <Container className="mt-1">
+        <Container className="mt-5">
             <Row className="mb-3">
                 <Col>
                     <h2 onClick={() => navigate('/garage')}
