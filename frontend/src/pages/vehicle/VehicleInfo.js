@@ -188,7 +188,7 @@ function VehicleInfo() {
                 <Col className="text-start">
                     <Button variant="primary"
                             onClick={() => navigate(`/garage/vehicle-history/${configId}`, {state: {configId}})}
-                            style={{ backgroundColor: '#8c7498', borderColor: '#8c7498' }}>
+                            style={{ backgroundColor: '#6A91BF', borderColor: '#8c7498' }}>
                         View Maintenance History
                     </Button>
                 </Col>
@@ -198,22 +198,28 @@ function VehicleInfo() {
                     <Card>
                         <Card.Header style={{backgroundColor: '#644A77', color: '#FFFFFF', fontSize: '1.25rem'}}>Vehicle
                             Specifications</Card.Header>
-                        <Card.Body className="text-left" style={{fontSize: '1.1rem'}}>
-                            {info ? (
-                                <>
-                                    <p><strong>Year:</strong> {info.message.year}</p>
-                                    <p><strong>Make:</strong> {info.message.make}</p>
-                                    <p><strong>Model:</strong> {info.message.model}</p>
-                                    <p><strong>Engine:</strong> {info.message.engine}</p>
-                                    <p><strong>Transmission:</strong> {info.message.transmission}</p>
-                                    <p><strong>Odometer:</strong> {odometer ? `${odometer} miles` : "0 miles"}</p>
-                                </>
-                            ) : "Loading vehicle specifications..."}
+                        <Card.Body className="text-left" style={{fontSize: '1.1rem', backgroundColor: '#C3C3C3'}}>
+                            <Form>
+                                <Form.Group>
+                                    <Form.Control className="mb-3 justify-content-center" as="textarea" rows="5" style={{resize: "none"}} disabled readOnly>
+                                        {info ? (
+                                            <>
+                                                <p><strong>Year:</strong> {info.message.year}</p>
+                                                <p><strong>Make:</strong> {info.message.make}</p>
+                                                <p><strong>Model:</strong> {info.message.model}</p>
+                                                <p><strong>Engine:</strong> {info.message.engine}</p>
+                                                <p><strong>Transmission:</strong> {info.message.transmission}</p>
+                                                <p><strong>Odometer:</strong> {odometer ? `${odometer} miles` : "0 miles"}</p>
+                                            </>
+                                        ) : "Loading vehicle specifications..."}
+                                    </Form.Control>
+                                </Form.Group>
+                            </Form>
                         </Card.Body>
                     </Card>
                     <Card className="mt-3">
                         <Card.Header style={{backgroundColor: '#644A77', color: '#FFFFFF', fontSize: '1.25rem'}}>Update Vehicle Odometer</Card.Header>
-                        <Card.Body>
+                        <Card.Body style={{backgroundColor: '#C3C3C3'}}>
                             <Form>
                                 <Form.Group as={Row} className="mb-3 justify-content-center">
                                     <Col sm="8">
@@ -228,7 +234,7 @@ function VehicleInfo() {
                                 </Form.Group>
                                 <div className="d-flex justify-content-center">
                                     <Button variant="primary" onClick={handleUpdateOdometer}
-                                            style={{ backgroundColor: '#8c7498', borderColor: '#8c7498' }}>
+                                            style={{ backgroundColor: '#A1CCA5', borderColor: '#8c7498', color: 'black' }}>
                                         Update Odometer
                                     </Button>
                                 </div>
@@ -239,7 +245,7 @@ function VehicleInfo() {
                 <Col md={7}>
                     <Card>
                         <Card.Header style={{backgroundColor: '#644A77', color: '#FFFFFF', fontSize: '1.25rem'}}>Upcoming Maintenance Procedures | Due at: {upcomingMaintenance ? upcomingMaintenance + ' miles' : 'Loading...'}</Card.Header>
-                        <Card.Body className="text-left" style={{fontSize: '1.1rem'}}>
+                        <Card.Body className="text-left" style={{fontSize: '1.1rem', backgroundColor: '#C3C3C3'}}>
                             <Table striped bordered hover size="sm">
                                 <thead>
                                 <tr>
@@ -247,7 +253,7 @@ function VehicleInfo() {
                                     <th>Part</th>
                                 </tr>
                                 </thead>
-                                <tbody>
+                                <tbody >
                                 {
                                     maintenance.length > 0 ? (
                                             maintenance.map((task, index) => (
