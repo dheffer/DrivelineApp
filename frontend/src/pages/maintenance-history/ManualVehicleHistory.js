@@ -49,7 +49,7 @@ function ManualVehicleHistory(props) {
 
     return (
         <>
-            <Button onClick={handleShow} style={{ backgroundColor: '#A1CCA5', borderColor: '#8c7498' }}>Add Maintenance History</Button>
+            <Button onClick={handleShow} style={{ backgroundColor: '#5E989C', borderColor: '#5E989C' }}>Add Maintenance History</Button>
             <Modal show={show} onHide={handleClose}>
                 <Modal.Dialog>
                     <Modal.Header closeButton>
@@ -106,7 +106,7 @@ function ManualVehicleHistory(props) {
                     </Modal.Body>
                     <Modal.Footer className={'mx-auto'}>
                         <Button variant="secondary" onClick={handleClose}>Close</Button>
-                        <Button variant="success" onClick={submit}>Upload</Button>
+                        <Button style={{backgroundColor: '#5E989C', borderColor: '#5E989C'}} onClick={submit}>Upload</Button>
                     </Modal.Footer>
                 </Modal.Dialog>
             </Modal>

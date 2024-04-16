@@ -152,7 +152,6 @@ function VehicleHistory(props) {
                                                 buttonVariant="outline-secondary"
                                                 style={{background: 'transparent'}}
                                             />
-                                            {/* Adding a span with horizontal padding */}
                                             <span style={{width: '8px', display: 'inline-block'}}></span>
                                             <DeleteMaintenanceHistory
                                                 maintenanceInfo={service}
@@ -276,7 +275,7 @@ function UpdateMaintenanceHistory(props) {
                     </Modal.Body>
                     <Modal.Footer className={'mx-auto'}>
                         <Button variant="secondary" onClick={handleClose}>Close</Button>
-                        <Button variant="success" onClick={submit}>Save changes</Button>
+                        <Button variant="success" onClick={submit} style={{ backgroundColor: '#5E989C', borderColor: '#5E989C' }}>Save changes</Button>
                     </Modal.Footer>
                 </Modal.Dialog>
             </Modal>

@@ -66,7 +66,7 @@ function Garage(props) {
     }, [refreshData]);
 
     return (
-        <Container className="mt-1">
+        <Container className="mt-5">
             <Row className="mb-3">
                 <Col>
                     <h2 onClick={() => navigate('/garage')}
@@ -77,7 +77,7 @@ function Garage(props) {
             </Row>
             <Row className="mb-3">
                 <Col className="text-start">
-                    <Link to="/garage/add" className="btn btn-primary" style={{ backgroundColor: '#8c7498', borderColor: '#8c7498' }}>
+                    <Link to="/garage/add" className="btn btn-primary" style={{ backgroundColor: '#5E989C', borderColor: '#5E989C' }}>
                         Add New Vehicle
                     </Link>
                 </Col>
