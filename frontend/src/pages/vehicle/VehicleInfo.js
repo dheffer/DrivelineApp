@@ -1,6 +1,6 @@
 import {Routes, Route, useLocation, useNavigate, Link} from "react-router-dom";
 import VehicleNavbar from "./VehicleNavbar";
-import {Badge, Card, Col, Row, Button, Container, Table, Form} from "react-bootstrap";
+import {Badge, Card, Col, Row, Button, Container, Table, Form, Alert} from "react-bootstrap";
 import React, {useEffect, useState} from "react";
 
 function VehicleInfo() {
@@ -15,7 +15,10 @@ function VehicleInfo() {
 
     const [upcomingMaintenance, setUpcomingMaintenance] = useState(null);
     const [odometer, setOdometer] = useState(0);
+
     const [newOdometerValue, setNewOdometerValue] = useState(0);
+    const [maintenanceLoading, setMaintenanceLoading] = useState(true);
+
 
 
     const [user, setUser] = useState("Loading...");
@@ -59,50 +62,51 @@ function VehicleInfo() {
             method: 'GET',
             headers: myHeaders,
             redirect: 'follow'
-        }
+        };
+
         fetch('/api/get-vehicle-info?config_id=' + configId, reqOptions)
-            .then(async (res) => {
+            .then(res => {
                 if (!res.ok) {
                     throw new Error('Network response was not ok');
                 }
-                console.log(res);
                 return res.json();
             })
-            .then(async (vehicle) => {
+            .then(vehicle => {
                 setInfo(vehicle);
                 return fetch("/api/get-user-vehicle-odometers", reqOptions);
             })
-            .then(async (odometerResponse) => {
+            .then(odometerResponse => {
                 if (!odometerResponse.ok) {
                     throw new Error('Network response was not ok');
                 }
                 return odometerResponse.json();
             })
-            .then(async (odometerData) => {
-                const currentOdometer = odometerData.find( reading => reading.config_id === configId).odometer;
+            .then(odometerData => {
+                const currentOdometer = odometerData.find(reading => reading.config_id === configId).odometer;
                 setOdometer(currentOdometer);
                 return fetch(`/api/get-maintenance?config_id=${configId}&odometer=${currentOdometer}`, reqOptions);
             })
-            .then(async (maintenanceResponse) => {
-                if (!maintenanceResponse.ok) {
-                    throw new Error('Network response was not ok');
+            .then(maintenanceResponse => maintenanceResponse.json())
+            .then(maintenanceData => {
+                if (maintenanceData.message) {
+                    setMaintenance([]);
+                    setMaintenanceLoading(false)
+                    setUpcomingMaintenance(null)
+                    throw new Error(maintenanceData.message);
                 }
-                return maintenanceResponse.json();
-            })
-            .then(async (maintenanceData) => {
-                setMaintenance(maintenanceData.message.tasks);
+                setMaintenance(maintenanceData.tasks);
+                setUpcomingMaintenance(maintenanceData.service_schedule_mileage);
                 setLoading(false);
-                setUpcomingMaintenance(maintenanceData.message.service_schedule_mileage)
-                console.log("Maintenance: " + maintenance)
-                console.log("Maintenance STRING: " + JSON.stringify(maintenance))
-                console.log("Maintenance msg: " + JSON.stringify(maintenance.message))
-
+                setMaintenanceLoading(false);
             })
-            .catch( (error) => {
-                console.error('There has been a problem with your fetch operation:', error);
+            .catch(error => {
+                console.error('There has been a problem with your fetch operation:', error.message);
+                setMaintenanceLoading(false);
+                setMaintenance([]);
             });
-        fetchReadings();
-    }, [configId, refreshData]);
+
+    }, []);
+
 
     const fetchReadings = async () => {
         const myHeaders = new Headers();
@@ -118,7 +122,6 @@ function VehicleInfo() {
             const response = await fetch("/api/get-user-vehicle-odometers", reqOptions);
             if(response.ok){
                 const data = await response.json();
-                console.log("READINGS "+ JSON.stringify(data));
                 setNewOdometerValue(data);
             }
             else{
@@ -131,15 +134,10 @@ function VehicleInfo() {
     }
 
     const handleUpdateOdometer = () => {
-        console.log("Updating odometer");
-        console.log(configId+ "= config");
-        console.log(newOdometerValue+ "= odometer");
 
         const myHeaders = new Headers();
         myHeaders.append("Authorization", "Bearer " + localStorage.getItem('token'));
         myHeaders.append("Content-Type", "application/json");
-
-        console.log("ODOMETER EMAIL: "+email);
 
         const reqOptions = {
             method: 'POST',
@@ -161,7 +159,6 @@ function VehicleInfo() {
                 return res.json();
             })
             .then(data => {
-                console.log("Odometer Updated! "+data);
                 fetchReadings();
                 setNewOdometerValue(0);
                 setRefreshData(!refreshData);
@@ -238,35 +235,39 @@ function VehicleInfo() {
                 </Col>
                 <Col md={7}>
                     <Card>
-                        <Card.Header style={{backgroundColor: '#644A77', color: '#FFFFFF', fontSize: '1.25rem'}}>Upcoming Maintenance Procedures | Due at: {upcomingMaintenance ? upcomingMaintenance + ' miles' : 'Loading...'}</Card.Header>
-                        <Card.Body className="text-left" style={{fontSize: '1.1rem'}}>
-                            <Table striped bordered hover size="sm">
-                                <thead>
-                                <tr>
-                                    <th>Action</th>
-                                    <th>Part</th>
-                                </tr>
-                                </thead>
-                                <tbody>
-                                {
+                        <Card.Header style={{ backgroundColor: '#644A77', color: '#FFFFFF', fontSize: '1.25rem' }}>
+                            Upcoming Maintenance Procedures | Due at: {upcomingMaintenance !== null ? upcomingMaintenance + ' miles' : 'No upcoming maintenance'}
+                        </Card.Header>
+                            <Card.Body className="text-left" style={{ fontSize: '1.1rem' }}>
+                                {maintenanceLoading ? (
+                                    <Alert variant="info" className="text-center">
+                                        Loading maintenance data...
+                                    </Alert>
+                                ) : (
                                     maintenance.length > 0 ? (
-                                            maintenance.map((task, index) => (
+                                        <Table striped bordered hover size="sm">
+                                            <thead>
+                                            <tr>
+                                                <th>Action</th>
+                                                <th>Part</th>
+                                            </tr>
+                                            </thead>
+                                            <tbody>
+                                            {maintenance.map((task, index) => (
                                                 <tr key={index}>
                                                     <td>{task.action ? task.action : 'Loading...'}</td>
                                                     <td>{task.part}</td>
                                                 </tr>
-                                            ))
-                                        ) :
-                                        <>
-                                            <tr>
-                                                <td>Loading...</td>
-                                                <td>Loading...</td>
-                                            </tr>
-                                        </>
-                                }
-                                </tbody>
-                            </Table>
-                        </Card.Body>
+                                            ))}
+                                            </tbody>
+                                        </Table>
+                                    ) : (
+                                        <Alert variant="info" className="text-center">
+                                            There is no maintenance data available.
+                                        </Alert>
+                                    )
+                                )}
+                            </Card.Body>
                     </Card>
                 </Col>
             </Row>
