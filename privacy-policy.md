@@ -1,7 +1,7 @@
 Privacy Policy:
 
 1. Information We Collect:
-   - Personal Information: We collect only your full name and email address to create your account.
+   - Personal Information: We collect your full name and email address to create your account.
    - Maintenance Data: You may choose to upload maintenance information about your vehicles to our platform. This may include service records, repair history, and scheduled maintenance tasks.
    - Usage Information: We may collect information about how you interact with our website, including your IP address, browser type, pages visited, and timestamps.
 
@@ -13,7 +13,7 @@ Privacy Policy:
 3. Data Sharing:
    - Third-Party Service Providers: We may share your information with third-party service providers who assist us in operating our website, conducting business, or servicing you, as long as those parties agree to keep this information confidential.
    - Legal Compliance: We may disclose your information as required by law or in response to valid legal requests, such as subpoenas or court orders.
-   - Consent: We will not share your personal information with third parties for marketing purposes without your explicit consent.
+   - Consent: We will not share your personal information with third parties for marketing purposes.
 
 4. Data Security:
    - We use OAuth instead of storing login credentials on our servers. The only user information we store is the Personal Information mentioned in Section 1.

@@ -147,10 +147,6 @@ function Vehicle(props) {
                     </Card.Text>
                     <Card.Footer className="d-flex justify-content-around">
                         <div className="d-flex flex-column align-items-center">
-                            <Badge bg='secondary'>CONFIG ID</Badge>
-                            <div>{v.configurations.config_id}</div>
-                        </div>
-                        <div className="d-flex flex-column align-items-center">
                             <Badge bg='secondary'>ODOMETER</Badge>
                             <div>{getOdometer(v.configurations.config_id)}</div>
                         </div>

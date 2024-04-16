@@ -47,11 +47,12 @@ function NavBar() {
                 </Nav>
                 <Nav className="ms-auto">
                     <Nav.Link style={{ color: 'white' }}>
-                        <Settings greeting={user ? user : 'Sign in'} />
+                        <Settings greeting={user ? user : ' '} />
                     </Nav.Link>
                 </Nav>
             </Container>
         </Navbar>
     );
 }
-    export default NavBar;
+
+export default NavBar;
