@@ -188,7 +188,7 @@ function VehicleInfo() {
                 <Col className="text-start">
                     <Button variant="primary"
                             onClick={() => navigate(`/garage/vehicle-history/${configId}`, {state: {configId}})}
-                            style={{ backgroundColor: '#8c7498', borderColor: '#8c7498' }}>
+                            style={{ backgroundColor: '#6A91BF', borderColor: '#6A91BF' }}>
                         View Maintenance History
                     </Button>
                 </Col>
@@ -228,7 +228,7 @@ function VehicleInfo() {
                                 </Form.Group>
                                 <div className="d-flex justify-content-center">
                                     <Button variant="primary" onClick={handleUpdateOdometer}
-                                            style={{ backgroundColor: '#8c7498', borderColor: '#8c7498' }}>
+                                            style={{ backgroundColor: '#5E989C', borderColor: '#5E989C' }}>
                                         Update Odometer
                                     </Button>
                                 </div>

@@ -39,7 +39,7 @@ function RemoveVehicle(props) {
 
     return (
         <>
-            <Button variant="secondary" onClick={handleShow}>Remove</Button>
+            <Button variant="danger" onClick={handleShow}>Remove</Button>
             <Modal show={show} onHide={handleClose}>
                 <Modal.Dialog>
                     <Modal.Header closeButton>

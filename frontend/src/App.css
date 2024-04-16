@@ -32,6 +32,16 @@ p {
   box-shadow: 0 2px 5px rgba(0, 0, 0, 0.15);
 }
 
+.custom-outline-button {
+  background-color: transparent;
+  color: #8c7498;
+  border: 1px solid #8c7498;
+}
+.custom-outline-button:hover {
+  background-color: #8c7498;
+  color: white;
+}
+
 .form-control {
   border: 1px solid #ccc;
   border-radius: 5px;

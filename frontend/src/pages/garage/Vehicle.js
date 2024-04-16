@@ -134,14 +134,14 @@ function Vehicle(props) {
             <Card style={{width: '22rem'}} id={v.configurations.year+v.configurations.make+v.configurations.model}>
                 <Card.Img variant="top"
                           src={getPicture(v.configurations.config_id) || "https://cdn.dealerk.it/cars/placeholder/placeholder-800.png"}
-                          style={{ height: '200px', width: '100%', objectFit: 'cover' }}
+                          style={{ height: '200px', width: '100%', objectFit: 'cover', cursor: 'pointer' }}
                           onClick={handleShowModal}
                 />
-                <Card.Body>
+                <Card.Body style={{backgroundColor: 'f0f0f0'}}>
                     <Card.Title className={'d-flex justify-content-center'}>{v.configurations.year} {v.configurations.make} {v.configurations.model}</Card.Title>
                     <Card.Text className="d-flex justify-content-around">
                         <Link to={`/garage/vehicle-info/${v.configurations.config_id}`} state={{configId: v.configurations.config_id}}>
-                            <Button style={{ backgroundColor: '#8c7498', borderColor: '#8c7498' }}>View Info</Button>
+                            <Button style={{ backgroundColor: '#6A91BF', borderColor: '#6A91BF' }}>View Info</Button>
                         </Link>
                         <RemoveVehicle configId={v.configurations.config_id} />
                     </Card.Text>
