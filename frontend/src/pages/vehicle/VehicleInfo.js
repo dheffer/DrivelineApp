@@ -102,7 +102,7 @@ function VehicleInfo() {
                 console.error('There has been a problem with your fetch operation:', error);
             });
         fetchReadings();
-    }, []);
+    }, [configId, refreshData]);
 
     const fetchReadings = async () => {
         const myHeaders = new Headers();
