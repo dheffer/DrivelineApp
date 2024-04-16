@@ -49,7 +49,7 @@ function ManualVehicleHistory(props) {
 
     return (
         <>
-            <Button onClick={handleShow} style={{ backgroundColor: '#8c7498', borderColor: '#8c7498' }}>Add Maintenance History</Button>
+            <Button onClick={handleShow} style={{ backgroundColor: '#A1CCA5', borderColor: '#8c7498' }}>Add Maintenance History</Button>
             <Modal show={show} onHide={handleClose}>
                 <Modal.Dialog>
                     <Modal.Header closeButton>
