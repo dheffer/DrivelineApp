@@ -252,7 +252,7 @@ function AddVehicle() {
 
                         <div className="text-center mt-4">
                             <Button
-                                style={{backgroundColor: '#644A77', borderColor: '#644A77'}}
+                                style={{backgroundColor: '#5E989C', borderColor: '#5E989C'}}
                                 onClick={handleSelectAndAddVehicle}
                                 disabled={!selectedVehicle.transmission || vehicleAdded}>
                                 Add Vehicle

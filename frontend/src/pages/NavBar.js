@@ -36,18 +36,18 @@ function NavBar() {
         fetchUser();
     }, []);
     return (
-        <Navbar expand="lg" className="bg-body-tertiary navbar-bottom-margin" sticky="top">
+        <Navbar expand="lg" style={{ backgroundColor: '#a8c1f0' }} sticky="top">
             <Container>
-                <Navbar.Brand href="/garage" className="d-flex justify-content-start">
-                    <span className="drive" style={{ display: 'flex', alignItems: 'flex-start'}}>Drive</span><span className="line" style={{ display: 'flex', alignItems: 'flex-start'}}>line</span>
+                <Navbar.Brand href="/garage" className="d-flex justify-content-start" style={{ color: 'white' }}>
+                    <span className="drive" style={{ display: 'flex', alignItems: 'flex-start'}}>Drive</span>
+                    <span className="line" style={{ display: 'flex', alignItems: 'flex-start'}}>line</span>
                 </Navbar.Brand>
                 <Nav className="me-auto">
-                    <Nav.Link href="/garage" style={{marginTop: "7px"}}>Garage</Nav.Link>
+                    <Nav.Link href="/garage" style={{ color: 'white', marginTop: "7px" }}>Garage</Nav.Link>
                 </Nav>
                 <Nav className="ms-auto">
-                    <Nav.Link>
-                        <Settings greeting={user ? user : 'Sign in'} />
-
+                    <Nav.Link style={{ color: 'white' }}>
+                        <Settings greeting={user ? user : ' '} />
                     </Nav.Link>
                 </Nav>
             </Container>

@@ -53,8 +53,9 @@ function VehicleHistory(props) {
             headers: myHeaders,
             redirect: 'follow'
         };
-        fetch(`/api/get-vehicle-info?configId=${configId}`, reqOptions)
+        fetch(`/api/get-vehicle-info?config_id=${configId}`, reqOptions)
             .then((res) => {
+                console.log('RES ' + res);
                 if (!res.ok) {
                     throw new Error('Network response was not ok');
                 }
@@ -66,21 +67,21 @@ function VehicleHistory(props) {
             .catch((error) => {
                 console.error('There has been a problem with your fetch operation:', error);
             });
-        fetch(`/api/get-vehicle-history?configId=${configId}`, reqOptions)
+        fetch(`/api/get-vehicle-history?config_id=${configId}`, reqOptions)
             .then((res) => {
                 if (!res.ok) {
                     throw new Error('Network response was not ok');
                 }
                 return res.json();
             })
-            .then((maintenanceData) => {
-                setMaintenance(maintenanceData[0]);
+            .then((maintenance) => {
+                setMaintenance(maintenance[0]);
                 setLoading(false);
             })
             .catch((error) => {
                 console.error('There has been a problem with your fetch operation:', error);
             });
-    }, [refreshData]);
+    }, []);
 
     return (
         <Container className="mt-5">
@@ -95,7 +96,7 @@ function VehicleHistory(props) {
                         {vehicleInfo ? (
                             <span onClick={() => navigate(`/garage/vehicle-info/${configId}`, {state: {configId}})}
                                   style={{ cursor: 'pointer', color: '#644A77', fontWeight: 'bold' }}>
-                                {vehicleInfo.year} {vehicleInfo.make} {vehicleInfo.model}
+                                {vehicleInfo.message.year} {vehicleInfo.message.make} {vehicleInfo.message.model}
                             </span>
                         ) : (
                             <span style={{ color: '#644A77', fontWeight: 'normal' }}> Loading Vehicle Info...</span>
@@ -115,7 +116,7 @@ function VehicleHistory(props) {
                         <Card.Header style={{ backgroundColor: '#644A77', color: '#FFFFFF', fontSize: '1.25rem' }}>
                             Detailed Maintenance Records
                         </Card.Header>
-                        <Card.Body>
+                        <Card.Body style={{backgroundColor: '#C3C3C3'}}>
                             <Table striped bordered hover size="sm">
                                 <thead>
                                 <tr>
@@ -126,7 +127,7 @@ function VehicleHistory(props) {
                                     <th style={{
                                         width: '18%',
                                         textAlign: 'right',
-                                        background: 'transparent',
+                                        background: 'white',
                                         borderLeft: 'none',
                                         padding: 0
                                     }}></th>
@@ -141,7 +142,7 @@ function VehicleHistory(props) {
                                         <td style={{borderRight: 'none'}}>{service.date}</td>
                                         <td style={{
                                             textAlign: 'right',
-                                            background: 'transparent',
+                                            background: 'white',
                                             borderLeft: 'none',
                                             padding: 0
                                         }}>
@@ -149,13 +150,14 @@ function VehicleHistory(props) {
                                                 maintenanceInfo={service}
                                                 configId={configId}
                                                 buttonVariant="outline-secondary"
+                                                style={{background: 'transparent'}}
                                             />
-                                            {/* Adding a span with horizontal padding */}
                                             <span style={{width: '8px', display: 'inline-block'}}></span>
                                             <DeleteMaintenanceHistory
                                                 maintenanceInfo={service}
                                                 configId={configId}
                                                 buttonVariant="outline-danger"
+                                                style={{background: 'transparent'}}
                                             />
                                         </td>
                                     </tr>
@@ -203,7 +205,7 @@ function UpdateMaintenanceHistory(props) {
             redirect: 'follow'
         };
 
-        fetch(`/api/update-maintenance-history?configId=${props.configId}`, reqOptions)
+        fetch(`/api/update-maintenance-history?config_id=${props.configId}`, reqOptions)
             .then((res) => res.json())
             .then((result) => {
                 console.log(result);
@@ -273,7 +275,7 @@ function UpdateMaintenanceHistory(props) {
                     </Modal.Body>
                     <Modal.Footer className={'mx-auto'}>
                         <Button variant="secondary" onClick={handleClose}>Close</Button>
-                        <Button variant="success" onClick={submit}>Save changes</Button>
+                        <Button variant="success" onClick={submit} style={{ backgroundColor: '#5E989C', borderColor: '#5E989C' }}>Save changes</Button>
                     </Modal.Footer>
                 </Modal.Dialog>
             </Modal>
@@ -304,11 +306,10 @@ function DeleteMaintenanceHistory(props) {
             redirect: "follow"
         };
 
-        fetch(`/api/delete-maintenance-history?configId=${props.configId}`, reqOptions)
+        fetch(`/api/delete-maintenance-history?config_id=${props.configId}`, reqOptions)
             .then((response) => response.text())
             .then((result) => {
-                console.log(result);
-                props.setRefreshData(!props.refreshData);
+                window.location.reload();
             })
             .catch((error) => console.error(error));
 

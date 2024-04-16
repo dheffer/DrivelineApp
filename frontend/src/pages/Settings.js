@@ -34,7 +34,7 @@ export const Settings = (props) => {
                         {props.greeting}
                     </Col>
                     <Col>
-                        <GearFill className=".pe-2" />
+                        { props.greeting === ' ' ? <></> : <GearFill className=".pe-2" />}
                     </Col>
                 </Row>
             </Nav.Link>

@@ -118,7 +118,6 @@ function VehicleInfo() {
             const response = await fetch("/api/get-user-vehicle-odometers", reqOptions);
             if(response.ok){
                 const data = await response.json();
-                console.log("READINGS "+ JSON.stringify(data));
                 setNewOdometerValue(data);
             }
             else{
@@ -188,7 +187,7 @@ function VehicleInfo() {
                 <Col className="text-start">
                     <Button variant="primary"
                             onClick={() => navigate(`/garage/vehicle-history/${configId}`, {state: {configId}})}
-                            style={{ backgroundColor: '#8c7498', borderColor: '#8c7498' }}>
+                            style={{ backgroundColor: '#6A91BF', borderColor: '#6A91BF' }}>
                         View Maintenance History
                     </Button>
                 </Col>
@@ -198,7 +197,7 @@ function VehicleInfo() {
                     <Card>
                         <Card.Header style={{backgroundColor: '#644A77', color: '#FFFFFF', fontSize: '1.25rem'}}>Vehicle
                             Specifications</Card.Header>
-                        <Card.Body className="text-left" style={{fontSize: '1.1rem'}}>
+                        <Card.Body className="text-left" style={{fontSize: '1.1rem', backgroundColor: '#C3C3C3'}}>
                             {info ? (
                                 <>
                                     <p><strong>Year:</strong> {info.message.year}</p>
@@ -213,7 +212,7 @@ function VehicleInfo() {
                     </Card>
                     <Card className="mt-3">
                         <Card.Header style={{backgroundColor: '#644A77', color: '#FFFFFF', fontSize: '1.25rem'}}>Update Vehicle Odometer</Card.Header>
-                        <Card.Body>
+                        <Card.Body style={{backgroundColor: '#C3C3C3'}}>
                             <Form>
                                 <Form.Group as={Row} className="mb-3 justify-content-center">
                                     <Col sm="8">
@@ -228,7 +227,7 @@ function VehicleInfo() {
                                 </Form.Group>
                                 <div className="d-flex justify-content-center">
                                     <Button variant="primary" onClick={handleUpdateOdometer}
-                                            style={{ backgroundColor: '#8c7498', borderColor: '#8c7498' }}>
+                                            style={{ backgroundColor: '#5E989C', borderColor: '#5E989C', color: 'White' }}>
                                         Update Odometer
                                     </Button>
                                 </div>
@@ -239,7 +238,7 @@ function VehicleInfo() {
                 <Col md={7}>
                     <Card>
                         <Card.Header style={{backgroundColor: '#644A77', color: '#FFFFFF', fontSize: '1.25rem'}}>Upcoming Maintenance Procedures | Due at: {upcomingMaintenance ? upcomingMaintenance + ' miles' : 'Loading...'}</Card.Header>
-                        <Card.Body className="text-left" style={{fontSize: '1.1rem'}}>
+                        <Card.Body className="text-left" style={{fontSize: '1.1rem', backgroundColor: '#C3C3C3'}}>
                             <Table striped bordered hover size="sm">
                                 <thead>
                                 <tr>
@@ -247,7 +246,7 @@ function VehicleInfo() {
                                     <th>Part</th>
                                 </tr>
                                 </thead>
-                                <tbody>
+                                <tbody >
                                 {
                                     maintenance.length > 0 ? (
                                             maintenance.map((task, index) => (
