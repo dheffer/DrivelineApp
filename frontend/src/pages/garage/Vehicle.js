@@ -141,15 +141,11 @@ function Vehicle(props) {
                     <Card.Title className={'d-flex justify-content-center'}>{v.configurations.year} {v.configurations.make} {v.configurations.model}</Card.Title>
                     <Card.Text className="d-flex justify-content-around">
                         <Link to={`/garage/vehicle-info/${v.configurations.config_id}`} state={{configId: v.configurations.config_id}}>
-                            <Button style={{ backgroundColor: '#8c7498', borderColor: '#8c7498' }}>View Info</Button>
+                            <Button style={{ backgroundColor: '#8c7498', borderColor: '#8c7498' }}>View/Edit Info</Button>
                         </Link>
                         <RemoveVehicle configId={v.configurations.config_id} />
                     </Card.Text>
                     <Card.Footer className="d-flex justify-content-around">
-                        <div className="d-flex flex-column align-items-center">
-                            <Badge bg='secondary'>CONFIG ID</Badge>
-                            <div>{v.configurations.config_id}</div>
-                        </div>
                         <div className="d-flex flex-column align-items-center">
                             <Badge bg='secondary'>ODOMETER</Badge>
                             <div>{getOdometer(v.configurations.config_id)}</div>
