@@ -116,7 +116,7 @@ function VehicleHistory(props) {
                         <Card.Header style={{ backgroundColor: '#644A77', color: '#FFFFFF', fontSize: '1.25rem' }}>
                             Detailed Maintenance Records
                         </Card.Header>
-                        <Card.Body>
+                        <Card.Body style={{backgroundColor: '#C3C3C3'}}>
                             <Table striped bordered hover size="sm">
                                 <thead>
                                 <tr>
@@ -142,7 +142,7 @@ function VehicleHistory(props) {
                                         <td style={{borderRight: 'none'}}>{service.date}</td>
                                         <td style={{
                                             textAlign: 'right',
-                                            background: 'transparent',
+                                            background: 'white',
                                             borderLeft: 'none',
                                             padding: 0
                                         }}>
@@ -150,6 +150,7 @@ function VehicleHistory(props) {
                                                 maintenanceInfo={service}
                                                 configId={configId}
                                                 buttonVariant="outline-secondary"
+                                                style={{background: 'transparent'}}
                                             />
                                             {/* Adding a span with horizontal padding */}
                                             <span style={{width: '8px', display: 'inline-block'}}></span>
@@ -157,6 +158,7 @@ function VehicleHistory(props) {
                                                 maintenanceInfo={service}
                                                 configId={configId}
                                                 buttonVariant="outline-danger"
+                                                style={{background: 'transparent'}}
                                             />
                                         </td>
                                     </tr>
